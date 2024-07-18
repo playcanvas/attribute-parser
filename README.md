@@ -55,6 +55,20 @@ and turns it into this...
 
 It takes the JSDocs and values and outputs the metadata in a serializable format.
 
+### Usage 
+
+```javascript
+// Initialise the parser
+const parser = new JSDocParser();
+await parser.init();
+
+// fetch your program source {[filename: string, contents: string][]}
+const scripts = await fetchScripts([...paths, './playcanvas.d.ts']);
+
+// Parse the program, starting from the first path
+const [attribute, errors] parser.parseAttributes(paths[0], scripts);
+```
+
 ### Attribute structure
 
 You can learn more about the special tags [available here ](https://github.com/playcanvas/attribute-parser/tree/main/test/fixtures)
