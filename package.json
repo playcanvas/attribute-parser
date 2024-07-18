@@ -1,0 +1,9 @@
+{
+  "name": "jsdoc-parser",
+  "type": "module",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "version": "0.0.1"
+}
