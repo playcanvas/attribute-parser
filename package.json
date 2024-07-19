@@ -17,5 +17,8 @@
   },
   "scripts": {
     "test": "mocha test/**/*.test.js --timeout 10000"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
