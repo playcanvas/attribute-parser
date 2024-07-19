@@ -40,12 +40,14 @@ export async function parseAttributes(...paths) {
     const parser = new JSDocParser();
     await parser.init();
     const scriptContents = await fetchScripts([...paths, './playcanvas.d.ts']);
-    return parser.parseAttributes(paths[0], scriptContents);
+    parser.updateProgram(scriptContents);
+    return parser.parseAttributes(paths[0]);
 }
 
 export async function getAttributes(...paths) {
     const parser = new JSDocParser();
     await parser.init();
     const scriptContents = await fetchScripts([...paths, './playcanvas.d.ts']);
-    return parser.getAttributes(paths[0], scriptContents);
+    parser.updateProgram(scriptContents);
+    return parser.getAttributes(paths[0]);
 }

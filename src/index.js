@@ -26,6 +26,12 @@ export class JSDocParser {
      */
     _env;
 
+    /**
+     * An internal array of program errors
+     * @private
+     */
+    _errors = [];
+
     async init(basePath = '') {
         if (this._env) {
             return;
@@ -50,9 +56,8 @@ export class JSDocParser {
      * @param {string[]} removedFiles - An array of file paths that should be removed from the program
      * @returns {{ parser: ScriptParser, program: ts.Program,
      * errors: import('./parsers/script-parser.js').ValidationError[]}} - The extracted attributes
-     * @private
      */
-    _updateProgram(newFiles = [], removedFiles = []) {
+    updateProgram(newFiles = [], removedFiles = []) {
         const errors = [];
 
         // Add custom files to the map
@@ -70,98 +75,72 @@ export class JSDocParser {
         });
 
 
-        const parser = new ScriptParser(this._env);
-        const program = this._env.languageService.getProgram();
+        this.parser = new ScriptParser(this._env);
+        this.program = this._env.languageService.getProgram();
 
         // Check for compiler errors
-        parser.validateProgram(errors);
+        this.parser.validateProgram(errors);
 
-        return {
-            parser,
-            program,
-            errors
-        };
+        this._errors = errors;
+
+        return errors;
     }
 
     /**
-     * Determines if a module contains a script that inherits from `pc.Script`
-     * @param {[string, string][]} files - An array of {[path]: [content]} pairs which represent the files in the program
-     * @returns 
+     * Returns all the valid ESM Scripts within a file
+     * @param fileName - The file name in the program to check
+     * @returns {import('typescript').Node[]} - An array of any exported ESM Script nodes within the file
      */
-    exportsEsmScript(files) {
+    getAllEsmScripts(fileName) {
 
-        const [fileName] = files;
-        
-        const { program, errors } = this._updateProgram(files);
-        if (errors.length) {
-            return false;
-        }
-
-        const typeChecker = program.getTypeChecker();
+        const typeChecker = this.program.getTypeChecker();
 
         // Find the Script class in the PlayCanvas namespace
-        const pcTypes = program.getSourceFile('/playcanvas.d.ts');
+        const pcTypes = this.program.getSourceFile('/playcanvas.d.ts');
 
-
-        if (!sourceFile) {
+        if (!pcTypes) {
             throw new Error(`PlayCanvas Types must be supplied`);
         }
-
-        const esmScriptClass = pcTypes.statements.find(node => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script')?.symbol;
-
+        
         // Parse the source file and pc types
-        const sourceFile = program.getSourceFile(fileName);
-
+        const sourceFile = this.program.getSourceFile(fileName);
+        
         if (!sourceFile) {
             throw new Error(`Source file ${fileName} not found`);
         }
-
+        
         // Extract all exported nodes
-        const nodes = getExportedNodes(program, sourceFile);
+        const nodes = getExportedNodes(this.program, sourceFile);
+
+        const esmScriptClass = pcTypes.statements.find(node => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script')?.symbol;
 
         // Check if the file exports a class that inherits from `Script`
-        return nodes.some(node => isAliasedClassDeclaration(node, typeChecker) && inheritsFrom(node, typeChecker, esmScriptClass));
+        return Array.from(nodes).filter(node => isAliasedClassDeclaration(node, typeChecker) && inheritsFrom(node, typeChecker, esmScriptClass));
 
     }
 
     /**
      * Analyzes the specified TypeScript file and extracts metadata from JSDoc comments.
      *
-     * @param {string} fileName - The name of the file to run
-     * @param {[string, string][]} newFiles - An array of {[path]: [content]} which represent the files in the program
-     * @param {string[]} removedFiles - An array of file paths that should be removed from the program
+     * @param {string} fileName - The name of the file in the program to run
      * @returns {[results: object, errors: import('./parsers/script-parser.js').ValidationError[]]} - The extracted attributes
      */
-    parseAttributes(fileName, newFiles = [], removedFiles = []) {
+    parseAttributes(fileName) {
         const results = {};
+        const errors = [...this._errors];
 
-        const { parser, program, errors } = this._updateProgram(newFiles, removedFiles);
-        if (errors.length) {
+        if(errors.length > 0 ){
             return [results, errors];
         }
 
-        const typeChecker = program.getTypeChecker();
-
-        // Find the Script class in the PlayCanvas namespace
-        const pcTypes = program.getSourceFile('/playcanvas.d.ts');
-        const esmScriptClass = pcTypes.statements.find(node => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script')?.symbol;
-
-        // Parse the source file and pc types
-        const sourceFile = program.getSourceFile(fileName);
-
-        if (!sourceFile) {
-            throw new Error(`Source file ${fileName} not found`);
-        }
-
         // Extract all exported nodes
-        const nodes = getExportedNodes(program, sourceFile);
+        const nodes = this.getAllEsmScripts(fileName);
 
         // Extract attributes from each script
         nodes.forEach((node) => {
-            if (!isAliasedClassDeclaration(node, typeChecker) || !inheritsFrom(node, typeChecker, esmScriptClass)) return;
             const name = toLowerCamelCase(node.name.text);
             const opts = results[name] = { attributes: {}, errors: [] };
-            parser.extractAttributes(node, opts);
+            this.parser.extractAttributes(node, opts);
         });
 
         return [results, errors];
@@ -170,26 +149,24 @@ export class JSDocParser {
     /**
      * Analyzes the specified TypeScript file and extracts metadata from JSDoc comments.
      * @param {string} fileName - The name of the file to run
-     * @param {[string, string][]} newFiles - An array of {[path]: [content]} which represent the files in the program
-     * @param {string[]} removedFiles - An array of file paths for files that should be removed from the program
      * @returns {[results: object, errors: import('./parsers/script-parser.js').ValidationError[]]} - The extracted attributes
      */
-    getAttributes(fileName, newFiles = [], removedFiles = []) {
+    getAttributes(fileName) {
         const results = {};
+        const errors = [...this._errors];
 
-        const { program, errors } = this._updateProgram(newFiles, removedFiles);
-        if (errors.length) {
+        if(errors.length > 0 ){
             return [results, errors];
         }
 
-        const typeChecker = program.getTypeChecker();
+        const typeChecker = this.program.getTypeChecker();
 
         // Find the Script class in the PlayCanvas namespace
-        const pcTypes = program.getSourceFile('/playcanvas.d.ts');
+        const pcTypes = this.program.getSourceFile('/playcanvas.d.ts');
         const esmScriptClass = pcTypes.statements.find(node => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script')?.symbol;
 
         // Parse the source file and pc types
-        const sourceFile = program.getSourceFile(fileName);
+        const sourceFile = this.program.getSourceFile(fileName);
 
         if (!sourceFile) {
             throw new Error(`Source file ${fileName} not found`);
