@@ -1,5 +1,5 @@
 {
-  "name": "jsdoc-parser",
+  "name": "@playcanvas/attribute-parser",
   "type": "module",
   "main": "src/index.js",
   "engines": {
