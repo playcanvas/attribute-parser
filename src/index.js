@@ -84,6 +84,47 @@ export class JSDocParser {
     }
 
     /**
+     * Determines if a module contains a script that inherits from `pc.Script`
+     * @param {[string, string][]} files - An array of {[path]: [content]} pairs which represent the files in the program
+     * @returns 
+     */
+    exportsEsmScript(files) {
+
+        const [fileName] = files;
+        
+        const { program, errors } = this._updateProgram(files);
+        if (errors.length) {
+            return false;
+        }
+
+        const typeChecker = program.getTypeChecker();
+
+        // Find the Script class in the PlayCanvas namespace
+        const pcTypes = program.getSourceFile('/playcanvas.d.ts');
+
+
+        if (!sourceFile) {
+            throw new Error(`PlayCanvas Types must be supplied`);
+        }
+
+        const esmScriptClass = pcTypes.statements.find(node => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script')?.symbol;
+
+        // Parse the source file and pc types
+        const sourceFile = program.getSourceFile(fileName);
+
+        if (!sourceFile) {
+            throw new Error(`Source file ${fileName} not found`);
+        }
+
+        // Extract all exported nodes
+        const nodes = getExportedNodes(program, sourceFile);
+
+        // Check if the file exports a class that inherits from `Script`
+        return nodes.some(node => isAliasedClassDeclaration(node, typeChecker) && inheritsFrom(node, typeChecker, esmScriptClass));
+
+    }
+
+    /**
      * Analyzes the specified TypeScript file and extracts metadata from JSDoc comments.
      *
      * @param {string} fileName - The name of the file to run
