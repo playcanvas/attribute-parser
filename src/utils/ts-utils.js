@@ -1,6 +1,6 @@
 import { DocNodeKind } from '@microsoft/tsdoc';
 import { knownLibFilesForCompilerOptions } from '@typescript/vfs';
-import ts from 'typescript';
+import * as ts from 'typescript';
 import { ParsingError } from '../parsers/parsing-error.js';
 
 export function createDefaultMapFromCDN(options, prefix, ts) {

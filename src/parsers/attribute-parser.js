@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import * as ts from 'typescript';
 import { TSDocConfiguration, TSDocTagDefinition, TSDocTagSyntaxKind, TextRange, TSDocParser } from "@microsoft/tsdoc";
 import { extractTextFromDocNode, getLeadingBlockCommentRanges, getType } from '../utils/ts-utils.js';
 
