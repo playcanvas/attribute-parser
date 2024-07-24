@@ -3,10 +3,9 @@ import { knownLibFilesForCompilerOptions } from '@typescript/vfs';
 import ts from 'typescript';
 import { ParsingError } from '../parsers/parsing-error.js';
 
-export function createDefaultMapFromCDN(options, basePath, ts) {
+export function createDefaultMapFromCDN(options, prefix, ts) {
     var fsMap = new Map();
     var files = knownLibFilesForCompilerOptions(options, ts);
-    var prefix = `${basePath}js/jsdoc-parser/types/`;
 
     async function uncached() {
         const contentPromises = files.map((lib) => {
