@@ -190,6 +190,11 @@ const mapAttributesToOutput = (attribute) => {
     // set the default value
     if (attribute.value !== undefined) attribute.default = attribute.value;
 
+    // Curve Attributes specifically should not expose a default value if it's an empty array
+    if (attribute.type === 'curve' && Array.isArray(attribute.value) && attribute.value.length === 0) {
+        delete attribute.default;
+    }
+
     // remove typeName from the output
     delete attribute.typeName;
     delete attribute.value;

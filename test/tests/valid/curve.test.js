@@ -27,7 +27,7 @@ describe('VALID: Curve attribute', function () {
         expect(data[0].example.attributes.a.name).to.equal('a');
         expect(data[0].example.attributes.a.type).to.equal('curve');
         expect(data[0].example.attributes.a.array).to.equal(false);
-        expect(data[0].example.attributes.a.default).to.eql([]);
+        expect(data[0].example.attributes.a.default).to.not.exist;
     });
 
     it('b: should be a curve attribute with a default value', function () {
@@ -43,7 +43,7 @@ describe('VALID: Curve attribute', function () {
         expect(data[0].example.attributes.c.name).to.equal('c');
         expect(data[0].example.attributes.c.type).to.equal('curve');
         expect(data[0].example.attributes.c.array).to.equal(false);
-        expect(data[0].example.attributes.c.default).to.eql([]);
+        expect(data[0].example.attributes.a.default).to.not.exist;
         expect(data[0].example.attributes.c.color).to.equal('r');
     });
 
@@ -52,7 +52,7 @@ describe('VALID: Curve attribute', function () {
         expect(data[0].example.attributes.d.name).to.equal('d');
         expect(data[0].example.attributes.d.type).to.equal('curve');
         expect(data[0].example.attributes.d.array).to.equal(false);
-        expect(data[0].example.attributes.d.default).to.eql([]);
+        expect(data[0].example.attributes.a.default).to.not.exist;
         expect(data[0].example.attributes.d.color).to.equal('rgb');
         expect(data[0].example.attributes.d.curves).to.deep.equal(['x', 'y', 'z']);
     });
@@ -63,7 +63,7 @@ describe('VALID: Curve attribute', function () {
         expect(data[0].example.attributes.e.type).to.equal('curve');
         expect(data[0].example.attributes.e.array).to.equal(true);
         expect(data[0].example.attributes.e.size).to.equal(2);
-        expect(data[0].example.attributes.e.default).equal(null);
+        expect(data[0].example.attributes.e.default).to.not.exist;
     });
 
     it('f: should be a curve attribute in an unsual format', function () {
