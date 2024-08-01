@@ -32,14 +32,20 @@ export class JSDocParser {
      */
     _errors = [];
 
-    async init(basePath = '') {
+    /**
+     * Initializes the JSDocParser with the standard library files
+     * 
+     * @param {string} libPath - The path to standard library files
+     * @returns {Promise<JSDocParser>} - The initialized JSDocParser
+     */
+    async init(libPath = '') {
         if (this._env) {
-            return;
+            return this;
         }
 
         let fsMap;
-        if (basePath) {
-            fsMap = await createDefaultMapFromCDN({ target: ts.ScriptTarget.ES2022 }, basePath, ts);
+        if (libPath) {
+            fsMap = await createDefaultMapFromCDN({ target: ts.ScriptTarget.ES2022 }, libPath, ts);
         } else {
             fsMap = await createDefaultMapFromNodeModules(COMPILER_OPTIONS, ts);
         }
@@ -47,6 +53,8 @@ export class JSDocParser {
         // Set up the virtual file system and environment
         const system = createSystem(fsMap);
         this._env = createVirtualTypeScriptEnvironment(system, Array.from(fsMap.keys()), ts, COMPILER_OPTIONS);
+
+        return this;
     }
 
     /**
