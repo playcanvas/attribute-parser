@@ -21,6 +21,7 @@ class Example extends Script {
      * @resource
      */
     c;
+
 }
 
 export { Example };
