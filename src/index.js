@@ -33,14 +33,20 @@ export class JSDocParser {
      */
     _errors = [];
 
-    async init(basePath = '') {
+    /**
+     * Initializes the JSDocParser with the standard library files
+     * 
+     * @param {string} libPath - The path to standard library files
+     * @returns {Promise<JSDocParser>} - The initialized JSDocParser
+     */
+    async init(libPath = '') {
         if (this._env) {
-            return;
+            return this;
         }
 
         let fsMap;
-        if (basePath) {
-            fsMap = await createDefaultMapFromCDN({ target: ts.ScriptTarget.ES2022 }, basePath, ts);
+        if (libPath) {
+            fsMap = await createDefaultMapFromCDN({ target: ts.ScriptTarget.ES2022 }, libPath, ts);
         } else {
             fsMap = await createDefaultMapFromNodeModules(COMPILER_OPTIONS, ts);
         }
@@ -52,6 +58,7 @@ export class JSDocParser {
         // Add global types to the parser
         this._env.createFile('/global.d.ts', globalTypes);
 
+        return this;
     }
 
     /**
