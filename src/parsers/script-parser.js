@@ -261,7 +261,7 @@ export class ScriptParser {
 
         // Report any compiler errors
         const compilerDiagnostics = this.program.getSyntacticDiagnostics();
-        // const compilerDiagnostics = this.program.getSemanticDiagnostics();
+
         if (compilerDiagnostics.length > 0) {
             for (const diagnostic of compilerDiagnostics) {
                 const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
