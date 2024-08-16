@@ -9,10 +9,12 @@ export default `
 declare module 'http://*' {
   const value: any;
   export default value;
+  export = value;
 }
 
 declare module 'https://*' {
   const value: any;
   export default value;
+  export = value;
 }
 `
