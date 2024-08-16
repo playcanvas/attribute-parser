@@ -201,7 +201,7 @@ export class JSDocParser {
                 }
 
                 // Extract JSDoc tags
-                const tags = member.jsDoc? member.jsDoc.map(jsdoc => jsdoc.tags?.map(tag => tag.tagName.getText()) ?? []).flat() : []
+                const tags = member.jsDoc ? member.jsDoc.map(jsdoc => jsdoc.tags?.map(tag => tag.tagName.getText()) ?? []).flat() : [];
 
                 const name = member.name.getText();
                 const type = getType(member, typeChecker);
