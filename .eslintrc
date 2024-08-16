@@ -4,9 +4,16 @@
     ],
     "rules": {
       "no-unused-expressions": "off",
-      "prefer-arrow-callback": "off",
       "jsdoc/check-tag-names": "off",
       "import/no-unresolved": "off"
-    }
+    },
+    "overrides": [
+        {
+            "files": ["./**/*.test.js"],
+            "rules": {
+              "prefer-arrow-callback": "off",
+          }
+        }
+      ]
   }
   

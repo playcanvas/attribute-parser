@@ -20,9 +20,7 @@ export function createDefaultMapFromCDN(options, prefix, ts) {
 
         const contents = await Promise.all(contentPromises);
 
-        contents.forEach(function (text, index) {
-            return fsMap.set(`/${files[index]}`, text);
-        });
+        contents.forEach((text, index) => fsMap.set(`/${files[index]}`, text));
 
         return fsMap;
     }
