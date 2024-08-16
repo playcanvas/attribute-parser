@@ -1,5 +1,6 @@
 import { Script } from 'playcanvas';
 
+// eslint-disable-next-line
 class NoInterfaceFolder {
     /**
      * @attribute

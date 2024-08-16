@@ -1,8 +1,6 @@
+import * as TWEEN from 'https://cdnjs.cloudflare.com/ajax/libs/tween.js/23.1.2/tween.esm.js';
+import confetti from 'https://esm.sh/canvas-confetti@1.6.0';
 import { Script } from 'playcanvas';
-
-// The parser should ignore https imports and not throw an error
-import confetti from "https://esm.sh/canvas-confetti@1.6.0"
-import * as TWEEN from 'https://cdnjs.cloudflare.com/ajax/libs/tween.js/23.1.2/tween.esm.js'
 
 class Example extends Script {
     /**
@@ -18,4 +16,3 @@ class Example extends Script {
 }
 
 export { Example };
-

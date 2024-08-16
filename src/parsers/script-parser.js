@@ -1,11 +1,11 @@
-import * as ts from 'typescript';
 import { TextRange } from '@microsoft/tsdoc';
+import * as ts from 'typescript';
 
 import { AttributeParser } from './attribute-parser.js';
 import { ParsingError } from './parsing-error.js';
-import { zipArrays } from '../utils/generic-utils.js';
 import { hasTag } from '../utils/attribute-utils.js';
-import { flatMapAnyNodes, getJSDocCommentRanges, parseArrayLiteral, parseBooleanNode, parseFloatNode, parseStringNode } from "../utils/ts-utils.js";
+import { zipArrays } from '../utils/generic-utils.js';
+import { flatMapAnyNodes, getJSDocCommentRanges, parseArrayLiteral, parseBooleanNode, parseFloatNode, parseStringNode } from '../utils/ts-utils.js';
 
 /**
  * @typedef {object} Attribute
@@ -72,27 +72,27 @@ const createArrayArgumentParser = (name, defaultArr = []) => (
  * eg `new Vec3(1, 2, 3)`
  */
 const SUPPORTED_INITIALIZABLE_TYPE_NAMES = new Map([
-    ["Curve", createArrayArgumentParser("Curve")],
-    ["Vec2", createNumberArgumentParser("Vec2", [0, 0])],
-    ["Vec3", createNumberArgumentParser("Vec3", [0, 0, 0])],
-    ["Vec4", createNumberArgumentParser("Vec4", [0, 0, 0, 0])],
-    ["Color", createNumberArgumentParser("Color", [1, 1, 1, 1])],
-    ["number", parseFloatNode],
-    ["string", parseStringNode],
-    ["boolean", parseBooleanNode]
+    ['Curve', createArrayArgumentParser('Curve')],
+    ['Vec2', createNumberArgumentParser('Vec2', [0, 0])],
+    ['Vec3', createNumberArgumentParser('Vec3', [0, 0, 0])],
+    ['Vec4', createNumberArgumentParser('Vec4', [0, 0, 0, 0])],
+    ['Color', createNumberArgumentParser('Color', [1, 1, 1, 1])],
+    ['number', parseFloatNode],
+    ['string', parseStringNode],
+    ['boolean', parseBooleanNode]
 ]);
 
 /**
  * The full set of supported PlayCanvas types.
  */
 const SUPPORTED_PLAYCANVAS_TYPES = new Set([
-    "Curve",
-    "Asset",
-    "Entity",
-    "Vec2",
-    "Vec3",
-    "Vec4",
-    "Color"
+    'Curve',
+    'Asset',
+    'Entity',
+    'Vec2',
+    'Vec3',
+    'Vec4',
+    'Color'
 ]);
 
 /**

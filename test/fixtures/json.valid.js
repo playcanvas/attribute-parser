@@ -3,6 +3,7 @@ import { Script, Vec3 } from 'playcanvas';
 /**
  * @interface
  */
+// eslint-disable-next-line
 class Folder {
     /**
      * @attribute
@@ -26,7 +27,9 @@ class Folder {
 
 /**
  * @interface
+ *
  */
+// eslint-disable-next-line
 class NestedFolder {
     /**
      * @attribute

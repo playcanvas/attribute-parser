@@ -1,6 +1,6 @@
+/* eslint-disable */
 import { Script } from 'playcanvas';
 
-// @ts-ignore
 Class Intentionally extends Invalid {
     /**
      * @attribute

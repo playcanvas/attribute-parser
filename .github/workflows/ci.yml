@@ -24,5 +24,8 @@ jobs:
     - name: Install dependencies
       run: npm clean-install --progress=false --no-fund
 
+    - name: Run ESLint
+      run: npm run lint
+
     - name: Run unit tests
       run: npm test

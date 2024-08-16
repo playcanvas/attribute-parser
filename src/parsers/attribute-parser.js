@@ -1,10 +1,10 @@
+import { TSDocConfiguration, TSDocTagDefinition, TSDocTagSyntaxKind, TextRange, TSDocParser } from '@microsoft/tsdoc';
 import * as ts from 'typescript';
-import { TSDocConfiguration, TSDocTagDefinition, TSDocTagSyntaxKind, TextRange, TSDocParser } from "@microsoft/tsdoc";
-import { extractTextFromDocNode, getLeadingBlockCommentRanges, getType } from '../utils/ts-utils.js';
 
-import { ParsingError } from "./parsing-error.js";
-import { hasTag } from "../utils/attribute-utils.js";
-import { parseTag, validateTag } from "../utils/tag-utils.js";
+import { ParsingError } from './parsing-error.js';
+import { hasTag } from '../utils/attribute-utils.js';
+import { parseTag, validateTag } from '../utils/tag-utils.js';
+import { extractTextFromDocNode, getLeadingBlockCommentRanges, getType } from '../utils/ts-utils.js';
 
 /**
  * A class to parse JSDoc comments and extract attribute metadata.
@@ -197,7 +197,7 @@ export class AttributeParser {
         } else {
             // Check for JSDoc annotations
             const jsDocs = ts.getJSDocTags(node);
-            const typeTag = jsDocs.find(doc => doc.tagName.text === "type");
+            const typeTag = jsDocs.find(doc => doc.tagName.text === 'type');
             if (typeTag && ts.isJSDocTypeTag(typeTag)) {
                 typeNode = typeTag.typeExpression;
             }
@@ -227,7 +227,7 @@ export class AttributeParser {
 
                         // Additionally check for JSDoc enum tag
                         const jsDocs = ts.getJSDocTags(declaration);
-                        const enumTag = jsDocs.find(doc => doc.tagName.text === "enum");
+                        const enumTag = jsDocs.find(doc => doc.tagName.text === 'enum');
                         if (enumTag && ts.isJSDocEnumTag(enumTag)) {
                             // This assumes enum members are correctly annotated in JSDoc comments
                             // Example: @enum {type} EnumName { Member1, Member2 }
@@ -245,10 +245,9 @@ export class AttributeParser {
      * Extract the public members and their values from a TypeScript node.
      *
      * @param {ts.Node} node - The node to parse
-     * @param {ParsingError[]} errors - An array to store any parsing errors
      * @returns {any[]} - The extracted members
      */
-    getMembers(node, errors = []) {
+    getMembers(node) {
 
         const members = [];
 

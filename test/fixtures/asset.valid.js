@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import { Script, Asset } from 'playcanvas';
 
 class Example extends Script {

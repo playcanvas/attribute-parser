@@ -22,12 +22,12 @@ export function parseTag(input = '') {
     try {
         const arr = parseStringToNumericalArray(input);
         if (Array.isArray(arr)) return arr;
-    } catch (e) {}
+    } catch { /* eslint-disable-next-line no-empty */ }
 
     try {
         const arr = JSON.parse(input);
         if (Array.isArray(arr)) return arr;
-    } catch (e) {}
+    } catch { /* eslint-disable-next-line no-empty */ }
 
     // If none of the above, return the string
     return input;
@@ -45,7 +45,7 @@ export function parseTag(input = '') {
 export function validateTag(value, typeAnnotation, env) {
 
     const sourceText = `let a: ${typeAnnotation} = ${value};`;
-    env.createFile("/___virtual__.ts", sourceText);
+    env.createFile('/___virtual__.ts', sourceText);
 
     // Get the program and check for semantic errors
     const program = env.languageService.getProgram();

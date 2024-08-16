@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-expressions */
-import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
+import { describe, it, before } from 'mocha';
 
 import { getAttributes } from '../../utils.js';
 

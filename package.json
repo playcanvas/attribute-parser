@@ -8,15 +8,19 @@
   "version": "1.0.4",
   "dependencies": {
     "@microsoft/tsdoc": "^0.15.0",
+    "@playcanvas/eslint-config": "^1.7.4",
     "@typescript/vfs": "^1.6.0",
+    "eslint": "^8.56.0",
     "typescript": "^5.5.3"
   },
   "devDependencies": {
     "chai": "^5.1.1",
+    "globals": "^15.9.0",
     "mocha": "^10.6.0"
   },
   "scripts": {
-    "test": "mocha test/**/*.test.js --timeout 10000"
+    "test": "mocha test/**/*.test.js --timeout 10000",
+    "lint": "eslint ."
   },
   "publishConfig": {
     "access": "public"

@@ -1,4 +1,3 @@
-
 import { Script } from 'playcanvas';
 
 class Example extends Script {
@@ -7,7 +6,7 @@ class Example extends Script {
      * @type {boolean}
      */
     a;
-};
+}
 
 class ExampleExtended extends Example {
     /**
@@ -15,7 +14,7 @@ class ExampleExtended extends Example {
      * @type {number}
      */
     b;
-};
+}
 
 class ExampleExtendedExtended extends ExampleExtended {
     /**
