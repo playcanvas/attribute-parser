@@ -245,10 +245,9 @@ export class AttributeParser {
      * Extract the public members and their values from a TypeScript node.
      *
      * @param {ts.Node} node - The node to parse
-     * @param {ParsingError[]} errors - An array to store any parsing errors
      * @returns {any[]} - The extracted members
      */
-    getMembers(node, errors = []) {
+    getMembers(node) {
 
         const members = [];
 

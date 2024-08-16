@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import { Script, Vec2, Vec3, Vec4 } from 'playcanvas';
 
 class Example extends Script {

@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import { Script, Curve } from 'playcanvas';
 
 class Example extends Script {

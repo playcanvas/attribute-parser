@@ -13,6 +13,7 @@ export default class ExampleDefault extends Script {};
 
 export class ExampleExport extends Script {}
 
+// eslint-disable-next-line
 class ExampleNotExported extends Script {}
 
 export {

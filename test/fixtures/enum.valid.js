@@ -12,6 +12,7 @@ const NumberEnum = {
 /**
  * @enum {string}
  */
+// eslint-disable-next-line
 const StringEnum = {
     A: 'a',
     B: 'b',
@@ -21,6 +22,7 @@ const StringEnum = {
 /**
  * @enum {Vec3}
  */
+// eslint-disable-next-line
 const Vec3Enum = {
     A: new Vec3(1, 2, 3),
     B: new Vec3(4, 5, 6),
@@ -30,6 +32,7 @@ const Vec3Enum = {
 /**
  * @enum {NumberEnum}
  */
+// eslint-disable-next-line
 const NumberNumberEnum = {
     A: NumberEnum.A,
     B: NumberEnum.B,
