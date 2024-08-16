@@ -13,7 +13,6 @@ class Example extends Script {
 
     initialize() {
         confetti();
-        window.localStorage.setItem('test', 'test');
         new TWEEN.Tween({ x: 0 }).to({ x: 100 }, 1000).start();
     }
 }
