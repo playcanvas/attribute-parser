@@ -1,7 +1,6 @@
-import { Script } from 'playcanvas';
-import { GraphNode } from './playcanvas';
+import { Script, GraphNode } from 'playcanvas';
 
-class Vec3 {};
+class Vec3 {}
 
 class Example extends Script {
     /**

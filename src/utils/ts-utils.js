@@ -1,6 +1,7 @@
 import { DocNodeKind } from '@microsoft/tsdoc';
 import { knownLibFilesForCompilerOptions } from '@typescript/vfs';
 import * as ts from 'typescript';
+
 import { ParsingError } from '../parsers/parsing-error.js';
 
 export function createDefaultMapFromCDN(options, prefix, ts) {
@@ -20,7 +21,7 @@ export function createDefaultMapFromCDN(options, prefix, ts) {
         const contents = await Promise.all(contentPromises);
 
         contents.forEach(function (text, index) {
-            return fsMap.set('/' + files[index], text);
+            return fsMap.set(`/${files[index]}`, text);
         });
 
         return fsMap;

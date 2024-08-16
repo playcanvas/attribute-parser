@@ -13,6 +13,15 @@ export const getTagFromJsdoc = (tag, doc) => {
     return doc?.tags?.find(doc => doc.tagName.text === tag);
 };
 
+/**
+ * Checks if a node has a specific JSDoc tag.
+ * @param {string} tag - The tag to search for
+ * @param {import("typescript").Node} node - The node to analyze
+ * @returns {import('typescript').Node} - True if the tag is found
+ */
+export const getTag = (tag, node) => {
+    return node?.jsDoc?.find(doc => getTagFromJsdoc(tag, doc));
+};
 
 /**
  * Checks if a node has a specific JSDoc tag.
@@ -22,17 +31,6 @@ export const getTagFromJsdoc = (tag, doc) => {
  */
 export const hasTag = (tag, node) => {
     return !!getTag(tag, node);
-};
-
-
-/**
- * Checks if a node has a specific JSDoc tag.
- * @param {string} tag - The tag to search for
- * @param {import("typescript").Node} node - The node to analyze
- * @returns {import('typescript').Node} - True if the tag is found
- */
-export const getTag = (tag, node) => {
-    return node?.jsDoc?.find(doc => getTagFromJsdoc(tag, doc));
 };
 
 

@@ -1,15 +1,14 @@
-
 import { Script } from 'playcanvas';
 
 import { ExampleImport } from './export.import.js';
 
-class ExampleImportExtend extends ExampleImport {};
+class ExampleImportExtend extends ExampleImport {}
 
 export { ExampleImport as ExampleImportExportAs } from './export.import.js';
 
-class Example extends Script {};
+class Example extends Script {}
 
-export default class ExampleDefault extends Script {};
+export default class ExampleDefault extends Script {}
 
 export class ExampleExport extends Script {}
 
@@ -21,4 +20,4 @@ export {
     Example as ExampleExportAs,
     ExampleImport,
     ExampleImportExtend
-}
+};

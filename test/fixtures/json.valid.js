@@ -27,7 +27,7 @@ class Folder {
 
 /**
  * @interface
- * 
+ *
  */
 // eslint-disable-next-line
 class NestedFolder {

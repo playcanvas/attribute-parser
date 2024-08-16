@@ -3,7 +3,7 @@ import { Script } from 'playcanvas';
 class Example extends Script {
     /**
      * This is a description of the attribute.
-     * 
+     *
      * @attribute
      * @type {number}
      * @title A number

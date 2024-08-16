@@ -1,3 +1,4 @@
+// eslint-disable
 import { Script } from 'playcanvas';
 
 class Example extends Script {

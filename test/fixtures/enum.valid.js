@@ -17,7 +17,7 @@ const StringEnum = {
     A: 'a',
     B: 'b',
     C: 'c'
-}
+};
 
 /**
  * @enum {Vec3}
@@ -37,7 +37,7 @@ const NumberNumberEnum = {
     A: NumberEnum.A,
     B: NumberEnum.B,
     C: NumberEnum.C
-}
+};
 
 class Example extends Script {
     /**

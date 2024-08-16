@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
-import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
 import { JSDocParser } from '../src/index.js';
 
 const __filename = fileURLToPath(import.meta.url);

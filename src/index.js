@@ -1,5 +1,6 @@
-import * as ts from 'typescript';
 import { createSystem, createDefaultMapFromNodeModules, createVirtualTypeScriptEnvironment } from '@typescript/vfs';
+import * as ts from 'typescript';
+
 import globalTypes from './global.types.js';
 import { ScriptParser } from './parsers/script-parser.js';
 import { createDefaultMapFromCDN, flatMapAnyNodes, getExportedNodes, getType, inheritsFrom, isAliasedClassDeclaration } from './utils/ts-utils.js';
@@ -16,7 +17,7 @@ const COMPILER_OPTIONS = {
     noImplicitAny: false, // Allow implicit any
     baseUrl: './',
     paths: {
-        "playcanvas": ["/playcanvas.js"]
+        'playcanvas': ['/playcanvas.js']
     }
 };
 
@@ -35,7 +36,7 @@ export class JSDocParser {
 
     /**
      * Initializes the JSDocParser with the standard library files
-     * 
+     *
      * @param {string} libPath - The path to standard library files
      * @returns {Promise<JSDocParser>} - The initialized JSDocParser
      */
@@ -100,7 +101,7 @@ export class JSDocParser {
 
     /**
      * Returns all the valid ESM Scripts within a file
-     * @param fileName - The file name in the program to check
+     * @param {string} fileName - The file name in the program to check
      * @returns {import('typescript').Node[]} - An array of any exported ESM Script nodes within the file
      */
     getAllEsmScripts(fileName) {
@@ -111,16 +112,16 @@ export class JSDocParser {
         const pcTypes = this.program.getSourceFile('/playcanvas.d.ts');
 
         if (!pcTypes) {
-            throw new Error(`PlayCanvas Types must be supplied`);
+            throw new Error('PlayCanvas Types must be supplied');
         }
-        
+
         // Parse the source file and pc types
         const sourceFile = this.program.getSourceFile(fileName);
-        
+
         if (!sourceFile) {
             throw new Error(`Source file ${fileName} not found`);
         }
-        
+
         // Extract all exported nodes
         const nodes = getExportedNodes(this.program, sourceFile);
 
@@ -141,7 +142,7 @@ export class JSDocParser {
         const results = {};
         const errors = [...this._errors];
 
-        if(errors.length > 0 ){
+        if (errors.length > 0) {
             return [results, errors];
         }
 
@@ -167,7 +168,7 @@ export class JSDocParser {
         const results = {};
         const errors = [...this._errors];
 
-        if(errors.length > 0 ){
+        if (errors.length > 0) {
             return [results, errors];
         }
 
