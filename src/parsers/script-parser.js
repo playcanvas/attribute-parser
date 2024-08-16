@@ -260,7 +260,8 @@ export class ScriptParser {
     validateProgram(errors = []) {
 
         // Report any compiler errors
-        const compilerDiagnostics = this.program.getSemanticDiagnostics();
+        const compilerDiagnostics = this.program.getSyntacticDiagnostics();
+
         if (compilerDiagnostics.length > 0) {
             for (const diagnostic of compilerDiagnostics) {
                 const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');

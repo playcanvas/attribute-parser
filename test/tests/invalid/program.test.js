@@ -12,6 +12,6 @@ describe('INVALID: Program ', function () {
     it('only errors should exist (1)', function () {
         expect(data).to.exist;
         expect(data[0]).to.be.empty;
-        expect(data[1].length).to.equal(1);
+        expect(data[1].length).to.equal(4);
     });
 });

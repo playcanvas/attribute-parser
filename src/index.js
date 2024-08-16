@@ -1,20 +1,18 @@
 import { createSystem, createDefaultMapFromNodeModules, createVirtualTypeScriptEnvironment } from '@typescript/vfs';
 import * as ts from 'typescript';
 
-import globalTypes from './global.types.js';
 import { ScriptParser } from './parsers/script-parser.js';
 import { createDefaultMapFromCDN, flatMapAnyNodes, getExportedNodes, getType, inheritsFrom, isAliasedClassDeclaration } from './utils/ts-utils.js';
 
 const toLowerCamelCase = str => str[0].toLowerCase() + str.substring(1);
 
 const COMPILER_OPTIONS = {
-    strictPropertyInitialization: false, // Allow uninitialized properties
+    strict: false,
     skipLibCheck: true, // Skip type checking of declaration files
     target: ts.ScriptTarget.ES2022, // If this version changes, the types must be updated in the /rollup.config.mjs
     module: ts.ModuleKind.CommonJS,
     checkJs: true, // Enable JSDoc parsing
     allowJs: true,
-    noImplicitAny: false, // Allow implicit any
     baseUrl: './',
     paths: {
         'playcanvas': ['/playcanvas.js']
@@ -55,9 +53,6 @@ export class JSDocParser {
         // Set up the virtual file system and environment
         const system = createSystem(fsMap);
         this._env = createVirtualTypeScriptEnvironment(system, Array.from(fsMap.keys()), ts, COMPILER_OPTIONS);
-
-        // Add global types to the parser
-        this._env.createFile('/global.d.ts', globalTypes);
 
         return this;
     }
@@ -206,7 +201,7 @@ export class JSDocParser {
                 }
 
                 // Extract JSDoc tags
-                const tags = member.jsDoc.map(jsdoc => jsdoc.tags?.map(tag => tag.tagName.getText()) ?? []).flat();
+                const tags = member.jsDoc? member.jsDoc.map(jsdoc => jsdoc.tags?.map(tag => tag.tagName.getText()) ?? []).flat() : []
 
                 const name = member.name.getText();
                 const type = getType(member, typeChecker);

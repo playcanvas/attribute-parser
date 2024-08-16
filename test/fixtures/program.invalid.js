@@ -1,6 +1,7 @@
 import { Script } from 'playcanvas';
 
-class Example extends Script {
+// @ts-ignore
+Class Intentionally extends Invalid {
     /**
      * @attribute
      * @type {boolean}
