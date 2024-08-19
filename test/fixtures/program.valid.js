@@ -3,7 +3,7 @@ import confetti from 'https://esm.sh/canvas-confetti@1.6.0';
 import { Script } from 'playcanvas';
 
 /** @enum {number} */
-export const MyEnum = { value: 0 }
+export const MyEnum = { value: 0 };
 
 class Example extends Script {
     /**
