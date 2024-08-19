@@ -86,7 +86,7 @@ export function isAliasedClassDeclaration(node, typeChecker) {
         return true;
     }
     // Try to resolve the original declaration
-    if (ts.isIdentifier(node.name)) {
+    if (node?.name && ts.isIdentifier(node.name)) {
         const symbol = typeChecker.getSymbolAtLocation(node.name);
         if (symbol) {
             const resolvedSymbol = resolveAliasedSymbol(typeChecker, symbol);

@@ -2,6 +2,9 @@ import * as TWEEN from 'https://cdnjs.cloudflare.com/ajax/libs/tween.js/23.1.2/t
 import confetti from 'https://esm.sh/canvas-confetti@1.6.0';
 import { Script } from 'playcanvas';
 
+/** @enum {number} */
+export const MyEnum = { value: 0 }
+
 class Example extends Script {
     /**
      * @attribute
