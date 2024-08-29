@@ -3,6 +3,7 @@ import * as ts from 'typescript';
 
 import { ScriptParser } from './parsers/script-parser.js';
 import { createDefaultMapFromCDN, flatMapAnyNodes, getExportedNodes, getType, inheritsFrom, isAliasedClassDeclaration } from './utils/ts-utils.js';
+import { isInterface } from './utils/attribute-utils.js';
 
 const toLowerCamelCase = str => str[0].toLowerCase() + str.substring(1);
 
@@ -179,9 +180,6 @@ export class JSDocParser {
         if (!sourceFile) {
             throw new Error(`Source file ${fileName} not found`);
         }
-
-        // Filter out classes that do not inherit from `Script` or are interfaces
-        const isInterface = node => node.jsDoc.some(jsdoc => jsdoc.tags?.some(tag => tag.tagName.getText() === 'interface'));
 
         const nodes = flatMapAnyNodes(sourceFile, (node) => {
             if (!ts.isClassDeclaration(node)) {
