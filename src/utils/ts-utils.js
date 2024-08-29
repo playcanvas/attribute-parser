@@ -379,7 +379,7 @@ export function parseNumber(input) {
 }
 
 /**
- * Parses a string representationn of a numerical array into an array of numbers.
+ * Parses a string representation of a numerical array into an array of numbers.
  *
  * @param {string} input - The string to parse
  * @returns {number[]} - The parsed array of numbers
