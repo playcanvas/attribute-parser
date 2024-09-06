@@ -6,7 +6,10 @@ class ExampleImportExtend extends ExampleImport {}
 
 export { ExampleImport as ExampleImportAsExport } from './export.import.js';
 
-class Example extends Script {}
+class Example extends Script {
+    /** @attribute */
+    num = 10;
+}
 
 export default class ExampleDefault extends Script {}
 
