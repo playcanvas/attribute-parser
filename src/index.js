@@ -123,7 +123,7 @@ export class JSDocParser {
 
         const esmScriptClass = pcTypes.statements.find(node => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script')?.symbol;
 
-        const esmScripts = new Map()
+        const esmScripts = new Map();
         // Check if the file exports a class that inherits from `Script`
         nodes.forEach((node, name) => {
             if (isAliasedClassDeclaration(node, typeChecker) && inheritsFrom(node, typeChecker, esmScriptClass)) {
