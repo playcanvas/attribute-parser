@@ -33,13 +33,15 @@ describe('VALID: Export Script', function () {
         expect(data[0].exampleDefault.errors).to.be.empty;
     });
 
-    it('ExampleExportAs: should not exist', function () {
-        expect(data[0]?.exampleExportAs).to.not.exist;
+    it('ExampleImportAsExport: should not exist', function () {
+        expect(data[0]?.exampleImportAsExport).to.exist;
+        expect(data[0].exampleImportAsExport.attributes).to.not.be.empty;
+        expect(data[0].exampleImportAsExport.errors).to.be.empty;
     });
 
     it('ExampleImport: should exist without attributes or errors', function () {
         expect(data[0]?.exampleImport).to.exist;
-        expect(data[0].exampleImport.attributes).to.be.empty;
+        expect(data[0].exampleImport.attributes).to.not.be.empty;
         expect(data[0].exampleImport.errors).to.be.empty;
     });
 

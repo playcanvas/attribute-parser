@@ -98,7 +98,7 @@ export class JSDocParser {
     /**
      * Returns all the valid ESM Scripts within a file
      * @param {string} fileName - The file name in the program to check
-     * @returns {import('typescript').Node[]} - An array of any exported ESM Script nodes within the file
+     * @returns {Map<string, import('typescript').Node>} - A map of valid ESM Script <names, nodes> within the file
      */
     getAllEsmScripts(fileName) {
 
@@ -123,9 +123,15 @@ export class JSDocParser {
 
         const esmScriptClass = pcTypes.statements.find(node => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script')?.symbol;
 
+        const esmScripts = new Map()
         // Check if the file exports a class that inherits from `Script`
-        return Array.from(nodes).filter(node => isAliasedClassDeclaration(node, typeChecker) && inheritsFrom(node, typeChecker, esmScriptClass));
+        nodes.forEach((node, name) => {
+            if (isAliasedClassDeclaration(node, typeChecker) && inheritsFrom(node, typeChecker, esmScriptClass)) {
+                esmScripts.set(name, node);
+            }
+        });
 
+        return esmScripts;
     }
 
     /**
@@ -146,9 +152,8 @@ export class JSDocParser {
         const nodes = this.getAllEsmScripts(fileName);
 
         // Extract attributes from each script
-        nodes.forEach((node) => {
-            const name = toLowerCamelCase(node.name.text);
-            const opts = results[name] = { attributes: {}, errors: [] };
+        nodes.forEach((node, name) => {
+            const opts = results[toLowerCamelCase(name)] = { attributes: {}, errors: [] };
             this.parser.extractAttributes(node, opts);
         });
 

@@ -4,7 +4,7 @@ import { ExampleImport } from './export.import.js';
 
 class ExampleImportExtend extends ExampleImport {}
 
-export { ExampleImport as ExampleImportExportAs } from './export.import.js';
+export { ExampleImport as ExampleImportAsExport } from './export.import.js';
 
 class Example extends Script {}
 
