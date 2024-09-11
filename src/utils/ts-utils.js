@@ -208,7 +208,7 @@ function getSuperClasses(node, typeChecker) {
 export function getJSDocCommentRanges(node, text, typeChecker) {
     const commentRanges = [];
 
-    if (ts.isClassDeclaration(node)) {
+    if (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) {
         // get an array of the class an all parent classed
         const heritageChain = getSuperClasses(node, typeChecker);
 
@@ -216,7 +216,7 @@ export function getJSDocCommentRanges(node, text, typeChecker) {
         heritageChain.forEach((classNode) => {
             // for each class iterate over it's class members
             classNode.members.forEach((member) => {
-                if (ts.isPropertyDeclaration(member) || ts.isSetAccessor(member)) {
+                if (ts.isPropertyDeclaration(member) || ts.isSetAccessor(member) || ts.isPropertySignature(member)) {
                     const memberName = member.name && ts.isIdentifier(member.name) ? member.name.text : 'unnamed';
                     const ranges = getLeadingBlockCommentRanges(member, text);
                     if (ranges.length > 0) {
@@ -309,6 +309,31 @@ export function isEnum(node) {
 
     return false;
 }
+/**
+ * Determines the primitive type for enums, or falls back to the actual type name.
+ *
+ * @param {ts.Type} type - The type to inspect.
+ * @param {ts.TypeChecker} typeChecker - The TypeScript type checker.
+ * @returns {string} - The primitive type of the enum or the type's name.
+ */
+export function getPrimitiveEnumType(type, typeChecker) {
+    // Check if the type is an enum type
+    if (type.symbol?.declarations?.some(decl => ts.isEnumDeclaration(decl))) {
+        // Get the type of enum members
+        const enumMembers = type.symbol.declarations[0].members;
+        const firstMemberValue = typeChecker.getConstantValue(enumMembers[0]);
+
+        const validEnumType = [
+            'number',
+            'string',
+            'boolean'
+        ]
+
+        if (validEnumType.includes(typeof firstMemberValue)) {
+            return typeof firstMemberValue;
+        }
+    }
+}
 
 /**
  * Gets the inferred type of a TypeScript node.
@@ -322,7 +347,7 @@ export function getType(node, typeChecker) {
         const type = typeChecker.getTypeAtLocation(node);
         const array = typeChecker.isArrayType(type);
         const actualType = array ? typeChecker.getElementTypeOfArrayType(type) : type;
-        const name = typeChecker.typeToString(actualType);
+        const name = getPrimitiveEnumType(actualType, typeChecker) ?? typeChecker.typeToString(actualType);
 
         return { type: actualType, name, array };
     }

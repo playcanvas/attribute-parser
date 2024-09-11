@@ -20,16 +20,6 @@ const StringEnum = {
 };
 
 /**
- * @enum {Vec3}
- */
-// eslint-disable-next-line
-const Vec3Enum = {
-    A: new Vec3(1, 2, 3),
-    B: new Vec3(4, 5, 6),
-    C: new Vec3(7, 8, 9)
-};
-
-/**
  * @enum {NumberEnum}
  */
 // eslint-disable-next-line
@@ -67,15 +57,9 @@ class Example extends Script {
 
     /**
      * @attribute
-     * @type {Vec3Enum}
-     */
-    i;
-
-    /**
-     * @attribute
      * @type {NumberNumberEnum}
      */
-    j = 2;
+    i = 2;
 }
 
 export { Example };

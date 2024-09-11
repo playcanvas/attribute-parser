@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 import { ParsingError } from './parsing-error.js';
 import { hasTag } from '../utils/attribute-utils.js';
 import { parseTag, validateTag } from '../utils/tag-utils.js';
-import { extractTextFromDocNode, getLeadingBlockCommentRanges, getType } from '../utils/ts-utils.js';
+import { extractTextFromDocNode, getLeadingBlockCommentRanges, getType, getPrimitiveEnumType } from '../utils/ts-utils.js';
 
 /**
  * A class to parse JSDoc comments and extract attribute metadata.
@@ -162,12 +162,14 @@ export class AttributeParser {
     getNodeAsAttribute(node, errors = []) {
 
         const name = node.name && ts.isIdentifier(node.name) && node.name.text;
-        const { type, name: typeName, array } = getType(node, this.typeChecker);
+        let { type, name: typeName, array } = getType(node, this.typeChecker);
         const enums = this.getEnumMembers(node, errors);
         let value = null;
 
+        // if(enums.length > 0 ) typeName = 
+
         // we don't need to serialize the value for arrays
-        const serializer = !array && this.typeSerializerMap.get(type);
+        const serializer = !array && this.typeSerializerMap.get(typeName);
         if (serializer) {
             try {
                 value = serializer(node.initializer ?? node);
@@ -192,8 +194,8 @@ export class AttributeParser {
         let members = [];
 
         // Check if there's a type annotation directly on the variable declaration
-        if (ts.isVariableDeclaration(node) && node.type) {
-            typeNode = node.type;
+        if (/*ts.isVariableDeclaration(node) && */node.type) {
+            typeNode = node;
         } else {
             // Check for JSDoc annotations
             const jsDocs = ts.getJSDocTags(node);
@@ -203,10 +205,13 @@ export class AttributeParser {
             }
         }
 
-        if (typeNode && ts.isTypeReferenceNode(typeNode.type)) {
+        // Also consider the elementType
+        const type = typeNode && (typeNode.type.elementType ?? typeNode.type);
+
+        if (typeNode && ts.isTypeReferenceNode(type)) {
 
             // resolve the symbol of the type
-            let symbol = this.typeChecker.getSymbolAtLocation(typeNode.type.typeName);
+            let symbol = this.typeChecker.getSymbolAtLocation(type.typeName);
 
             // Resolve aliases, which are common with imports
             if (symbol && symbol.flags & ts.SymbolFlags.Alias) {

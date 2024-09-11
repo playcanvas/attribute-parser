@@ -147,7 +147,8 @@ const SUPPORTED_BLOCK_TAGS = new Map([
     ['precision', 'number'],
     ['size', 'number'],
     ['step', 'number'],
-    ['title', 'string']
+    ['title', 'string'],
+    ['default', 'any']
 ]);
 
 /**
@@ -188,7 +189,7 @@ const mapAttributesToOutput = (attribute) => {
     if (attribute.enum.length === 0) delete attribute.enum;
 
     // set the default value
-    if (attribute.value !== undefined) attribute.default = attribute.value;
+    if (attribute.value !== undefined) attribute.default = attribute.default ?? attribute.value;
 
     // Curve Attributes specifically should not expose a default value if it's an empty array
     if (attribute.type === 'curve' && Array.isArray(attribute.value) && attribute.value.length === 0) {
@@ -244,7 +245,7 @@ export class ScriptParser {
             const typeName = this.typeChecker.typeToString(type);
             const serializer = SUPPORTED_INITIALIZABLE_TYPE_NAMES.get(typeName);
             if (serializer) {
-                this.typeSerializerMap.set(type, serializer);
+                this.typeSerializerMap.set(typeName, serializer);
             }
         });
 
