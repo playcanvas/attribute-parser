@@ -5,8 +5,8 @@ import { parseAttributes } from '../../utils.js';
 
 function runTests(fileName) {
 
-    const isTS= fileName.endsWith('.ts');
-    const script = isTS ? 'TypeScript' : 'JavaScript';
+    const isTS = fileName.endsWith('.ts');
+    const script = isTS ? 'TS' : 'JS';
 
     describe(`${script}: VALID: Asset attribute`, function () {
         let data;
@@ -53,7 +53,7 @@ function runTests(fileName) {
         });
 
     });
-};
+}
 
 runTests('./asset.valid.js');
 runTests('./asset.valid.ts');

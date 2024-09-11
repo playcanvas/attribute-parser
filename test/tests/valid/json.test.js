@@ -3,7 +3,7 @@ import { describe, it, before } from 'mocha';
 
 import { parseAttributes } from '../../utils.js';
 
-describe(`Javascript: VALID: Asset attribute`, function () {
+describe('JS: VALID: Asset attribute', function () {
 
     let data;
     before(async function () {
@@ -150,7 +150,7 @@ describe(`Javascript: VALID: Asset attribute`, function () {
 });
 
 
-describe(`Typescript: VALID: Asset attribute`, function () {
+describe('TS: VALID: Asset attribute', function () {
 
     let data;
     before(async function () {

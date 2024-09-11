@@ -1,4 +1,4 @@
-import { Script, Vec3 } from 'playcanvas';
+import { Script } from 'playcanvas';
 
 /**
  * @enum {number}

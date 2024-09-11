@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 import { ParsingError } from './parsing-error.js';
 import { hasTag } from '../utils/attribute-utils.js';
 import { parseTag, validateTag } from '../utils/tag-utils.js';
-import { extractTextFromDocNode, getLeadingBlockCommentRanges, getType, getPrimitiveEnumType } from '../utils/ts-utils.js';
+import { extractTextFromDocNode, getLeadingBlockCommentRanges, getType } from '../utils/ts-utils.js';
 
 /**
  * A class to parse JSDoc comments and extract attribute metadata.
@@ -162,11 +162,9 @@ export class AttributeParser {
     getNodeAsAttribute(node, errors = []) {
 
         const name = node.name && ts.isIdentifier(node.name) && node.name.text;
-        let { type, name: typeName, array } = getType(node, this.typeChecker);
+        const { type, name: typeName, array } = getType(node, this.typeChecker);
         const enums = this.getEnumMembers(node, errors);
         let value = null;
-
-        // if(enums.length > 0 ) typeName = 
 
         // we don't need to serialize the value for arrays
         const serializer = !array && this.typeSerializerMap.get(typeName);
@@ -194,7 +192,7 @@ export class AttributeParser {
         let members = [];
 
         // Check if there's a type annotation directly on the variable declaration
-        if (/*ts.isVariableDeclaration(node) && */node.type) {
+        if (node.type) {
             typeNode = node;
         } else {
             // Check for JSDoc annotations

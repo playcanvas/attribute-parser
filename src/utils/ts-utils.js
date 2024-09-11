@@ -309,30 +309,30 @@ export function isEnum(node) {
 
     return false;
 }
+
 /**
  * Determines the primitive type for enums, or falls back to the actual type name.
  *
  * @param {ts.Type} type - The type to inspect.
  * @param {ts.TypeChecker} typeChecker - The TypeScript type checker.
- * @returns {string} - The primitive type of the enum or the type's name.
+ * @returns {'string' | 'boolean' | 'number' | null} - The primitive type of the enum or the type's name.
  */
 export function getPrimitiveEnumType(type, typeChecker) {
     // Check if the type is an enum type
-    if (type.symbol?.declarations?.some(decl => ts.isEnumDeclaration(decl))) {
-        // Get the type of enum members
-        const enumMembers = type.symbol.declarations[0].members;
-        const firstMemberValue = typeChecker.getConstantValue(enumMembers[0]);
+    if (!type.symbol?.declarations?.some(decl => ts.isEnumDeclaration(decl))) return null;
 
-        const validEnumType = [
-            'number',
-            'string',
-            'boolean'
-        ]
+    // Get the type of enum members
+    const enumMembers = type.symbol.declarations[0].members;
+    const firstMemberValue = typeChecker.getConstantValue(enumMembers[0]);
 
-        if (validEnumType.includes(typeof firstMemberValue)) {
-            return typeof firstMemberValue;
-        }
-    }
+    const validEnumType = [
+        'number',
+        'string',
+        'boolean'
+    ];
+
+    const typeOf = typeof firstMemberValue;
+    return validEnumType.includes(typeOf) ? typeOf : null;
 }
 
 /**
