@@ -209,7 +209,7 @@ export class JSDocParser {
 
                 const namePos = ts.getLineAndCharacterOfPosition(member.getSourceFile(), member.name.getStart());
 
-                const jsdocNode = member.jsDoc[member.jsDoc.length - 1];
+                const jsdocNode = member.jsDoc && member.jsDoc[member.jsDoc.length - 1];
                 const jsdocPos = jsdocNode ? ts.getLineAndCharacterOfPosition(member.getSourceFile(), jsdocNode.getStart()) : null;
 
                 const data = {
