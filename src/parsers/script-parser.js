@@ -5,7 +5,7 @@ import { AttributeParser } from './attribute-parser.js';
 import { ParsingError } from './parsing-error.js';
 import { hasTag } from '../utils/attribute-utils.js';
 import { zipArrays } from '../utils/generic-utils.js';
-import { flatMapAnyNodes, getJSDocCommentRanges, parseArrayLiteral, parseBooleanNode, parseFloatNode, parseStringNode } from '../utils/ts-utils.js';
+import { flatMapAnyNodes, getJSDocCommentRanges, getLiteralValue, parseArrayLiteral, parseBooleanNode, parseFloatNode, parseStringNode } from '../utils/ts-utils.js';
 
 /**
  * @typedef {object} Attribute
@@ -77,9 +77,9 @@ const SUPPORTED_INITIALIZABLE_TYPE_NAMES = new Map([
     ['Vec3', createNumberArgumentParser('Vec3', [0, 0, 0])],
     ['Vec4', createNumberArgumentParser('Vec4', [0, 0, 0, 0])],
     ['Color', createNumberArgumentParser('Color', [1, 1, 1, 1])],
-    ['number', parseFloatNode],
-    ['string', parseStringNode],
-    ['boolean', parseBooleanNode]
+    ['number', getLiteralValue],
+    ['string', getLiteralValue],
+    ['boolean', getLiteralValue]
 ]);
 
 /**

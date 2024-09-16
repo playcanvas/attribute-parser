@@ -44,7 +44,7 @@ class Example extends Script {
      * @attribute
      * @type {NumberEnum}
      */
-    e;
+    e = NumberEnum.A;
 
     /**
      * @attribute

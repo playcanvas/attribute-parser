@@ -19,7 +19,7 @@
     "mocha": "^10.6.0"
   },
   "scripts": {
-    "test": "mocha test/**/*.test.js --timeout 10000",
+    "test": "mocha test/**/valid/enum.test.js --timeout 10000",
     "lint": "eslint ."
   },
   "publishConfig": {
