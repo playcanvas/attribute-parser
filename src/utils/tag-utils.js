@@ -1,3 +1,5 @@
+import { DiagnosticCategory, flattenDiagnosticMessageText } from 'typescript';
+
 import { parseNumber, parseStringToNumericalArray } from './ts-utils.js';
 
 /**
@@ -35,15 +37,15 @@ export function parseTag(input = '') {
 
 /**
  * Validates that a tag value matches the expected type
- * 
- * @param value - The value to be validated.
- * @param typeAnnotation - The TypeScript type annotation as a string.
- * @param env - The environment containing the language service and file creation utilities.
+ *
+ * @param {String} value - The value to be validated.
+ * @param {String} typeAnnotation - The TypeScript type annotation as a string.
+ * @param {import('@typescript/vfs').VirtualTypeScriptEnvironment} env - The environment containing the language service and file creation utilities.
  * @throws Will throw an error if the value does not conform to the typeAnnotation.
- * @returns `true` if validation passes without type errors.
+ * @returns {true} if validation passes without type errors.
  */
 export function validateTag(value, typeAnnotation, env) {
-    const virtualFileName = "/___virtual__.ts";
+    const virtualFileName = '/___virtual__.ts';
     const sourceText = `let a: ${typeAnnotation} = ${value};`;
 
     // Create or overwrite the virtual file with the new source text
@@ -57,16 +59,12 @@ export function validateTag(value, typeAnnotation, env) {
 
     // Filter for type assignment errors (Error Code 2322: Type 'X' is not assignable to type 'Y')
     const typeErrors = errors.filter(
-        error => error.code === 2322 && error.category === ts.DiagnosticCategory.Error
+        error => error.code === 2322 && error.category === DiagnosticCategory.Error
     );
 
     // If any type error is found, throw an error with the diagnostic message
     if (typeErrors.length > 0) {
-        // TypeScript's messageText can be a string or a DiagnosticMessageChain
-        const errorMessage = typeErrors[0].messageText instanceof ts.DiagnosticMessageChain
-            ? flattenDiagnosticMessageText(typeErrors[0].messageText, "\n")
-            : typeErrors[0].messageText.toString();
-
+        const errorMessage = typeErrors[0].messageText.toString();
         throw new Error(`Type Validation Error: ${errorMessage}`);
     }
 
