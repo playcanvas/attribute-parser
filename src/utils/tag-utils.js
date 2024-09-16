@@ -1,4 +1,4 @@
-import { DiagnosticCategory, flattenDiagnosticMessageText } from 'typescript';
+import { DiagnosticCategory } from 'typescript';
 
 import { parseNumber, parseStringToNumericalArray } from './ts-utils.js';
 
