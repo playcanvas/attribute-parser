@@ -517,7 +517,7 @@ function evaluatePrefixUnaryExpression(node, typeChecker) {
 
 function handleObjectLiteral(node, typeChecker) {
     const obj = {};
-    node.properties.forEach(prop => {
+    node.properties.forEach((prop) => {
         if (ts.isPropertyAssignment(prop)) {
             const key = prop.name.getText();
             const value = getLiteralValue(prop.initializer, typeChecker);

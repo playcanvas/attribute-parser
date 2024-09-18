@@ -5,7 +5,7 @@ import { AttributeParser } from './attribute-parser.js';
 import { ParsingError } from './parsing-error.js';
 import { hasTag } from '../utils/attribute-utils.js';
 import { zipArrays } from '../utils/generic-utils.js';
-import { flatMapAnyNodes, getJSDocCommentRanges, getLiteralValue, parseArrayLiteral, parseBooleanNode, parseFloatNode, parseStringNode } from '../utils/ts-utils.js';
+import { flatMapAnyNodes, getJSDocCommentRanges, getLiteralValue, parseArrayLiteral, parseFloatNode } from '../utils/ts-utils.js';
 
 /**
  * @typedef {object} Attribute
@@ -189,9 +189,9 @@ const mapAttributesToOutput = (attribute) => {
 
     // If the attribute has no default value then set it
     if (attribute.value === undefined) {
-        if(attribute.type === 'string') attribute.value = '';
-        if(attribute.type === 'number') attribute.value = 0;
-        if(attribute.type === 'boolean') attribute.value = false;
+        if (attribute.type === 'string') attribute.value = '';
+        if (attribute.type === 'number') attribute.value = 0;
+        if (attribute.type === 'boolean') attribute.value = false;
     }
 
     // set the default value
