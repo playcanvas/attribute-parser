@@ -477,7 +477,7 @@ function resolveIdentifier(node, typeChecker) {
 /**
  * Resolve the value of a property access expression. Limited to simple cases like
  * object literals and variable declarations.
- * 
+ *
  * @param {import('typescript').Node} node - The property access expression node
  * @param {import('typescript')} typeChecker - The TypeScript type checker
  * @returns {any} - The resolved value of the property access
@@ -504,7 +504,7 @@ const resolvePropertyAccess = (node, typeChecker) => {
     }
 
     return undefined;
-}
+};
 
 /**
  * Evaluates unary prefixes like +, -, !, ~, and returns the result.
@@ -527,7 +527,7 @@ const evaluatePrefixUnaryExpression = (node, typeChecker) => {
         }
     }
     return undefined;
-}
+};
 
 function handleObjectLiteral(node, typeChecker) {
     const obj = {};
@@ -549,7 +549,7 @@ function handleObjectLiteral(node, typeChecker) {
  * Attempts to extract a literal value from a TypeScript node. This function
  * supports various types of literals and expressions, including object literals,
  * array literals, identifiers, and unary expressions.
- * 
+ *
  * @param {import('typescript').Node} node - The AST node to evaluate
  * @param {import('typescript').TypeChecker} typeChecker - The TypeScript type checker
  * @returns {any} - The extracted literal value
