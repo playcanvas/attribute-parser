@@ -474,7 +474,15 @@ function resolveIdentifier(node, typeChecker) {
     return undefined;
 }
 
-function resolvePropertyAccess(node, typeChecker) {
+/**
+ * Resolve the value of a property access expression. Limited to simple cases like
+ * object literals and variable declarations.
+ * 
+ * @param {import('typescript').Node} node - The property access expression node
+ * @param {import('typescript')} typeChecker - The TypeScript type checker
+ * @returns {any} - The resolved value of the property access
+ */
+const resolvePropertyAccess = (node, typeChecker) => {
     const symbol = typeChecker.getSymbolAtLocation(node);
     if (symbol && symbol.declarations) {
         for (const declaration of symbol.declarations) {
@@ -498,7 +506,13 @@ function resolvePropertyAccess(node, typeChecker) {
     return undefined;
 }
 
-function evaluatePrefixUnaryExpression(node, typeChecker) {
+/**
+ * Evaluates unary prefixes like +, -, !, ~, and returns the result.
+ * @param {import('typescript').Node} node - The AST node to evaluate
+ * @param {import('typescript').TypeChecker} typeChecker - The TypeScript type checker
+ * @returns {number | boolean | undefined} - The result of the evaluation
+ */
+const evaluatePrefixUnaryExpression = (node, typeChecker) => {
     const operandValue = getLiteralValue(node.operand, typeChecker);
     if (operandValue !== undefined) {
         switch (node.operator) {
@@ -531,7 +545,15 @@ function handleObjectLiteral(node, typeChecker) {
     return obj;
 }
 
-// Modify getLiteralValue to handle ObjectLiteralExpression
+/**
+ * Attempts to extract a literal value from a TypeScript node. This function
+ * supports various types of literals and expressions, including object literals,
+ * array literals, identifiers, and unary expressions.
+ * 
+ * @param {import('typescript').Node} node - The AST node to evaluate
+ * @param {import('typescript').TypeChecker} typeChecker - The TypeScript type checker
+ * @returns {any} - The extracted literal value
+ */
 export function getLiteralValue(node, typeChecker) {
     if (!node) return undefined;
 
