@@ -4,9 +4,9 @@ import { Script, Vec3 } from 'playcanvas';
  * @enum {number}
  */
 const NumberEnum = {
-    A: 0,
-    B: 1,
-    C: 2
+    A: 13,
+    B: 14,
+    C: 23
 };
 
 /**
