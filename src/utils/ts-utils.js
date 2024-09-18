@@ -535,7 +535,7 @@ function handleObjectLiteral(node, typeChecker) {
 export function getLiteralValue(node, typeChecker) {
     if (!node) return undefined;
 
-    if (ts.isLiteralExpression(node)) {
+    if (ts.isLiteralExpression(node) || ts.isBooleanLiteral(node)) {
         if (ts.isStringLiteral(node)) {
             return node.text;
         }

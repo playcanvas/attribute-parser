@@ -187,6 +187,13 @@ const mapAttributesToOutput = (attribute) => {
     // remove enum if it's empty
     if (attribute.enum.length === 0) delete attribute.enum;
 
+    // If the attribute has no default value then set it
+    if (attribute.value === undefined) {
+        if(attribute.type === 'string') attribute.value = '';
+        if(attribute.type === 'number') attribute.value = 0;
+        if(attribute.type === 'boolean') attribute.value = false;
+    }
+
     // set the default value
     if (attribute.value !== undefined) attribute.default = attribute.value;
 
