@@ -170,7 +170,7 @@ export class AttributeParser {
         const serializer = !array && this.typeSerializerMap.get(type);
         if (serializer) {
             try {
-                value = serializer(node.initializer ?? node);
+                value = serializer(node.initializer ?? node, this.typeChecker);
             } catch (error) {
                 errors.push(error);
                 return;
