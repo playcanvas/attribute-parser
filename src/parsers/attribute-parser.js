@@ -256,21 +256,7 @@ export class AttributeParser {
 
                 if (ts.isPropertyAssignment(property)) {
                     const name = property.name && ts.isIdentifier(property.name) && property.name.text;
-                    let value;
-
-                    const node = property.initializer;
-
-                    value = getLiteralValue(node, this.typeChecker);
-
-                    // Enums can only contain primitives (string|number|boolean)
-                    // if (ts.isNumericLiteral(node)) {
-                    //     value = parseFloat(node.getText());
-                    // } else if (node.kind === ts.SyntaxKind.TrueKeyword || node.kind === ts.SyntaxKind.FalseKeyword) {
-                    //     value = node.kind === ts.SyntaxKind.TrueKeyword;
-                    // } else {
-                    //     value = node.getText();
-                    // }
-
+                    const value = getLiteralValue(property.initializer, this.typeChecker);
                     members.push({ [name]: value });
                 }
             });
