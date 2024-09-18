@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 import { ParsingError } from './parsing-error.js';
 import { hasTag } from '../utils/attribute-utils.js';
 import { parseTag, validateTag } from '../utils/tag-utils.js';
-import { extractTextFromDocNode, getLeadingBlockCommentRanges, getType } from '../utils/ts-utils.js';
+import { extractTextFromDocNode, getLeadingBlockCommentRanges, getLiteralValue, getType } from '../utils/ts-utils.js';
 
 /**
  * A class to parse JSDoc comments and extract attribute metadata.
@@ -260,14 +260,16 @@ export class AttributeParser {
 
                     const node = property.initializer;
 
+                    value = getLiteralValue(node, this.typeChecker);
+
                     // Enums can only contain primitives (string|number|boolean)
-                    if (ts.isNumericLiteral(node)) {
-                        value = parseFloat(node.getText());
-                    } else if (node.kind === ts.SyntaxKind.TrueKeyword || node.kind === ts.SyntaxKind.FalseKeyword) {
-                        value = node.kind === ts.SyntaxKind.TrueKeyword;
-                    } else {
-                        value = node.getText();
-                    }
+                    // if (ts.isNumericLiteral(node)) {
+                    //     value = parseFloat(node.getText());
+                    // } else if (node.kind === ts.SyntaxKind.TrueKeyword || node.kind === ts.SyntaxKind.FalseKeyword) {
+                    //     value = node.kind === ts.SyntaxKind.TrueKeyword;
+                    // } else {
+                    //     value = node.getText();
+                    // }
 
                     members.push({ [name]: value });
                 }
