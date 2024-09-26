@@ -12,6 +12,7 @@ const NumberEnum = {
 /**
  * @enum {string}
  */
+// eslint-disable-next-line
 const StringEnum = {
     A: 'a',
     B: 'b',

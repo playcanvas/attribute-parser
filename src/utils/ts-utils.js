@@ -518,9 +518,9 @@ const resolvePropertyAccess = (node, typeChecker) => {
             if (ts.isVariableDeclaration(declaration) && declaration.initializer) {
                 return getLiteralValue(declaration.initializer, typeChecker);
             }
-            
-            if(ts.isEnumMember(declaration)) {
-                return declaration.initializer ? getLiteralValue(declaration.initializer, typeChecker) : declaration.name.getText()
+
+            if (ts.isEnumMember(declaration)) {
+                return declaration.initializer ? getLiteralValue(declaration.initializer, typeChecker) : declaration.name.getText();
             }
 
         }
