@@ -167,7 +167,7 @@ export class AttributeParser {
         let value = null;
 
         // we don't need to serialize the value for arrays
-        const serializer = !array && this.typeSerializerMap.get(type);
+        const serializer = !array && this.typeSerializerMap.get(typeName);
         if (serializer) {
             try {
                 value = serializer(node.initializer ?? node, this.typeChecker);
@@ -192,8 +192,8 @@ export class AttributeParser {
         let members = [];
 
         // Check if there's a type annotation directly on the variable declaration
-        if (ts.isVariableDeclaration(node) && node.type) {
-            typeNode = node.type;
+        if (node.type) {
+            typeNode = node;
         } else {
             // Check for JSDoc annotations
             const jsDocs = ts.getJSDocTags(node);
@@ -203,10 +203,13 @@ export class AttributeParser {
             }
         }
 
-        if (typeNode && ts.isTypeReferenceNode(typeNode.type)) {
+        // Also consider the elementType
+        const type = typeNode && (typeNode.type.elementType ?? typeNode.type);
+
+        if (typeNode && ts.isTypeReferenceNode(type)) {
 
             // resolve the symbol of the type
-            let symbol = this.typeChecker.getSymbolAtLocation(typeNode.type.typeName);
+            let symbol = this.typeChecker.getSymbolAtLocation(type.typeName);
 
             // Resolve aliases, which are common with imports
             if (symbol && symbol.flags & ts.SymbolFlags.Alias) {
@@ -222,7 +225,7 @@ export class AttributeParser {
 
                         // Check if the declaration is a TypeScript enum
                         if (ts.isEnumDeclaration(declaration)) {
-                            members = declaration.members.map(member => member.name.getText());
+                            members = declaration.members.map(member => ({ [member.name.getText()]: member.initializer.text }));
                         }
 
                         // Additionally check for JSDoc enum tag
