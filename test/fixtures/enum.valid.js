@@ -4,15 +4,14 @@ import { Script } from 'playcanvas';
  * @enum {number}
  */
 const NumberEnum = {
-    A: 0,
-    B: 1,
-    C: 2
+    A: 13,
+    B: 14,
+    C: 23
 };
 
 /**
  * @enum {string}
  */
-// eslint-disable-next-line
 const StringEnum = {
     A: 'a',
     B: 'b',
@@ -34,7 +33,7 @@ class Example extends Script {
      * @attribute
      * @type {NumberEnum}
      */
-    e;
+    e = NumberEnum.A;
 
     /**
      * @attribute

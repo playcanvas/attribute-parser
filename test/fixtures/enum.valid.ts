@@ -1,9 +1,9 @@
 import { Script, Vec3 } from 'playcanvas';
 
 enum NumberEnum {
-    A = 0,
-    B = 1,
-    C = 2
+    A = 13,
+    B = 14,
+    C = 23
 };
 
 enum StringEnum {
@@ -22,7 +22,7 @@ class Example extends Script {
     /**
      * @attribute
      */
-    e : NumberEnum;
+    e : NumberEnum = NumberEnum.A;
 
     /**
      * @attribute

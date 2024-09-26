@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 import { ParsingError } from './parsing-error.js';
 import { hasTag } from '../utils/attribute-utils.js';
 import { parseTag, validateTag } from '../utils/tag-utils.js';
-import { extractTextFromDocNode, getLeadingBlockCommentRanges, getType } from '../utils/ts-utils.js';
+import { extractTextFromDocNode, getLeadingBlockCommentRanges, getLiteralValue, getType } from '../utils/ts-utils.js';
 
 /**
  * A class to parse JSDoc comments and extract attribute metadata.
@@ -170,7 +170,7 @@ export class AttributeParser {
         const serializer = !array && this.typeSerializerMap.get(typeName);
         if (serializer) {
             try {
-                value = serializer(node.initializer ?? node);
+                value = serializer(node.initializer ?? node, this.typeChecker);
             } catch (error) {
                 errors.push(error);
                 return;
@@ -225,7 +225,7 @@ export class AttributeParser {
 
                         // Check if the declaration is a TypeScript enum
                         if (ts.isEnumDeclaration(declaration)) {
-                            members = declaration.members.map(member => member.name.getText());
+                            members = declaration.members.map(member => ({ [member.name.getText()]: member.initializer.text }));
                         }
 
                         // Additionally check for JSDoc enum tag
@@ -259,19 +259,7 @@ export class AttributeParser {
 
                 if (ts.isPropertyAssignment(property)) {
                     const name = property.name && ts.isIdentifier(property.name) && property.name.text;
-                    let value;
-
-                    const node = property.initializer;
-
-                    // Enums can only contain primitives (string|number|boolean)
-                    if (ts.isNumericLiteral(node)) {
-                        value = parseFloat(node.getText());
-                    } else if (node.kind === ts.SyntaxKind.TrueKeyword || node.kind === ts.SyntaxKind.FalseKeyword) {
-                        value = node.kind === ts.SyntaxKind.TrueKeyword;
-                    } else {
-                        value = node.getText();
-                    }
-
+                    const value = getLiteralValue(property.initializer, this.typeChecker);
                     members.push({ [name]: value });
                 }
             });

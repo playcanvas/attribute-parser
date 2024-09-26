@@ -486,6 +486,142 @@ export const parseBooleanNode = (node) => {
     return node.kind === ts.SyntaxKind.TrueKeyword;
 };
 
+function resolveIdentifier(node, typeChecker) {
+    const symbol = typeChecker.getSymbolAtLocation(node);
+    if (symbol && symbol.declarations) {
+        for (const declaration of symbol.declarations) {
+            if (ts.isVariableDeclaration(declaration) && declaration.initializer) {
+                return getLiteralValue(declaration.initializer, typeChecker);
+            }
+            // Handle other kinds of declarations if needed
+        }
+    }
+    return undefined;
+}
+
+/**
+ * Resolve the value of a property access expression. Limited to simple cases like
+ * object literals and variable declarations.
+ *
+ * @param {import('typescript').Node} node - The property access expression node
+ * @param {import('typescript')} typeChecker - The TypeScript type checker
+ * @returns {any} - The resolved value of the property access
+ */
+const resolvePropertyAccess = (node, typeChecker) => {
+    const symbol = typeChecker.getSymbolAtLocation(node);
+    if (symbol && symbol.declarations) {
+        for (const declaration of symbol.declarations) {
+            if (ts.isPropertyAssignment(declaration) && declaration.initializer) {
+                return getLiteralValue(declaration.initializer, typeChecker);
+            }
+
+            if (ts.isVariableDeclaration(declaration) && declaration.initializer) {
+                return getLiteralValue(declaration.initializer, typeChecker);
+            }
+            
+            if(ts.isEnumMember(declaration)) {
+                return declaration.initializer ? getLiteralValue(declaration.initializer, typeChecker) : declaration.name.getText()
+            }
+
+        }
+    }
+
+    // If symbol not found directly, attempt to resolve the object first
+    const objValue = getLiteralValue(node.expression, typeChecker);
+    if (objValue && typeof objValue === 'object') {
+        const propName = node.name.text;
+        return objValue[propName];
+    }
+
+    return undefined;
+};
+
+/**
+ * Evaluates unary prefixes like +, -, !, ~, and returns the result.
+ * @param {import('typescript').Node} node - The AST node to evaluate
+ * @param {import('typescript').TypeChecker} typeChecker - The TypeScript type checker
+ * @returns {number | boolean | undefined} - The result of the evaluation
+ */
+const evaluatePrefixUnaryExpression = (node, typeChecker) => {
+    const operandValue = getLiteralValue(node.operand, typeChecker);
+    if (operandValue !== undefined) {
+        switch (node.operator) {
+            case ts.SyntaxKind.PlusToken:
+                return +operandValue;
+            case ts.SyntaxKind.MinusToken:
+                return -operandValue;
+            case ts.SyntaxKind.ExclamationToken:
+                return !operandValue;
+            case ts.SyntaxKind.TildeToken:
+                return ~operandValue;
+        }
+    }
+    return undefined;
+};
+
+function handleObjectLiteral(node, typeChecker) {
+    const obj = {};
+    node.properties.forEach((prop) => {
+        if (ts.isPropertyAssignment(prop)) {
+            const key = prop.name.getText();
+            const value = getLiteralValue(prop.initializer, typeChecker);
+            obj[key] = value;
+        } else if (ts.isShorthandPropertyAssignment(prop)) {
+            const key = prop.name.getText();
+            const value = resolveIdentifier(prop.name, typeChecker);
+            obj[key] = value;
+        }
+    });
+    return obj;
+}
+
+/**
+ * Attempts to extract a literal value from a TypeScript node. This function
+ * supports various types of literals and expressions, including object literals,
+ * array literals, identifiers, and unary expressions.
+ *
+ * @param {import('typescript').Node} node - The AST node to evaluate
+ * @param {import('typescript').TypeChecker} typeChecker - The TypeScript type checker
+ * @returns {any} - The extracted literal value
+ */
+export function getLiteralValue(node, typeChecker) {
+    if (!node) return undefined;
+
+    if (ts.isLiteralExpression(node) || ts.isBooleanLiteral(node)) {
+        if (ts.isStringLiteral(node)) {
+            return node.text;
+        }
+        if (ts.isNumericLiteral(node)) {
+            return Number(node.text);
+        }
+        if (node.kind === ts.SyntaxKind.TrueKeyword) {
+            return true;
+        }
+        if (node.kind === ts.SyntaxKind.FalseKeyword) {
+            return false;
+        }
+    }
+
+    switch (node.kind) {
+        case ts.SyntaxKind.NullKeyword:
+            return null;
+        case ts.SyntaxKind.ArrayLiteralExpression:
+            return (node).elements.map(element => getLiteralValue(element, typeChecker));
+        case ts.SyntaxKind.ObjectLiteralExpression:
+            return handleObjectLiteral(node, typeChecker);
+        case ts.SyntaxKind.Identifier:
+            return resolveIdentifier(node, typeChecker);
+        case ts.SyntaxKind.PropertyAccessExpression:
+            return resolvePropertyAccess(node, typeChecker);
+        case ts.SyntaxKind.ParenthesizedExpression:
+            return getLiteralValue((node).expression, typeChecker);
+        case ts.SyntaxKind.PrefixUnaryExpression:
+            return evaluatePrefixUnaryExpression(node, typeChecker);
+        default:
+            return undefined;
+    }
+}
+
 /**
  * If the given node is a string literal, returns the parsed string.
  * @param {import('typescript').Node} node - The node to check

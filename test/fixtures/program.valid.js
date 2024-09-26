@@ -8,13 +8,17 @@ export const MyEnum = { value: 0 };
 class Example extends Script {
     /**
      * @attribute
-     * @type {boolean}
+     * @precision 1
+     * @type {number}
      */
-    a = false;
+    a;
 
     initialize() {
         confetti();
         new TWEEN.Tween({ x: 0 }).to({ x: 100 }, 1000).start();
+
+        // This is an intentional type error, but the parser should ignore these
+        this.a = 'string';
     }
 }
 
