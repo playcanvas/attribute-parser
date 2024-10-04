@@ -51,7 +51,7 @@ export class JSDocParser {
             // This is a node only option. If no lib path is passed, attempt to resolve ES types from node_modules.
             fsMap = await createDefaultMapFromNodeModules(COMPILER_OPTIONS, ts);
 
-        } else if(libPath.endsWith('.d.ts')) {
+        } else if (libPath.endsWith('.d.ts')) {
 
             // If the libPath is a '.d.ts' file then load it and add it
             const types = await fetch(libPath).then(r => r.text());
