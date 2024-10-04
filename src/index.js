@@ -8,9 +8,10 @@ import { createDefaultMapFromCDN, flatMapAnyNodes, getExportedNodes, getType, in
 const toLowerCamelCase = str => str[0].toLowerCase() + str.substring(1);
 
 const COMPILER_OPTIONS = {
+    noLib: true,
     strict: false,
     skipLibCheck: true, // Skip type checking of declaration files
-    target: ts.ScriptTarget.ES2022, // If this version changes, the types must be updated in the /rollup.config.mjs
+    target: ts.ScriptTarget.ES2023, // If this version changes, the types must be updated in the /rollup.config.mjs
     module: ts.ModuleKind.CommonJS,
     checkJs: true, // Enable JSDoc parsing
     allowJs: true,
@@ -39,16 +40,18 @@ export class JSDocParser {
      * @param {string} libPath - The path to standard library files
      * @returns {Promise<JSDocParser>} - The initialized JSDocParser
      */
-    async init(libPath = '') {
+    async init(libPath) {
         if (this._env) {
             return this;
         }
 
         let fsMap;
-        if (libPath) {
-            fsMap = await createDefaultMapFromCDN({ target: ts.ScriptTarget.ES2022 }, libPath, ts);
-        } else {
+        // This is a node only option. If no lib path is passed, attempt to resolve ES types from node_modules.
+        if (!libPath) {
             fsMap = await createDefaultMapFromNodeModules(COMPILER_OPTIONS, ts);
+        } else {
+            const types = await fetch(libPath).then(r => r.text());
+            fsMap = new Map([['/lib.d.ts', types]]);
         }
 
         // Set up the virtual file system and environment
