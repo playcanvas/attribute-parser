@@ -345,8 +345,12 @@ export function getPrimitiveEnumType(type, typeChecker) {
 export function getType(node, typeChecker) {
     if (node?.name?.kind === ts.SyntaxKind.Identifier) {
         const type = typeChecker.getTypeAtLocation(node);
-        const array = typeChecker.isArrayType(type);
-        const actualType = array ? typeChecker.getElementTypeOfArrayType(type) : type;
+
+        // If this is a union, get the first type
+        const isEnum = !!(type.aliasSymbol && (type.aliasSymbol.flags & ts.SymbolFlags.Enum));
+        const firstType = !isEnum && type.isUnion() ? type.types[0] : type;
+        const array = typeChecker.isArrayType(firstType);
+        const actualType = array ? typeChecker.getElementTypeOfArrayType(firstType) : firstType;
         const name = getPrimitiveEnumType(actualType, typeChecker) ?? typeChecker.typeToString(actualType);
 
         return { type: actualType, name, array };

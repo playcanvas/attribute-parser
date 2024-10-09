@@ -28,6 +28,13 @@ class Example extends Script {
      * @type {number}
      */
     c;
+
+    /**
+     * Union Types. Takes the first type
+     * @attribute
+     * @type {string | number}
+     */
+    d
 }
 
 export { Example };
