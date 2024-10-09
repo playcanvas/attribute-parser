@@ -1,4 +1,4 @@
-import { Script } from 'playcanvas'
+import { Script } from 'playcanvas';
 
 export class Example extends Script {
     /**

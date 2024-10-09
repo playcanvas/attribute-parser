@@ -1,4 +1,5 @@
 import { Script } from 'playcanvas';
+
 import { Example } from './example.dep.js';
 
 class ExampleExtended extends Example {

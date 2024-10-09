@@ -211,7 +211,7 @@ export function getJSDocCommentRanges(node, typeChecker) {
     if (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) {
         // get an array of the class an all parent classed
         const heritageChain = getSuperClasses(node, typeChecker)
-        .filter(classNode => !classNode.getSourceFile().isDeclarationFile)
+        .filter(classNode => !classNode.getSourceFile().isDeclarationFile);
 
         // iterate over the heritance chain
         heritageChain.forEach((classNode) => {
