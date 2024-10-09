@@ -321,8 +321,6 @@ export class ScriptParser {
             return attributes;
         }
 
-        // const buffer = node.getSourceFile().getFullText();
-
         // Find "/** */" style comments associated with this node.
         const comments = getJSDocCommentRanges(node, this.typeChecker);
 
