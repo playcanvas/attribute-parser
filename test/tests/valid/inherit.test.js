@@ -6,7 +6,7 @@ import { parseAttributes } from '../../utils.js';
 describe('VALID: Script inheritance attributes', function () {
     let data;
     before(async function () {
-        data = await parseAttributes('./inherit.valid.js');
+        data = await parseAttributes('./inherit.valid.js', './example.dep.js');
     });
 
     it('only results should exist', function () {

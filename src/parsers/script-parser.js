@@ -321,17 +321,19 @@ export class ScriptParser {
             return attributes;
         }
 
-        const buffer = node.getSourceFile().getFullText();
+        // const buffer = node.getSourceFile().getFullText();
 
         // Find "/** */" style comments associated with this node.
-        const comments = getJSDocCommentRanges(node, buffer, this.typeChecker);
+        const comments = getJSDocCommentRanges(node, this.typeChecker);
 
         // Parse the comments for attribute metadata
         for (const comment of comments) {
 
+            const memberFileText = comment.member.getSourceFile().getFullText();
+
             // Parse the comment for attribute metadata
             const attributeMetadata = this.attributeParser.parseAttributeComment(
-                TextRange.fromStringRange(buffer, comment.range.pos, comment.range.end),
+                TextRange.fromStringRange(memberFileText, comment.range.pos, comment.range.end),
                 comment.member,
                 errors,
                 requiresAttributeTag

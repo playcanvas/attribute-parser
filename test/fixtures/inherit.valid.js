@@ -1,12 +1,5 @@
 import { Script } from 'playcanvas';
-
-class Example extends Script {
-    /**
-     * @attribute
-     * @type {boolean}
-     */
-    a;
-}
+import { Example } from './example.dep.js';
 
 class ExampleExtended extends Example {
     /**

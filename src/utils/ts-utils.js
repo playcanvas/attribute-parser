@@ -205,12 +205,13 @@ function getSuperClasses(node, typeChecker) {
  * @param {import('typescript').TypeChecker} typeChecker - The TypeScript type checker
  * @returns {{ memberName: string, member: ts.Node, range: import('typescript').CommentRange}[]} - An array of comment ranges
  */
-export function getJSDocCommentRanges(node, text, typeChecker) {
+export function getJSDocCommentRanges(node, typeChecker) {
     const commentRanges = [];
 
     if (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) {
         // get an array of the class an all parent classed
-        const heritageChain = getSuperClasses(node, typeChecker);
+        const heritageChain = getSuperClasses(node, typeChecker)
+        .filter(classNode => !classNode.getSourceFile().isDeclarationFile)
 
         // iterate over the heritance chain
         heritageChain.forEach((classNode) => {
@@ -218,7 +219,7 @@ export function getJSDocCommentRanges(node, text, typeChecker) {
             classNode.members.forEach((member) => {
                 if (ts.isPropertyDeclaration(member) || ts.isSetAccessor(member) || ts.isPropertySignature(member)) {
                     const memberName = member.name && ts.isIdentifier(member.name) ? member.name.text : 'unnamed';
-                    const ranges = getLeadingBlockCommentRanges(member, text);
+                    const ranges = getLeadingBlockCommentRanges(member, member.getSourceFile().getFullText());
                     if (ranges.length > 0) {
                         commentRanges.push({
                             memberName,
