@@ -24,6 +24,14 @@ describe('VALID: Script inheritance attributes', function () {
     it('ExampleExtended: should exist without errors', function () {
         expect(data[0]?.exampleExtended).to.exist;
         expect(data[0].exampleExtended.attributes).to.not.be.empty;
+        expect(data[0].exampleExtended.attributes.a).to.exist;
+        expect(data[0].exampleExtended.attributes.a.type).to.equal('boolean');
+        expect(data[0].exampleExtended.attributes.a.array).to.equal(false);
+        expect(data[0].exampleExtended.attributes.a.default).to.equal(false);
+        expect(data[0].exampleExtended.attributes.b).to.be.exists;
+        expect(data[0].exampleExtended.attributes.b.type).to.equal('number');
+        expect(data[0].exampleExtended.attributes.b.array).to.equal(false);
+        expect(data[0].exampleExtended.attributes.b.default).to.equal(0);
         expect(data[0].exampleExtended.errors).to.be.empty;
     });
 
