@@ -45,7 +45,7 @@ function resolveAliasedSymbol(typeChecker, symbol) {
  * Returns an array of exported nodes from a TypeScript source file.
  * @param {import('typescript').Program} program - The TypeScript program
  * @param {import('typescript').SourceFile} sourceFile - The TypeScript source file
- * @returns {Set<import('typescript').Node>} - A Set of exported nodes
+ * @returns {let map: Map<string, Set<import('typescript').Node>>} - A Map of exported nodes
  */
 export function getExportedNodes(program, sourceFile) {
     if (!program || !sourceFile) {
@@ -62,16 +62,18 @@ export function getExportedNodes(program, sourceFile) {
     const exportedSymbols = typeChecker.getExportsOfModule(moduleSymbol);
 
     // Find the actual declaration nodes for each exported symbol
-    const exportedNodes = [];
+    const exportedNodes = new Map();
 
     exportedSymbols.forEach((symbol) => {
         const resolvedSymbol = resolveAliasedSymbol(typeChecker, symbol);
         if (resolvedSymbol.declarations) {
-            exportedNodes.push(...resolvedSymbol.declarations);
+            const node = resolvedSymbol.declarations[0];
+            const name = symbol.name === 'default' ? node.name.getText() : symbol.name;
+            exportedNodes.set(name, node);
         }
     });
 
-    return new Set(exportedNodes);
+    return exportedNodes;
 }
 
 /**
