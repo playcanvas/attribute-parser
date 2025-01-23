@@ -48,12 +48,16 @@ describe('VALID: Export Script', function () {
     it('ExampleImport: should exist without attributes or errors', function () {
         expect(data[0]?.exampleImport).to.exist;
         expect(data[0].exampleImport.attributes).to.not.be.empty;
+        expect(data[0].exampleImport.attributes.prop.type).to.equal('number');
+        expect(data[0].exampleImport.attributes.prop.default).to.equal(10);
         expect(data[0].exampleImport.errors).to.be.empty;
     });
 
     it('ExampleImportExtend: should exist without attributes or errors', function () {
         expect(data[0]?.exampleImportExtend).to.exist;
-        expect(data[0].exampleImportExtend.attributes).to.be.empty;
+        expect(data[0].exampleImportExtend.attributes).to.not.be.empty;
+        expect(data[0].exampleImportExtend.attributes.prop.type).to.equal('number');
+        expect(data[0].exampleImportExtend.attributes.prop.default).to.equal(10);
         expect(data[0].exampleImportExtend.errors).to.be.empty;
     });
 
