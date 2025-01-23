@@ -24,12 +24,12 @@ export function parseTag(input = '') {
     try {
         const arr = parseStringToNumericalArray(input);
         if (Array.isArray(arr)) return arr;
-    } catch { /* eslint-disable-next-line no-empty */ }
+    } catch { }
 
     try {
         const arr = JSON.parse(input);
         if (Array.isArray(arr)) return arr;
-    } catch { /* eslint-disable-next-line no-empty */ }
+    } catch { }
 
     // If none of the above, return the string
     return input;
