@@ -15,7 +15,7 @@ describe('VALID: Export Script', function () {
         expect(data[1]).to.be.empty;
     });
 
-    it('Example: should exist without attributes or errors', function () {
+    it('Example: should exist with attributes', function () {
         expect(data[0]?.example).to.exist;
         expect(data[0].example.attributes).to.not.be.empty;
         expect(data[0].example.errors).to.be.empty;
@@ -45,7 +45,7 @@ describe('VALID: Export Script', function () {
         expect(data[0].exampleExportAs.errors).to.be.empty;
     });
 
-    it('ExampleImport: should exist without attributes or errors', function () {
+    it('ExampleImport: should exist with attributes', function () {
         expect(data[0]?.exampleImport).to.exist;
         expect(data[0].exampleImport.attributes).to.not.be.empty;
         expect(data[0].exampleImport.attributes.prop.type).to.equal('number');
@@ -53,7 +53,7 @@ describe('VALID: Export Script', function () {
         expect(data[0].exampleImport.errors).to.be.empty;
     });
 
-    it('ExampleImportExtend: should exist without attributes or errors', function () {
+    it('ExampleImportExtend: should exist with attributes', function () {
         expect(data[0]?.exampleImportExtend).to.exist;
         expect(data[0].exampleImportExtend.attributes).to.not.be.empty;
         expect(data[0].exampleImportExtend.attributes.prop.type).to.equal('number');
