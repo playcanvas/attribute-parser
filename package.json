@@ -14,8 +14,8 @@
     "typescript": "^5.5.3"
   },
   "devDependencies": {
-    "chai": "5.1.1",
-    "globals": "15.9.0",
+    "chai": "5.1.2",
+    "globals": "15.14.0",
     "mocha": "11.1.0"
   },
   "scripts": {
