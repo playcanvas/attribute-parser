@@ -15,9 +15,9 @@ describe('VALID: Export Script', function () {
         expect(data[1]).to.be.empty;
     });
 
-    it('Example: should exist without attributes or errors', function () {
+    it('Example: should exist with attributes', function () {
         expect(data[0]?.example).to.exist;
-        expect(data[0].example.attributes).to.be.empty;
+        expect(data[0].example.attributes).to.not.be.empty;
         expect(data[0].example.errors).to.be.empty;
     });
 
@@ -33,19 +33,31 @@ describe('VALID: Export Script', function () {
         expect(data[0].exampleDefault.errors).to.be.empty;
     });
 
-    it('ExampleExportAs: should not exist', function () {
-        expect(data[0]?.exampleExportAs).to.not.exist;
+    it('ExampleImportAsExport: should not exist', function () {
+        expect(data[0]?.exampleImportAsExport).to.exist;
+        expect(data[0].exampleImportAsExport.attributes).to.not.be.empty;
+        expect(data[0].exampleImportAsExport.errors).to.be.empty;
     });
 
-    it('ExampleImport: should exist without attributes or errors', function () {
+    it('ExampleExportAs: should not exist', function () {
+        expect(data[0]?.exampleExportAs).to.exist;
+        expect(data[0].exampleExportAs.attributes).to.not.be.empty;
+        expect(data[0].exampleExportAs.errors).to.be.empty;
+    });
+
+    it('ExampleImport: should exist with attributes', function () {
         expect(data[0]?.exampleImport).to.exist;
-        expect(data[0].exampleImport.attributes).to.be.empty;
+        expect(data[0].exampleImport.attributes).to.not.be.empty;
+        expect(data[0].exampleImport.attributes.prop.type).to.equal('number');
+        expect(data[0].exampleImport.attributes.prop.default).to.equal(10);
         expect(data[0].exampleImport.errors).to.be.empty;
     });
 
-    it('ExampleImportExtend: should exist without attributes or errors', function () {
+    it('ExampleImportExtend: should exist with attributes', function () {
         expect(data[0]?.exampleImportExtend).to.exist;
-        expect(data[0].exampleImportExtend.attributes).to.be.empty;
+        expect(data[0].exampleImportExtend.attributes).to.not.be.empty;
+        expect(data[0].exampleImportExtend.attributes.prop.type).to.equal('number');
+        expect(data[0].exampleImportExtend.attributes.prop.default).to.equal(10);
         expect(data[0].exampleImportExtend.errors).to.be.empty;
     });
 
