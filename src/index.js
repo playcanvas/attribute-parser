@@ -8,9 +8,10 @@ import { createDefaultMapFromCDN, flatMapAnyNodes, getExportedNodes, getType, in
 const toLowerCamelCase = str => str[0].toLowerCase() + str.substring(1);
 
 const COMPILER_OPTIONS = {
+    noLib: true,
     strict: false,
     skipLibCheck: true, // Skip type checking of declaration files
-    target: ts.ScriptTarget.ES2022, // If this version changes, the types must be updated in the /rollup.config.mjs
+    target: ts.ScriptTarget.ES2023, // If this version changes, the types must be updated in the /rollup.config.mjs
     module: ts.ModuleKind.CommonJS,
     checkJs: true, // Enable JSDoc parsing
     allowJs: true,
@@ -36,19 +37,30 @@ export class JSDocParser {
     /**
      * Initializes the JSDocParser with the standard library files
      *
-     * @param {string} libPath - The path to standard library files
+     * @param {string} libPath - A path to a directory of library types, or a path to the '.d.ts' file itself
      * @returns {Promise<JSDocParser>} - The initialized JSDocParser
      */
-    async init(libPath = '') {
+    async init(libPath) {
         if (this._env) {
             return this;
         }
 
         let fsMap;
-        if (libPath) {
-            fsMap = await createDefaultMapFromCDN({ target: ts.ScriptTarget.ES2022 }, libPath, ts);
-        } else {
+        if (!libPath) {
+
+            // This is a node only option. If no lib path is passed, attempt to resolve ES types from node_modules.
             fsMap = await createDefaultMapFromNodeModules(COMPILER_OPTIONS, ts);
+
+        } else if (libPath.endsWith('.d.ts')) {
+
+            // If the libPath is a '.d.ts' file then load it and add it
+            const types = await fetch(libPath).then(r => r.text());
+            fsMap = new Map([['/lib.d.ts', types]]);
+
+        } else {
+
+            // A libPath was supplied, but not to a '.d.ts', so assume this is a path to types
+            fsMap = await createDefaultMapFromCDN(COMPILER_OPTIONS, libPath, ts);
         }
 
         // Set up the virtual file system and environment
@@ -214,7 +226,7 @@ export class JSDocParser {
 
                 const namePos = ts.getLineAndCharacterOfPosition(member.getSourceFile(), member.name.getStart());
 
-                const jsdocNode = member.jsDoc[member.jsDoc.length - 1];
+                const jsdocNode = member.jsDoc && member.jsDoc[member.jsDoc.length - 1];
                 const jsdocPos = jsdocNode ? ts.getLineAndCharacterOfPosition(member.getSourceFile(), jsdocNode.getStart()) : null;
 
                 const data = {

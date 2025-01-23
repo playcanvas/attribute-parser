@@ -1,3 +1,5 @@
+import { DiagnosticCategory } from 'typescript';
+
 import { parseNumber, parseStringToNumericalArray } from './ts-utils.js';
 
 /**
@@ -22,12 +24,12 @@ export function parseTag(input = '') {
     try {
         const arr = parseStringToNumericalArray(input);
         if (Array.isArray(arr)) return arr;
-    } catch { /* eslint-disable-next-line no-empty */ }
+    } catch { }
 
     try {
         const arr = JSON.parse(input);
         if (Array.isArray(arr)) return arr;
-    } catch { /* eslint-disable-next-line no-empty */ }
+    } catch { }
 
     // If none of the above, return the string
     return input;
@@ -35,31 +37,37 @@ export function parseTag(input = '') {
 
 /**
  * Validates that a tag value matches the expected type
- * @throws {Error} - If the tag value is not the expected type
  *
- * @param {String} value - The string representation of the value to type check
- * @param {string} typeAnnotation - The expected type
- * @param {import('@typescript/vfs').VirtualTypeScriptEnvironment} env - The environment to validate in
- * @returns {boolean} - Whether the tag value is valid
+ * @param {String} value - The value to be validated.
+ * @param {String} typeAnnotation - The TypeScript type annotation as a string.
+ * @param {import('@typescript/vfs').VirtualTypeScriptEnvironment} env - The environment containing the language service and file creation utilities.
+ * @throws Will throw an error if the value does not conform to the typeAnnotation.
+ * @returns {true} if validation passes without type errors.
  */
 export function validateTag(value, typeAnnotation, env) {
-
+    const virtualFileName = '/___virtual__.ts';
     const sourceText = `let a: ${typeAnnotation} = ${value};`;
-    env.createFile('/___virtual__.ts', sourceText);
 
-    // Get the program and check for semantic errors
-    const program = env.languageService.getProgram();
-    const errors = program.getSemanticDiagnostics();
+    // Create or overwrite the virtual file with the new source text
+    env.createFile(virtualFileName, sourceText);
 
-    // Filter against the type errors we're concerned with
-    const typeErrors = errors.filter(error => error.category === 1 && error.code === 2322);
+    // Retrieve the language service from the environment
+    const languageService = env.languageService;
 
-    // return first error
-    const typeError = typeErrors[0];
+    // Fetch semantic diagnostics only for the virtual file
+    const errors = languageService.getSemanticDiagnostics(virtualFileName);
 
-    if (typeError) {
-        throw new Error(`${typeError.messageText}`);
+    // Filter for type assignment errors (Error Code 2322: Type 'X' is not assignable to type 'Y')
+    const typeErrors = errors.filter(
+        error => error.code === 2322 && error.category === DiagnosticCategory.Error
+    );
+
+    // If any type error is found, throw an error with the diagnostic message
+    if (typeErrors.length > 0) {
+        const errorMessage = typeErrors[0].messageText.toString();
+        throw new Error(`Type Validation Error: ${errorMessage}`);
     }
 
+    // If no type errors are found, return true indicating successful validation
     return true;
 }

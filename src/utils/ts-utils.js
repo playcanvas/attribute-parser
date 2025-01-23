@@ -5,8 +5,8 @@ import * as ts from 'typescript';
 import { ParsingError } from '../parsers/parsing-error.js';
 
 export function createDefaultMapFromCDN(options, prefix, ts) {
-    var fsMap = new Map();
-    var files = knownLibFilesForCompilerOptions(options, ts);
+    const fsMap = new Map();
+    const files = knownLibFilesForCompilerOptions(options, ts);
 
     async function uncached() {
         const contentPromises = files.map((lib) => {
@@ -207,20 +207,21 @@ function getSuperClasses(node, typeChecker) {
  * @param {import('typescript').TypeChecker} typeChecker - The TypeScript type checker
  * @returns {{ memberName: string, member: ts.Node, range: import('typescript').CommentRange}[]} - An array of comment ranges
  */
-export function getJSDocCommentRanges(node, text, typeChecker) {
+export function getJSDocCommentRanges(node, typeChecker) {
     const commentRanges = [];
 
-    if (ts.isClassDeclaration(node)) {
+    if (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) {
         // get an array of the class an all parent classed
-        const heritageChain = getSuperClasses(node, typeChecker);
+        const heritageChain = getSuperClasses(node, typeChecker)
+        .filter(classNode => !classNode.getSourceFile().isDeclarationFile);
 
         // iterate over the heritance chain
         heritageChain.forEach((classNode) => {
             // for each class iterate over it's class members
             classNode.members.forEach((member) => {
-                if (ts.isPropertyDeclaration(member) || ts.isSetAccessor(member)) {
+                if (ts.isPropertyDeclaration(member) || ts.isSetAccessor(member) || ts.isPropertySignature(member)) {
                     const memberName = member.name && ts.isIdentifier(member.name) ? member.name.text : 'unnamed';
-                    const ranges = getLeadingBlockCommentRanges(member, text);
+                    const ranges = getLeadingBlockCommentRanges(member, member.getSourceFile().getFullText());
                     if (ranges.length > 0) {
                         commentRanges.push({
                             memberName,
@@ -313,6 +314,31 @@ export function isEnum(node) {
 }
 
 /**
+ * Determines the primitive type for enums, or falls back to the actual type name.
+ *
+ * @param {ts.Type} type - The type to inspect.
+ * @param {ts.TypeChecker} typeChecker - The TypeScript type checker.
+ * @returns {'string' | 'boolean' | 'number' | null} - The primitive type of the enum or the type's name.
+ */
+export function getPrimitiveEnumType(type, typeChecker) {
+    // Check if the type is an enum type
+    if (!type.symbol?.declarations?.some(decl => ts.isEnumDeclaration(decl))) return null;
+
+    // Get the type of enum members
+    const enumMembers = type.symbol.declarations[0].members;
+    const firstMemberValue = typeChecker.getConstantValue(enumMembers[0]);
+
+    const validEnumType = [
+        'number',
+        'string',
+        'boolean'
+    ];
+
+    const typeOf = typeof firstMemberValue;
+    return validEnumType.includes(typeOf) ? typeOf : null;
+}
+
+/**
  * Gets the inferred type of a TypeScript node.
  *
  * @param {ts.Node} node - The TypeScript node to analyze
@@ -324,7 +350,7 @@ export function getType(node, typeChecker) {
         const type = typeChecker.getTypeAtLocation(node);
         const array = typeChecker.isArrayType(type);
         const actualType = array ? typeChecker.getElementTypeOfArrayType(type) : type;
-        const name = typeChecker.typeToString(actualType);
+        const name = getPrimitiveEnumType(actualType, typeChecker) ?? typeChecker.typeToString(actualType);
 
         return { type: actualType, name, array };
     }
@@ -462,6 +488,142 @@ export const parseBooleanNode = (node) => {
     }
     return node.kind === ts.SyntaxKind.TrueKeyword;
 };
+
+function resolveIdentifier(node, typeChecker) {
+    const symbol = typeChecker.getSymbolAtLocation(node);
+    if (symbol && symbol.declarations) {
+        for (const declaration of symbol.declarations) {
+            if (ts.isVariableDeclaration(declaration) && declaration.initializer) {
+                return getLiteralValue(declaration.initializer, typeChecker);
+            }
+            // Handle other kinds of declarations if needed
+        }
+    }
+    return undefined;
+}
+
+/**
+ * Resolve the value of a property access expression. Limited to simple cases like
+ * object literals and variable declarations.
+ *
+ * @param {import('typescript').Node} node - The property access expression node
+ * @param {import('typescript')} typeChecker - The TypeScript type checker
+ * @returns {any} - The resolved value of the property access
+ */
+const resolvePropertyAccess = (node, typeChecker) => {
+    const symbol = typeChecker.getSymbolAtLocation(node);
+    if (symbol && symbol.declarations) {
+        for (const declaration of symbol.declarations) {
+            if (ts.isPropertyAssignment(declaration) && declaration.initializer) {
+                return getLiteralValue(declaration.initializer, typeChecker);
+            }
+
+            if (ts.isVariableDeclaration(declaration) && declaration.initializer) {
+                return getLiteralValue(declaration.initializer, typeChecker);
+            }
+
+            if (ts.isEnumMember(declaration)) {
+                return declaration.initializer ? getLiteralValue(declaration.initializer, typeChecker) : declaration.name.getText();
+            }
+
+        }
+    }
+
+    // If symbol not found directly, attempt to resolve the object first
+    const objValue = getLiteralValue(node.expression, typeChecker);
+    if (objValue && typeof objValue === 'object') {
+        const propName = node.name.text;
+        return objValue[propName];
+    }
+
+    return undefined;
+};
+
+/**
+ * Evaluates unary prefixes like +, -, !, ~, and returns the result.
+ * @param {import('typescript').Node} node - The AST node to evaluate
+ * @param {import('typescript').TypeChecker} typeChecker - The TypeScript type checker
+ * @returns {number | boolean | undefined} - The result of the evaluation
+ */
+const evaluatePrefixUnaryExpression = (node, typeChecker) => {
+    const operandValue = getLiteralValue(node.operand, typeChecker);
+    if (operandValue !== undefined) {
+        switch (node.operator) {
+            case ts.SyntaxKind.PlusToken:
+                return +operandValue;
+            case ts.SyntaxKind.MinusToken:
+                return -operandValue;
+            case ts.SyntaxKind.ExclamationToken:
+                return !operandValue;
+            case ts.SyntaxKind.TildeToken:
+                return ~operandValue;
+        }
+    }
+    return undefined;
+};
+
+function handleObjectLiteral(node, typeChecker) {
+    const obj = {};
+    node.properties.forEach((prop) => {
+        if (ts.isPropertyAssignment(prop)) {
+            const key = prop.name.getText();
+            const value = getLiteralValue(prop.initializer, typeChecker);
+            obj[key] = value;
+        } else if (ts.isShorthandPropertyAssignment(prop)) {
+            const key = prop.name.getText();
+            const value = resolveIdentifier(prop.name, typeChecker);
+            obj[key] = value;
+        }
+    });
+    return obj;
+}
+
+/**
+ * Attempts to extract a literal value from a TypeScript node. This function
+ * supports various types of literals and expressions, including object literals,
+ * array literals, identifiers, and unary expressions.
+ *
+ * @param {import('typescript').Node} node - The AST node to evaluate
+ * @param {import('typescript').TypeChecker} typeChecker - The TypeScript type checker
+ * @returns {any} - The extracted literal value
+ */
+export function getLiteralValue(node, typeChecker) {
+    if (!node) return undefined;
+
+    if (ts.isLiteralExpression(node) || ts.isBooleanLiteral(node)) {
+        if (ts.isStringLiteral(node)) {
+            return node.text;
+        }
+        if (ts.isNumericLiteral(node)) {
+            return Number(node.text);
+        }
+        if (node.kind === ts.SyntaxKind.TrueKeyword) {
+            return true;
+        }
+        if (node.kind === ts.SyntaxKind.FalseKeyword) {
+            return false;
+        }
+    }
+
+    switch (node.kind) {
+        case ts.SyntaxKind.NullKeyword:
+            return null;
+        case ts.SyntaxKind.ArrayLiteralExpression:
+            return (node).elements.map(element => getLiteralValue(element, typeChecker));
+        case ts.SyntaxKind.ObjectLiteralExpression:
+            return handleObjectLiteral(node, typeChecker);
+        case ts.SyntaxKind.Identifier:
+            return resolveIdentifier(node, typeChecker);
+        case ts.SyntaxKind.PropertyAccessExpression:
+            return resolvePropertyAccess(node, typeChecker);
+        case ts.SyntaxKind.ParenthesizedExpression:
+            return getLiteralValue((node).expression, typeChecker);
+        case ts.SyntaxKind.PrefixUnaryExpression:
+            return evaluatePrefixUnaryExpression(node, typeChecker);
+        default:
+            return undefined;
+    }
+}
 
 /**
  * If the given node is a string literal, returns the parsed string.

@@ -13,5 +13,6 @@ describe('VALID: Program ', function () {
         expect(data).to.exist;
         expect(data[0]).to.not.be.empty;
         expect(data[1]).to.be.empty;
+        expect(data[0].example.errors).to.be.empty;
     });
 });

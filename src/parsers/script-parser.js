@@ -5,7 +5,7 @@ import { AttributeParser } from './attribute-parser.js';
 import { ParsingError } from './parsing-error.js';
 import { hasTag } from '../utils/attribute-utils.js';
 import { zipArrays } from '../utils/generic-utils.js';
-import { flatMapAnyNodes, getJSDocCommentRanges, parseArrayLiteral, parseBooleanNode, parseFloatNode, parseStringNode } from '../utils/ts-utils.js';
+import { flatMapAnyNodes, getJSDocCommentRanges, getLiteralValue, parseArrayLiteral, parseFloatNode } from '../utils/ts-utils.js';
 
 /**
  * @typedef {object} Attribute
@@ -77,9 +77,9 @@ const SUPPORTED_INITIALIZABLE_TYPE_NAMES = new Map([
     ['Vec3', createNumberArgumentParser('Vec3', [0, 0, 0])],
     ['Vec4', createNumberArgumentParser('Vec4', [0, 0, 0, 0])],
     ['Color', createNumberArgumentParser('Color', [1, 1, 1, 1])],
-    ['number', parseFloatNode],
-    ['string', parseStringNode],
-    ['boolean', parseBooleanNode]
+    ['number', getLiteralValue],
+    ['string', getLiteralValue],
+    ['boolean', getLiteralValue]
 ]);
 
 /**
@@ -147,7 +147,8 @@ const SUPPORTED_BLOCK_TAGS = new Map([
     ['precision', 'number'],
     ['size', 'number'],
     ['step', 'number'],
-    ['title', 'string']
+    ['title', 'string'],
+    ['default', 'any']
 ]);
 
 /**
@@ -187,8 +188,15 @@ const mapAttributesToOutput = (attribute) => {
     // remove enum if it's empty
     if (attribute.enum.length === 0) delete attribute.enum;
 
+    // If the attribute has no default value then set it
+    if (attribute.value === undefined) {
+        if (attribute.type === 'string') attribute.value = '';
+        if (attribute.type === 'number') attribute.value = 0;
+        if (attribute.type === 'boolean') attribute.value = false;
+    }
+
     // set the default value
-    if (attribute.value !== undefined) attribute.default = attribute.value;
+    if (attribute.value !== undefined) attribute.default = attribute.default ?? attribute.value;
 
     // Curve Attributes specifically should not expose a default value if it's an empty array
     if (attribute.type === 'curve' && Array.isArray(attribute.value) && attribute.value.length === 0) {
@@ -244,7 +252,7 @@ export class ScriptParser {
             const typeName = this.typeChecker.typeToString(type);
             const serializer = SUPPORTED_INITIALIZABLE_TYPE_NAMES.get(typeName);
             if (serializer) {
-                this.typeSerializerMap.set(type, serializer);
+                this.typeSerializerMap.set(typeName, serializer);
             }
         });
 
@@ -313,17 +321,17 @@ export class ScriptParser {
             return attributes;
         }
 
-        const buffer = node.getSourceFile().getFullText();
-
         // Find "/** */" style comments associated with this node.
-        const comments = getJSDocCommentRanges(node, buffer, this.typeChecker);
+        const comments = getJSDocCommentRanges(node, this.typeChecker);
 
         // Parse the comments for attribute metadata
         for (const comment of comments) {
 
+            const memberFileText = comment.member.getSourceFile().getFullText();
+
             // Parse the comment for attribute metadata
             const attributeMetadata = this.attributeParser.parseAttributeComment(
-                TextRange.fromStringRange(buffer, comment.range.pos, comment.range.end),
+                TextRange.fromStringRange(memberFileText, comment.range.pos, comment.range.end),
                 comment.member,
                 errors,
                 requiresAttributeTag
