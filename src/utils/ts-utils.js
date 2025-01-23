@@ -5,8 +5,8 @@ import * as ts from 'typescript';
 import { ParsingError } from '../parsers/parsing-error.js';
 
 export function createDefaultMapFromCDN(options, prefix, ts) {
-    var fsMap = new Map();
-    var files = knownLibFilesForCompilerOptions(options, ts);
+    const fsMap = new Map();
+    const files = knownLibFilesForCompilerOptions(options, ts);
 
     async function uncached() {
         const contentPromises = files.map((lib) => {
