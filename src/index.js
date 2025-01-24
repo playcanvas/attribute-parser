@@ -123,10 +123,18 @@ export class JSDocParser {
             throw new Error('PlayCanvas Types must be supplied');
         }
 
+        const esmScripts = new Map();
+
         // Parse the source file and pc types
         const sourceFile = this.program.getSourceFile(fileName);
 
-        if (!sourceFile) {
+        // In a special edge case where the files contents are empty, the sourcefile will be undefined
+        // So we should early out
+        if (sourceFile === undefined) {
+            return esmScripts;
+        }
+
+        if (sourceFile === null) {
             throw new Error(`Source file ${fileName} not found`);
         }
 
@@ -135,7 +143,6 @@ export class JSDocParser {
 
         const esmScriptClass = pcTypes.statements.find(node => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script')?.symbol;
 
-        const esmScripts = new Map();
         // Check if the file exports a class that inherits from `Script`
         nodes.forEach((node, name) => {
             if (isAliasedClassDeclaration(node, typeChecker) && inheritsFrom(node, typeChecker, esmScriptClass)) {
