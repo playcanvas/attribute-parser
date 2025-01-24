@@ -134,7 +134,7 @@ export class JSDocParser {
             return esmScripts;
         }
 
-        if (!sourceFile) {
+        if (sourceFile === null) {
             throw new Error(`Source file ${fileName} not found`);
         }
 
