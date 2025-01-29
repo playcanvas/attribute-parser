@@ -1,4 +1,3 @@
-import { DocNodeKind } from '@microsoft/tsdoc';
 import { knownLibFilesForCompilerOptions } from '@typescript/vfs';
 import * as ts from 'typescript';
 
@@ -205,10 +204,10 @@ function getSuperClasses(node, typeChecker) {
  * @param {import('typescript').Node} node - The TypeScript node to analyze
  * @param {string} text - The full text content of the source file
  * @param {import('typescript').TypeChecker} typeChecker - The TypeScript type checker
- * @returns {{ memberName: string, member: ts.Node, range: import('typescript').CommentRange}[]} - An array of comment ranges
+ * @returns {{ memberName: string, member: Node, range: import('typescript').CommentRange}[]} - An array of comment ranges
  */
-export function getJSDocCommentRanges(node, typeChecker) {
-    const commentRanges = [];
+export function getJSDocTags(node, typeChecker) {
+    const tags = [];
 
     if (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) {
         // get an array of the class an all parent classed
@@ -221,12 +220,11 @@ export function getJSDocCommentRanges(node, typeChecker) {
             classNode.members.forEach((member) => {
                 if (ts.isPropertyDeclaration(member) || ts.isSetAccessor(member) || ts.isPropertySignature(member)) {
                     const memberName = member.name && ts.isIdentifier(member.name) ? member.name.text : 'unnamed';
-                    const ranges = getLeadingBlockCommentRanges(member, member.getSourceFile().getFullText());
-                    if (ranges.length > 0) {
-                        commentRanges.push({
+                    const hasJsDoc = member.jsDoc?.length > 0;
+                    if (hasJsDoc) {
+                        tags.push({
                             memberName,
-                            member,
-                            range: ranges[0]
+                            member
                         });
                     }
                 }
@@ -234,62 +232,7 @@ export function getJSDocCommentRanges(node, typeChecker) {
         });
     }
 
-    return commentRanges;
-}
-
-const ASTERISK = 42;
-const SLASH = 47;
-
-/**
- * Retrieves the JSDoc-style comments blocks associated with a specific AST node.
- * @param {import('typescript').Node} node - The TypeScript node to analyze
- * @param {string} text - The full text content of the source file
- * @returns {import('typescript').CommentRange[]} - An array of comment ranges
- */
-export function getLeadingBlockCommentRanges(node, text) {
-    const ranges = ts.getLeadingCommentRanges(text, node.getFullStart()) ?? [];
-    return ranges.filter(({ pos }) => {
-        return (
-            text.charCodeAt(pos + 1) === ASTERISK &&
-            text.charCodeAt(pos + 2) === ASTERISK &&
-            text.charCodeAt(pos + 3) !== SLASH
-        );
-    });
-}
-
-/**
- * Recursively extract text content from a DocNode.
- * @param {tsdoc.DocNode} node - The DocNode from which to extract text.
- * @returns {string} - The concatenated string of all text content.
- */
-export function extractTextFromDocNode(node) {
-    // Check if the current node is a PlainText node
-    if (node.kind === DocNodeKind.PlainText) {
-        return node.text.trim(); // Cast and return as we found a PlainText node
-    }
-
-    // If not, recursively search its children
-    for (const child of node.getChildNodes()) {
-        const result = extractTextFromDocNode(child);
-        if (result !== null) {
-            return result; // Return the first PlainText node found in the subtree
-        }
-    }
-
-    return null;
-}
-
-/**
- * Extracts all imports from a TypeScript source file.
- * @param {ts.Node} node - The TypeScript node to analyze
- * @returns {string[]} - An array of import statements
- */
-export function getLeadingComments(node) {
-    const fullText = node.getFullText();
-    const commentRanges = ts.getLeadingCommentRanges(fullText, 0);
-
-    if (!commentRanges) return [];
-    return commentRanges.map(range => fullText.slice(range.pos, range.end));
+    return tags;
 }
 
 /**
@@ -343,7 +286,7 @@ export function getPrimitiveEnumType(type, typeChecker) {
  *
  * @param {ts.Node} node - The TypeScript node to analyze
  * @param {ts.TypeChecker} typeChecker - The TypeScript type checker
- * @returns {{ array: boolean, name: string | undefined, type: ts.Type | null }} - The inferred type of the node
+ * @returns {{ array: boolean, name: string | undefined, type: Type | null }} - The inferred type of the node
  */
 export function getType(node, typeChecker) {
     if (node?.name?.kind === ts.SyntaxKind.Identifier) {
@@ -565,11 +508,11 @@ const evaluatePrefixUnaryExpression = (node, typeChecker) => {
 function handleObjectLiteral(node, typeChecker) {
     const obj = {};
     node.properties.forEach((prop) => {
-        if (ts.isPropertyAssignment(prop)) {
+        if  (ts.isPropertyAssignment(prop)) {
             const key = prop.name.getText();
             const value = getLiteralValue(prop.initializer, typeChecker);
             obj[key] = value;
-        } else if (ts.isShorthandPropertyAssignment(prop)) {
+        } else if  (ts.isShorthandPropertyAssignment(prop)) {
             const key = prop.name.getText();
             const value = resolveIdentifier(prop.name, typeChecker);
             obj[key] = value;
@@ -632,7 +575,7 @@ export function getLiteralValue(node, typeChecker) {
  */
 export const parseStringNode = (node) => {
     if (node.kind !== ts.SyntaxKind.StringLiteral) {
-        if (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent)) {
+        if  (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent)) {
             throw new ParsingError(node, `"${node.parent.getText()}" must be defined with a string literal.`);
         }
         return '';
@@ -642,7 +585,7 @@ export const parseStringNode = (node) => {
 
 export const parseArrayLiteralNode = (node, isArgument = false) => {
     if (node.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
-        if (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent) || isArgument) {
+        if  (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent) || isArgument) {
             throw new ParsingError(node, `"${node.parent.getText()}" must be defined with an array literal.`);
         }
         return [];

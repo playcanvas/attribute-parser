@@ -1,11 +1,10 @@
-import { TextRange } from '@microsoft/tsdoc';
 import * as ts from 'typescript';
 
 import { AttributeParser } from './attribute-parser.js';
 import { ParsingError } from './parsing-error.js';
 import { hasTag } from '../utils/attribute-utils.js';
 import { zipArrays } from '../utils/generic-utils.js';
-import { flatMapAnyNodes, getJSDocCommentRanges, getLiteralValue, parseArrayLiteral, parseFloatNode } from '../utils/ts-utils.js';
+import { flatMapAnyNodes, getJSDocTags, getLiteralValue, parseArrayLiteral, parseFloatNode } from '../utils/ts-utils.js';
 
 /**
  * @typedef {object} Attribute
@@ -322,17 +321,14 @@ export class ScriptParser {
         }
 
         // Find "/** */" style comments associated with this node.
-        const comments = getJSDocCommentRanges(node, this.typeChecker);
+        const members = getJSDocTags(node, this.typeChecker);
 
         // Parse the comments for attribute metadata
-        for (const comment of comments) {
-
-            const memberFileText = comment.member.getSourceFile().getFullText();
+        for (const { member, memberName } of members) {
 
             // Parse the comment for attribute metadata
             const attributeMetadata = this.attributeParser.parseAttributeComment(
-                TextRange.fromStringRange(memberFileText, comment.range.pos, comment.range.end),
-                comment.member,
+                member,
                 errors,
                 requiresAttributeTag
             );
@@ -341,11 +337,11 @@ export class ScriptParser {
             if (attributeMetadata) {
 
                 const { type, typeName } = attributeMetadata;
-                const initializer = comment.member?.initializer;
+                const initializer = member?.initializer;
 
                 if (typeName === 'any') {
 
-                    const error = new ParsingError(comment.member, `The attribute "${comment.memberName}" is not initialized and does not have a @type tag.`);
+                    const error = new ParsingError(member, `The attribute "${memberName}" is not initialized and does not have a @type tag.`);
                     errors.push(error);
                     continue;
 
@@ -369,7 +365,7 @@ export class ScriptParser {
 
                     // Check if the type is a valid interface
                     if (!isInitialized && !typeIsInterface && !typeIsJSDocTypeDef && !isJSDocTypeLiteral) {
-                        const error = new ParsingError(comment.member, `Attribute "${comment.memberName}" is an invalid type.`);
+                        const error = new ParsingError(member, `Attribute "${memberName}" is an invalid type.`);
                         errors.push(error);
                         continue;
                     }
@@ -408,7 +404,7 @@ export class ScriptParser {
                 }
 
                 // Add the attribute to the list of found attributes
-                attributes[comment.memberName] = mapAttributesToOutput(attributeMetadata);
+                attributes[memberName] = mapAttributesToOutput(attributeMetadata);
 
             }
         }
