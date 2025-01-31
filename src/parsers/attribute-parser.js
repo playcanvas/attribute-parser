@@ -1,10 +1,9 @@
-import { TSDocConfiguration, TSDocTagDefinition, TSDocTagSyntaxKind, TextRange, TSDocParser } from '@microsoft/tsdoc';
 import * as ts from 'typescript';
 
 import { ParsingError } from './parsing-error.js';
 import { hasTag } from '../utils/attribute-utils.js';
 import { parseTag, validateTag } from '../utils/tag-utils.js';
-import { extractTextFromDocNode, getLeadingBlockCommentRanges, getLiteralValue, getType } from '../utils/ts-utils.js';
+import { getLiteralValue, getType } from '../utils/ts-utils.js';
 
 /**
  * A class to parse JSDoc comments and extract attribute metadata.
@@ -25,44 +24,18 @@ export class AttributeParser {
         this.program = env.languageService.getProgram();
         this.typeChecker = this.program.getTypeChecker();
 
-        this.attributeTag = new TSDocTagDefinition({
-            tagName: '@attribute', syntaxKind: TSDocTagSyntaxKind.ModifierTag
-        });
-
-        this.typeTag = new TSDocTagDefinition({
-            tagName: '@type', syntaxKind: TSDocTagSyntaxKind.BlockTag
-        });
-
-        const conf = new TSDocConfiguration();
-        conf.validation.reportUnsupportedTags = false;
-
-        conf.addTagDefinition(this.attributeTag);
-
-        tags.forEach((_, tag) => {
-            const tagDefinition = new TSDocTagDefinition({
-                tagName: `@${tag}`, syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false
-            });
-            conf.addTagDefinition(tagDefinition);
-        });
-
-        this.parser = new TSDocParser(conf);
     }
 
     /**
      * Parses a JSdoc comment and extracts any associated metadata if the `@attribute`
      * modifier is used. Returns null if this is not an attribute comment.
      *
-     * @param {TextRange} comment - The comment to parse
      * @param {ts.Node} node - The node to parse
      * @param {ParsingError[]} errors - An array to store any parsing errors
      * @param {boolean} requiresAttributeTag - Whether the comment must have an attribute tag
      * @returns {*} - The extracted metadata or null if no metadata was found
      */
-    parseAttributeComment(comment, node, errors = [], requiresAttributeTag = true) {
-
-        const parserContext = this.parser.parseRange(comment);
-        const docComment = parserContext.docComment;
-        const file = node.getSourceFile();
+    parseAttributeComment(node, errors = [], requiresAttributeTag = true) {
 
         // Check if the comment has an attribute tag
         if (!requiresAttributeTag || hasTag('attribute', node)) {
@@ -73,7 +46,7 @@ export class AttributeParser {
             if (!attribute) return;
 
             // Extract the description from the summary section
-            const description = extractTextFromDocNode(docComment.summarySection);
+            const description = node.jsDoc[0].comment;
             if (description) {
                 attribute.description = description.split('.')[0];
             }
@@ -96,6 +69,7 @@ export class AttributeParser {
                         attribute[tag.tagName.text] = value;
 
                     } catch (error) {
+                        const file = node.getSourceFile();
                         const { line, character } = file.getLineAndCharacterOfPosition(tag.getStart());
                         const parseError = new ParsingError(tag, `Error (${line}, ${character}): Parsing Tag '@${tag.tagName.text} ${commentText}' - ${error.message}`);
                         errors.push(parseError);
@@ -104,51 +78,6 @@ export class AttributeParser {
             });
 
             return attribute;
-        }
-    }
-
-    /**
-     * Returns the leading block comments for an typescript AST node.
-     *
-     * @param {import('typescript').Node} node - The node to parse
-     * @param {string[]} errors - An array to store any parsing errors
-     * @returns {import('@microsoft/tsdoc').DocComment} - The extracted doc comment;
-     */
-    getCommentsForNode(node, errors = []) {
-        const fullText = node.getSourceFile().getFullText();
-        const comments = getLeadingBlockCommentRanges(node, fullText);
-
-        if (comments.length === 0) return null;
-
-        const lastComment = comments[0];
-        const textRange = TextRange.fromStringRange(fullText, lastComment.pos, lastComment.end);
-
-        const parserContext = this.parser.parseRange(textRange);
-        const docComment = parserContext.docComment;
-
-        // Check for comment parsing errors and flag them
-        this.populateErrors(node, parserContext, errors);
-
-        return docComment;
-    }
-
-    /**
-     * Populates the errors array with any parsing errors found in the parser context.
-     *
-     * @param {import('typescript').Node} node - The node to parse
-     * @param {import('@microsoft/tsdoc').ParserContext} parserContext - The parser context to check for errors
-     * @param {string[]} errors - An array to store any parsing errors
-     */
-    populateErrors(node, parserContext, errors) {
-        if (parserContext.log.messages.length > 0) {
-            const sourceFile = node.getSourceFile();
-
-            const formattedErrors = parserContext.log.messages.map((message) => {
-                const location = sourceFile.getLineAndCharacterOfPosition(message.textRange.pos);
-                return `${sourceFile.fileName}(${location.line + 1},${location.character + 1}): [TSDoc] ${message}`;
-            });
-
-            errors.push(...formattedErrors);
         }
     }
 
