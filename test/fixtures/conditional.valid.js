@@ -3,13 +3,13 @@ import { Script } from 'playcanvas';
 class Example extends Script {
     /**
      * @attribute
-     * @visibleWhen {b === 2}
+     * @visibleif {b === 2}
      */
     a = 1;
 
     /**
      * @attribute
-     * @enabledWhen {a === 3}
+     * @enabledif {a === 3}
      */
     b = 1;
 

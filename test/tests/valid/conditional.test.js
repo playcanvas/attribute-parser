@@ -21,25 +21,25 @@ describe('VALID: Conditional Tags', function () {
         expect(data[0].example.errors).to.be.empty;
     });
 
-    it('a: should conditional `@visibleWhen` tag', function () {
+    it('a: should conditional `@visibleif` tag', function () {
         expect(data[0].example.attributes.a).exist;
         expect(data[0].example.attributes.a.name).to.equal('a');
         expect(data[0].example.attributes.a.type).to.equal('number');
-        expect(data[0].example.attributes.a.visibleWhen).to.equal('b === 2');
+        expect(data[0].example.attributes.a.visibleif).to.equal('b === 2');
     });
 
-    it('b: should conditional `@enabledWhen` tag', function () {
+    it('b: should conditional `@enabledif` tag', function () {
         expect(data[0].example.attributes.b).exist;
         expect(data[0].example.attributes.b.name).to.equal('b');
         expect(data[0].example.attributes.b.type).to.equal('number');
-        expect(data[0].example.attributes.b.enabledWhen).to.equal('a === 3');
+        expect(data[0].example.attributes.b.enabledif).to.equal('a === 3');
     });
 
-    it('c: should not include `@enabledWhen` or `@visibleWhen` tag if none is declared', function () {
+    it('c: should not include `@enabledif` or `@visibleif` tag if none is declared', function () {
         expect(data[0].example.attributes.c).exist;
         expect(data[0].example.attributes.c.name).to.equal('c');
         expect(data[0].example.attributes.c.type).to.equal('number');
-        expect(data[0].example.attributes.c.enabledWhen).to.not.exist;
-        expect(data[0].example.attributes.c.visibleWhen).to.not.exist;
+        expect(data[0].example.attributes.c.enabledif).to.not.exist;
+        expect(data[0].example.attributes.c.visibleif).to.not.exist;
     });
 });

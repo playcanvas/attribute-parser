@@ -148,8 +148,8 @@ const SUPPORTED_BLOCK_TAGS = new Map([
     ['step', 'number'],
     ['title', 'string'],
     ['default', 'any'],
-    ['enabledWhen', 'any'],
-    ['visibleWhen', 'any']
+    ['enabledif', 'any'],
+    ['visibleif', 'any']
 ]);
 
 /**
@@ -204,14 +204,14 @@ const mapAttributesToOutput = (attribute) => {
         delete attribute.default;
     }
 
-    // enabledWhen is in a {}, so strip it out
-    if (attribute.enabledWhen?.startsWith('{') && attribute.enabledWhen?.endsWith('}')) {
-        attribute.enabledWhen = attribute.enabledWhen.slice(1, -1);
+    // enabledif is in a {}, so strip it out
+    if (attribute.enabledif?.startsWith('{') && attribute.enabledif?.endsWith('}')) {
+        attribute.enabledif = attribute.enabledif.slice(1, -1);
     }
 
-    // enabledWhen is in a {}, so strip it out
-    if (attribute.visibleWhen?.startsWith('{') && attribute.visibleWhen?.endsWith('}')) {
-        attribute.visibleWhen = attribute.visibleWhen.slice(1, -1);
+    // enabledif is in a {}, so strip it out
+    if (attribute.visibleif?.startsWith('{') && attribute.visibleif?.endsWith('}')) {
+        attribute.visibleif = attribute.visibleif.slice(1, -1);
     }
 
     // remove typeName from the output
