@@ -147,7 +147,9 @@ const SUPPORTED_BLOCK_TAGS = new Map([
     ['size', 'number'],
     ['step', 'number'],
     ['title', 'string'],
-    ['default', 'any']
+    ['default', 'any'],
+    ['enabledWhen', 'any'],
+    ['visibleWhen', 'any']
 ]);
 
 /**
@@ -200,6 +202,16 @@ const mapAttributesToOutput = (attribute) => {
     // Curve Attributes specifically should not expose a default value if it's an empty array
     if (attribute.type === 'curve' && Array.isArray(attribute.value) && attribute.value.length === 0) {
         delete attribute.default;
+    }
+
+    // enabledWhen is in a {}, so strip it out
+    if (attribute.enabledWhen?.startsWith('{') && attribute.enabledWhen?.endsWith('}')) {
+        attribute.enabledWhen = attribute.enabledWhen.slice(1, -1);
+    }
+
+    // enabledWhen is in a {}, so strip it out
+    if (attribute.visibleWhen?.startsWith('{') && attribute.visibleWhen?.endsWith('}')) {
+        attribute.visibleWhen = attribute.visibleWhen.slice(1, -1);
     }
 
     // remove typeName from the output
