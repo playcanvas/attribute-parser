@@ -16,7 +16,8 @@ const NumberEnum = {
 const StringEnum = {
     A: 'a',
     B: 'b',
-    C: 'c'
+    C: 'c',
+    'A string key': 'd'
 };
 
 /**
