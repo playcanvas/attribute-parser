@@ -56,10 +56,11 @@ function runTests(fileName) {
             expect(data[0].example.attributes.h.name).to.equal('h');
             expect(data[0].example.attributes.h.type).to.equal('string');
             expect(data[0].example.attributes.h.array).to.equal(false);
-            expect(data[0].example.attributes.h.enum).to.be.an('array').with.lengthOf(3);
+            expect(data[0].example.attributes.h.enum).to.be.an('array').with.lengthOf(4);
             expect(data[0].example.attributes.h.enum[0]).to.deep.equal({ A: 'a' });
             expect(data[0].example.attributes.h.enum[1]).to.deep.equal({ B: 'b' });
             expect(data[0].example.attributes.h.enum[2]).to.deep.equal({ C: 'c' });
+            expect(data[0].example.attributes.h.enum[3]).to.deep.equal({ 'A string key': 'd' });
             expect(data[0].example.attributes.h.default).to.equal('');
         });
 
