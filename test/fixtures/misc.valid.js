@@ -40,6 +40,7 @@ class Example extends Script {
         return this._d;
     }
 
+    // eslint-disable-next-line grouped-accessor-pairs
     set d(v) {
         this._d = v;
     }
