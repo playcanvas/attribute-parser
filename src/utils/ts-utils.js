@@ -218,9 +218,19 @@ export function getJSDocTags(node, typeChecker) {
         heritageChain.forEach((classNode) => {
             // for each class iterate over it's class members
             classNode.members.forEach((member) => {
-                if (ts.isPropertyDeclaration(member) || ts.isSetAccessor(member) || ts.isPropertySignature(member)) {
+                const isSetter = ts.isSetAccessor(member);
+                if (ts.isPropertyDeclaration(member) || isSetter || ts.isPropertySignature(member)) {
                     const memberName = member.name && ts.isIdentifier(member.name) ? member.name.text : 'unnamed';
-                    const hasJsDoc = member.jsDoc?.length > 0;
+
+                    let hasJsDoc = member.jsDoc?.length > 0;
+
+                    // If we are a setter with no jsdoc block, check any associated getter
+                    if (isSetter && !hasJsDoc) {
+                        const symbol = typeChecker.getSymbolAtLocation(member.name);
+                        member = symbol.declarations.find(accessor => accessor.jsDoc?.length > 0);
+                        hasJsDoc = !!member;
+                    }
+
                     if (hasJsDoc) {
                         tags.push({
                             memberName,
