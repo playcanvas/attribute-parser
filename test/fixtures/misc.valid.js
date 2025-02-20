@@ -12,6 +12,8 @@ class Example extends Script {
 
     _b = 10;
 
+    _d = 10;
+
     /**
      * @attribute
      * @type {number}
@@ -28,6 +30,20 @@ class Example extends Script {
      * @type {number}
      */
     c;
+
+    /**
+     * Reverse order gett/setter accessor
+     * @attribute
+     * @type {number}
+     */
+    get d() {
+        return this._d;
+    }
+
+    // eslint-disable-next-line grouped-accessor-pairs
+    set d(v) {
+        this._d = v;
+    }
 }
 
 export { Example };

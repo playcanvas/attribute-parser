@@ -43,4 +43,12 @@ describe('VALID: Misc attribute types', function () {
         expect(data[0].example.attributes.c).to.not.exist;
     });
 
+    it('d: should be a numeric attribute with a getter and setter defined in reverse order', function () {
+        expect(data[0].example.attributes.d).to.exist;
+        expect(data[0].example.attributes.d.name).to.equal('d');
+        expect(data[0].example.attributes.d.type).to.equal('number');
+        expect(data[0].example.attributes.d.array).to.equal(false);
+        expect(data[0].example.attributes.d.default).to.equal(0);
+    });
+
 });
