@@ -6,6 +6,8 @@ import { Script } from 'playcanvas';
 export const MyEnum = { value: 0 };
 
 class Example extends Script {
+    static scriptName = 'customExample';
+
     /**
      * @attribute
      * @precision 1
