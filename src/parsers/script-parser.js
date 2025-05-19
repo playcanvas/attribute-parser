@@ -393,9 +393,9 @@ export class ScriptParser {
                         Array.from(type.symbol.members).map(arr => arr[1].declarations[0]) ??  // a typedefs property declarations
                         [];
 
-                    // If the type is an interface, we need to parse the attribute comments, if not, just the intitialized object
+                    // If the type is an interface or an initialized object, we need to parse the attribute comments, if not, just the intitialized object
                     let commentAttributes;
-                    if (typeIsInterface) {
+                    if (typeIsInterface || isInitialized) {
                         commentAttributes = this.extractAttributes(typeNode, { errors, requiresAttributeTag: false, depth: depth + 1 });
                     }
 
