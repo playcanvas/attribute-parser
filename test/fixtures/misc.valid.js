@@ -2,7 +2,9 @@ import { Script } from 'playcanvas';
 
 class Example extends Script {
     /**
-     * This is a description of the attribute.
+     * This is a description of the attribute. It can be multi-sentence.
+     *
+     * And multi-line too
      *
      * @attribute
      * @type {number}
