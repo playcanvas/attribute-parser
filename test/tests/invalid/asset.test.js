@@ -26,7 +26,7 @@ describe('INVALID: Asset attribute', function () {
         expect(data[0].example.attributes.a.name).to.equal('a');
         expect(data[0].example.attributes.a.type).to.equal('asset');
         expect(data[0].example.attributes.a.default).to.not.exist;
-        expect(data[0].example.attributes.a.resource).to.not.exist;
+        expect(data[0].example.attributes.a.assetType).to.not.exist;
     });
 
     it('b: should fallback to an asset attribute without resource', function () {
@@ -34,7 +34,7 @@ describe('INVALID: Asset attribute', function () {
         expect(data[0].example.attributes.b.name).to.equal('b');
         expect(data[0].example.attributes.b.type).to.equal('asset');
         expect(data[0].example.attributes.b.default).to.not.exist;
-        expect(data[0].example.attributes.b.resource).to.not.exist;
+        expect(data[0].example.attributes.b.assetType).to.not.exist;
     });
 
     it('c: should fallback to an asset attribute without resource', function () {
@@ -42,6 +42,6 @@ describe('INVALID: Asset attribute', function () {
         expect(data[0].example.attributes.c.name).to.equal('c');
         expect(data[0].example.attributes.c.type).to.equal('asset');
         expect(data[0].example.attributes.c.default).to.not.exist;
-        expect(data[0].example.attributes.c.resource).to.not.exist;
+        expect(data[0].example.attributes.c.assetType).to.not.exist;
     });
 });

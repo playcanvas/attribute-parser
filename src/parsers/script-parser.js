@@ -186,6 +186,11 @@ const mapAttributesToOutput = (attribute) => {
         attribute.type = 'rgba';
     }
 
+    if (attribute.resource) {
+        attribute.assetType = attribute.resource;
+        delete attribute.resource;
+    }
+
     // remove enum if it's empty
     if (attribute.enum.length === 0) delete attribute.enum;
 
