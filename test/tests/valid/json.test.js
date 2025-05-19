@@ -37,12 +37,15 @@ describe('JS: VALID: Asset attribute', function () {
         expect(data[0].example.attributes.f.schema[0].type).to.equal('boolean');
         expect(data[0].example.attributes.f.schema[0].array).to.equal(false);
         expect(data[0].example.attributes.f.schema[0].default).to.equal(false);
+        expect(data[0].example.attributes.f.schema[0].description).to.equal('This is some description of the attribute');
     });
 
     it('f[b]: should be a numeric attribute', function () {
         expect(data[0].example.attributes.f.schema[1].name).to.equal('b');
         expect(data[0].example.attributes.f.schema[1].type).to.equal('number');
         expect(data[0].example.attributes.f.schema[1].array).to.equal(false);
+        expect(data[0].example.attributes.f.schema[1].min).to.equal(10);
+        expect(data[0].example.attributes.f.schema[1].max).to.equal(20);
         expect(data[0].example.attributes.f.schema[1].default).to.equal(10);
     });
 
@@ -98,6 +101,22 @@ describe('JS: VALID: Asset attribute', function () {
         expect(data[0].example.attributes.i.default).to.eql(null);
 
         expect(data[0].example.attributes.i.schema).to.exist;
+    });
+
+    it('i[a]: should be a boolean attribute', function () {
+        expect(data[0].example.attributes.i.schema[0].name).to.equal('a');
+        expect(data[0].example.attributes.i.schema[0].type).to.equal('boolean');
+        expect(data[0].example.attributes.i.schema[0].array).to.equal(false);
+        expect(data[0].example.attributes.i.schema[0].default).to.equal(true);
+        expect(data[0].example.attributes.i.schema[0].description).to.equal('description of a');
+    });
+
+    it('i[b]: should be a numeric attribute', function () {
+        expect(data[0].example.attributes.i.schema[1].name).to.equal('b');
+        expect(data[0].example.attributes.i.schema[1].type).to.equal('number');
+        expect(data[0].example.attributes.i.schema[1].array).to.equal(false);
+        expect(data[0].example.attributes.i.schema[1].min).to.equal(10);
+        expect(data[0].example.attributes.i.schema[1].max).to.equal(20);
     });
 
     it('j: should be a typedef json attribute', function () {
@@ -184,6 +203,7 @@ describe('TS: VALID: Asset attribute', function () {
         expect(data[0].example.attributes.f.schema[0].type).to.equal('boolean');
         expect(data[0].example.attributes.f.schema[0].array).to.equal(false);
         expect(data[0].example.attributes.f.schema[0].default).to.equal(false);
+        expect(data[0].example.attributes.f.schema[0].description).to.equal('This is some description of the attribute');
     });
 
     it('f[b]: should be a numeric attribute', function () {
@@ -191,6 +211,8 @@ describe('TS: VALID: Asset attribute', function () {
         expect(data[0].example.attributes.f.schema[1].type).to.equal('number');
         expect(data[0].example.attributes.f.schema[1].array).to.equal(false);
         expect(data[0].example.attributes.f.schema[1].default).to.equal(10);
+        expect(data[0].example.attributes.f.schema[1].min).to.equal(10);
+        expect(data[0].example.attributes.f.schema[1].max).to.equal(20);
     });
 
     it('f[c]: should be a string attribute', function () {
@@ -245,6 +267,22 @@ describe('TS: VALID: Asset attribute', function () {
         expect(data[0].example.attributes.i.default).to.eql(null);
 
         expect(data[0].example.attributes.i.schema).to.exist;
+    });
+
+    it('i[a]: should be a boolean attribute', function () {
+        expect(data[0].example.attributes.i.schema[0].name).to.equal('a');
+        expect(data[0].example.attributes.i.schema[0].type).to.equal('boolean');
+        expect(data[0].example.attributes.i.schema[0].array).to.equal(false);
+        expect(data[0].example.attributes.i.schema[0].default).to.equal(true);
+        expect(data[0].example.attributes.i.schema[0].description).to.equal('description of a');
+    });
+
+    it('i[b]: should be a numeric attribute', function () {
+        expect(data[0].example.attributes.i.schema[1].name).to.equal('b');
+        expect(data[0].example.attributes.i.schema[1].type).to.equal('number');
+        expect(data[0].example.attributes.i.schema[1].array).to.equal(false);
+        expect(data[0].example.attributes.i.schema[1].min).to.equal(10);
+        expect(data[0].example.attributes.i.schema[1].max).to.equal(20);
     });
 
     it('l: should be an inline type json attribute', function () {

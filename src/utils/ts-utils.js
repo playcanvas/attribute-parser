@@ -209,6 +209,7 @@ function getSuperClasses(node, typeChecker) {
 export function getJSDocTags(node, typeChecker) {
     const tags = [];
 
+    // check if class interface of initialized object
     if (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) {
         // get an array of the class an all parent classed
         const heritageChain = getSuperClasses(node, typeChecker)
@@ -239,6 +240,23 @@ export function getJSDocTags(node, typeChecker) {
                     }
                 }
             });
+        });
+    } else if (ts.isObjectLiteralExpression(node)) {
+        // Handle object literals
+        node.properties.forEach((property) => {
+            if (ts.isPropertyAssignment(property)) {
+                const memberName = property.name &&
+                    (ts.isIdentifier(property.name) || ts.isStringLiteral(property.name)) ?
+                    property.name.text :
+                    'unnamed';
+
+                if (property.jsDoc?.length > 0) {
+                    tags.push({
+                        memberName,
+                        member: property
+                    });
+                }
+            }
         });
     }
 
