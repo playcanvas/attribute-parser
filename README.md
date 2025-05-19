@@ -1,59 +1,55 @@
 # PlayCanvas Attribute Parser
 
-This the official JSDoc attribute parser used in the PlayCanvas editor. 
+This is the official JSDoc attribute parser used in the PlayCanvas Editor.
 
-It's used in the PlayCanvas Editor to collect metadata from jsdoc annotated users scripts. This allows special `@attribute` members which can surface contextual data about class members.
+It collects metadata from user scripts by parsing `@attribute` JSDoc annotations. These attributes enable the PlayCanvas Editor to expose UI controls and contextual information for your script properties.
 
-## A quick examples
+Example
 
-It takes a script like this...
+Given a script like this:
 
 ```javascript
 class Rotator extends ScriptType {
   /**
    * @attribute
-   * Speed determines how fast to rotate things"
+   * Speed determines how fast to rotate things
    */
-   speed = new Vec3()
+  speed = new Vec3();
 
-   /**
-    * @attribute
-    *  An array of Entities to rotate
-    * 
-    * @type {Entity[]}
-    */
-   thingsToRotate
+  /**
+   * @attribute
+   * An array of Entities to rotate
+   *
+   * @type {Entity[]}
+   */
+  thingsToRotate;
 }
 ```
 
-and turns it into the following data ...
+The parser outputs:
 
 
 ```json
 {
-    "rotator": {
-        "attributes": {
-            "speed": {
-                "type": "vec3",
-                "name": "speed",
-                "array": false,
-                "description": "Speed determines how fast to rotate things\"",
-                "default": [
-                    0,
-                    0,
-                    0
-                ]
-            },
-            "thingsToRotate": {
-                "type": "entity",
-                "name": "thingsToRotate",
-                "array": true,
-                "description": "An array of Entities to rotate",
-                "default": null
-            }
-        },
-        "errors": []
-    }
+  "rotator": {
+    "attributes": {
+      "speed": {
+        "type": "vec3",
+        "name": "speed",
+        "array": false,
+        "description": "Speed determines how fast to rotate things",
+        "default": [0, 0, 0]
+      },
+      "thingsToRotate": {
+        "type": "entity",
+        "name": "thingsToRotate",
+        "array": true,
+        "description": "An array of Entities to rotate",
+        "default": null
+      }
+    },
+    "errors": []
+  }
 }
 ```
 
@@ -63,26 +59,26 @@ JSDocs tags are parsed and values and outputs the metadata in a serializable for
 
 ```javascript
 // Initialise the parser
+// Initialize the parser
 const parser = new JSDocParser();
 await parser.init();
 
-// fetch your program source {[filename: string, contents: string][]}
+// Load your source files: {[filename: string]: string}[]
 const scripts = await fetchScripts([...paths, './playcanvas.d.ts']);
 
-// update the progam
-parser.updateProgram(scripts)
+// Update the parser program
+parser.updateProgram(scripts);
 
-// Parse the program, starting from the first path
-const [attribute, errors] parser.parseAttributes("./index.js");
+// Parse attributes from the entry point
+const [attributes, errors] = parser.parseAttributes("./index.js");
 ```
 
 ### Attribute structure
 
-You can learn more about the special tags [available here ](https://github.com/playcanvas/attribute-parser/tree/main/test/fixtures)
-
+See the [test fixtures](https://github.com/playcanvas/attribute-parser/tree/main/test/fixtures) for examples of supported JSDoc tags and output formats.
 
 ### Tests
 
-We provide good coverage
+This project includes good test coverage for all supported tag formats and edge cases.
 
 
