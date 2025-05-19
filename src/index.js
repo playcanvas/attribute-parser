@@ -271,4 +271,3 @@ export class JSDocParser {
         return [results, errors];
     }
 }
-

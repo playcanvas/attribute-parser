@@ -50,4 +50,4 @@ export const isInterface = (node) => {
  * @param {import('typescript').Node} member - The node to analyze
  * @returns {boolean} - True if the node is a scriptName property
  */
-export const isStaticMember = member => (getCombinedModifierFlags(member) & ModifierFlags.Static) !== 0
+export const isStaticMember = member => (getCombinedModifierFlags(member) & ModifierFlags.Static) !== 0;
