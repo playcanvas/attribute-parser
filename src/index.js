@@ -143,9 +143,26 @@ export class JSDocParser {
 
         const esmScriptClass = pcTypes.statements.find(node => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script')?.symbol;
 
+        const isScriptNameMember = member => (
+            ts.isPropertyDeclaration(member) && // Is a property declaration
+            ts.isIdentifier(member.name) &&
+            member.name.text === 'scriptName' &&
+            (ts.getCombinedModifierFlags(member) & ts.ModifierFlags.Static) !== 0 &&
+            ts.isStringLiteral(member.initializer)
+        );
+
         // Check if the file exports a class that inherits from `Script`
         nodes.forEach((node, name) => {
             if (isAliasedClassDeclaration(node, typeChecker) && inheritsFrom(node, typeChecker, esmScriptClass)) {
+
+                // Check for a static scriptName property and use that as the name if it exists
+                const scriptNameMember = node.members.find(isScriptNameMember);
+
+                // If the scriptName property exists, use that as the name
+                if (scriptNameMember) {
+                    name = scriptNameMember.initializer.text;
+                }
+
                 esmScripts.set(name, node);
             }
         });

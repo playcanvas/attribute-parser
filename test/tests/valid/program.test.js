@@ -9,10 +9,15 @@ describe('VALID: Program ', function () {
         data = await parseAttributes('./program.valid.js');
     });
 
+    it('should have a customExample script', function () {
+        expect(data[0].customExample).to.exist;
+        expect(data[0].customExample.errors).to.be.empty;
+    });
+
     it('only results should exist', function () {
         expect(data).to.exist;
         expect(data[0]).to.not.be.empty;
         expect(data[1]).to.be.empty;
-        expect(data[0].example.errors).to.be.empty;
+        expect(data[0].customExample.errors).to.be.empty;
     });
 });
