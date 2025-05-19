@@ -2,7 +2,7 @@ import { createSystem, createDefaultMapFromNodeModules, createVirtualTypeScriptE
 import * as ts from 'typescript';
 
 import { ScriptParser } from './parsers/script-parser.js';
-import { isInterface } from './utils/attribute-utils.js';
+import { isInterface, isStaticMember } from './utils/attribute-utils.js';
 import { createDefaultMapFromCDN, flatMapAnyNodes, getExportedNodes, getType, inheritsFrom, isAliasedClassDeclaration } from './utils/ts-utils.js';
 
 const toLowerCamelCase = str => str[0].toLowerCase() + str.substring(1);
@@ -147,7 +147,7 @@ export class JSDocParser {
             ts.isPropertyDeclaration(member) && // Is a property declaration
             ts.isIdentifier(member.name) &&
             member.name.text === 'scriptName' &&
-            (ts.getCombinedModifierFlags(member) & ts.ModifierFlags.Static) !== 0 &&
+            isStaticMember(member) &&
             ts.isStringLiteral(member.initializer)
         );
 
@@ -235,7 +235,7 @@ export class JSDocParser {
             const members = [];
 
             for (const member of node.members) {
-                if (member.kind !== ts.SyntaxKind.PropertyDeclaration) {
+                if (member.kind !== ts.SyntaxKind.PropertyDeclaration || isStaticMember(member)) {
                     continue;
                 }
 
@@ -271,3 +271,4 @@ export class JSDocParser {
         return [results, errors];
     }
 }
+

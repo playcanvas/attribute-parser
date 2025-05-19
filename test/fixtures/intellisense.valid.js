@@ -14,6 +14,9 @@ class Folder {
 }
 
 export class Example extends Script {
+
+    static scriptName = 'Example';
+
     /**
      * @attribute
      */
