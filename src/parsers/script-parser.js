@@ -186,6 +186,7 @@ const mapAttributesToOutput = (attribute) => {
         attribute.type = 'rgba';
     }
 
+    // 'resource' type needs to be mapped to 'assetType'
     if (attribute.resource) {
         attribute.assetType = attribute.resource;
         delete attribute.resource;
