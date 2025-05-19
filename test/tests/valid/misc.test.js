@@ -28,7 +28,7 @@ describe('VALID: Misc attribute types', function () {
         expect(data[0].example.attributes.a.array).to.equal(false);
         expect(data[0].example.attributes.a.default).to.equal(0);
         expect(data[0].example.attributes.a.title).to.equal('A number');
-        expect(data[0].example.attributes.a.description).to.equal('This is a description of the attribute');
+        expect(data[0].example.attributes.a.description).to.equal('This is a description of the attribute. It can be multi-sentence.\n\nAnd multi-line too');
     });
 
     it('b: should be a numeric attribute with a getter and setter', function () {

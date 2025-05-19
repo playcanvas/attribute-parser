@@ -46,10 +46,7 @@ export class AttributeParser {
             if (!attribute) return;
 
             // Extract the description from the summary section
-            const description = node.jsDoc[0].comment;
-            if (description) {
-                attribute.description = description.split('.')[0];
-            }
+            attribute.description = node.jsDoc?.[0]?.comment || '';
 
             // Extract metadata from custom tags
             const jsDocTags = node.jsDoc?.[0]?.tags ?? [];
