@@ -390,7 +390,7 @@ export class ScriptParser {
 
                     // If the type is an interface, we need to parse the attribute comments, if not, just the intitialized object
                     let commentAttributes;
-                    if (typeIsInterface) {
+                    if (typeIsInterface || isInitialized) {
                         commentAttributes = this.extractAttributes(typeNode, { errors, requiresAttributeTag: false, depth: depth + 1 });
                     }
 

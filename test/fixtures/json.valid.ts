@@ -2,6 +2,7 @@ import { Script, Vec3 } from 'playcanvas';
 
 interface Folder {
     /**
+     * This is some description of the attribute.
      * @attribute
      */
     a: boolean;
@@ -9,6 +10,7 @@ interface Folder {
     /**
      * @attribute
      * @default 10
+     * @range [10, 20]
      */
     b: number;
 
@@ -54,7 +56,14 @@ class Example extends Script {
     /**
      * @attribute
      */
-    i = { a: true, b: 10, c: 'hello', d: [new Vec3(1, 2, 3)] };
+    i = {
+        /** description of a */
+        a: true,
+        /** @range [10, 20] */
+        b: 10,
+        c: 'hello',
+        d: [new Vec3(1, 2, 3)]
+    };
 
     /**
      * @attribute

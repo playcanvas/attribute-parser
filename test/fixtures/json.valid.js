@@ -6,6 +6,7 @@ import { Script, Vec3 } from 'playcanvas';
 // eslint-disable-next-line
 class Folder {
     /**
+     * This is some description of the attribute.
      * @attribute
      * @type {boolean}
      */
@@ -13,6 +14,7 @@ class Folder {
 
     /**
      * @attribute
+     * @range [10, 20]
      */
     b = 10;
 
@@ -64,7 +66,14 @@ class Example extends Script {
     /**
      * @attribute
      */
-    i = { a: true, b: 10, c: 'hello', d: [new Vec3(1, 2, 3)] };
+    i = {
+        /** description of a */
+        a: true,
+        /** @range [10, 20] */
+        b: 10,
+        c: 'hello',
+        d: [new Vec3(1, 2, 3)]
+    };
 
     /**
      * @typedef {object} TypeDefFolder
