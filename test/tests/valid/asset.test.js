@@ -40,7 +40,7 @@ function runTests(fileName) {
             expect(data[0].example.attributes.b.type).to.equal('asset');
             expect(data[0].example.attributes.b.array).to.equal(false);
             expect(data[0].example.attributes.b.default).to.equal(null);
-            expect(data[0].example.attributes.b.resource).to.equal('texture');
+            expect(data[0].example.attributes.b.assetType).to.equal('texture');
         });
 
         it('c: should be a asset attribute array with a container resource', function () {
@@ -49,7 +49,7 @@ function runTests(fileName) {
             expect(data[0].example.attributes.c.type).to.equal('asset');
             expect(data[0].example.attributes.c.array).to.equal(true);
             expect(data[0].example.attributes.c.default).to.equal(null);
-            expect(data[0].example.attributes.c.resource).to.equal('container');
+            expect(data[0].example.attributes.c.assetType).to.equal('container');
         });
 
     });
