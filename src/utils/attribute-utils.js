@@ -1,3 +1,5 @@
+import { getCombinedModifierFlags, ModifierFlags } from 'typescript';
+
 /**
  * @file Utility functions for parsing Script attributes.
  */
@@ -42,3 +44,10 @@ export const hasTag = (tag, node) => {
 export const isInterface = (node) => {
     return hasTag('interface', node);
 };
+
+/**
+ * Checks if a node is a scriptName property
+ * @param {import('typescript').Node} member - The node to analyze
+ * @returns {boolean} - True if the node is a scriptName property
+ */
+export const isStaticMember = member => (getCombinedModifierFlags(member) & ModifierFlags.Static) !== 0;

@@ -20,6 +20,10 @@ describe('VALID: Intellisense Parsing', function () {
         expect(data[0]?.example).to.exist;
     });
 
+    it('does not return static members', function () {
+        expect(data[0].example[0].name).to.not.equal('scriptName');
+    });
+
     it('attributes have correct types', function () {
         expect(data[0].folder[0].type).to.equal('any');
         expect(data[0].folder[1].type).to.equal('number');
