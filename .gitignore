@@ -133,3 +133,6 @@ dist
 
 # npm registry
 .npmrc
+
+# Types
+/types

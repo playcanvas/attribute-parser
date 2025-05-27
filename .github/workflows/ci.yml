@@ -7,25 +7,29 @@ on:
     branches: [ main ]
 
 jobs:
-  # build:
-  #   name: Build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Check out code
-  #       uses: actions/checkout@v4
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
 
-  #     - name: Set up Node.js 18.x
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 18.x
-  #         cache: 'npm'
-  #         registry-url: 'https://registry.npmjs.org/'
+      - name: Set up Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org/'
 
-  #     - name: Install Dependencies
-  #       run: npm ci
+      - name: Install Dependencies
+        run: npm ci
 
-  #     - name: Build PlayCanvas Attribute Parser
-  #       run: npm run build
+      - name: Build PlayCanvas Attribute Parser
+        run: npm run build
+
+      - name: Build PlayCanvas Attribute Parser Types
+        run: npm run build:types
+
 
   lint:
     name: Lint
