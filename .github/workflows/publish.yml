@@ -25,6 +25,8 @@ jobs:
 
       - name: Build PlayCanvas Attribute Parser
         run: npm run build
+        env:
+          NODE_ENV: production
 
       - name: Build PlayCanvas Attribute Parser Types
         run: npm run build:types
