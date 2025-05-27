@@ -30,6 +30,8 @@ jobs:
       - name: Build PlayCanvas Attribute Parser Types
         run: npm run build:types
 
+      - name: Run Publint
+        run: npm run publint
 
   lint:
     name: Lint
