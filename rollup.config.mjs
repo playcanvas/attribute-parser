@@ -32,17 +32,14 @@ export default {
             browser: true, // This instructs the plugin to resolve for the browser
             preferBuiltins: false // Prefer the local versions of built-ins instead of Node.js versions
         }),
-        production &&
-            swc({
-                swc: {
-                    minify: true,
-                    jsc: {
-                        minify: {
-                            compress: true,
-                            mangle: true
-                        }
-                    }
+        swc({
+            swc: {
+                minify: production,
+                env: {
+                    loose: true
                 }
-            })
+            }
+        })
     ]
+
 };
