@@ -49,7 +49,6 @@
     "build": "rollup -c",
     "build:types": "tsc -p tsconfig.build.json",
     "watch": "rollup -c -w",
-    "docs": "typedoc",
     "lint": "eslint src rollup.config.mjs",
     "lint:fix": "eslint src rollup.config.mjs --fix",
     "type:check": "tsc --noEmit",
