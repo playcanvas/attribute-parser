@@ -12,6 +12,7 @@
   "license": "MIT",
   "type": "module",
   "main": "src/index.js",
+  "types": "types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
@@ -19,7 +20,6 @@
     },
     "./libs": "./dist/libs.d.ts"
   },
-  "types": "types/index.d.ts",
   "bugs": {
     "url": "https://github.com/playcanvas/attribute-parser/issues"
   },
