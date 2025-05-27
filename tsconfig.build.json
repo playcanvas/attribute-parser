@@ -1,0 +1,14 @@
+{
+    "files": ["src/index.js"],
+    "compilerOptions": {
+        "allowJs": true,
+        "lib": [
+            "es2019",
+            "dom",
+            "dom.iterable"
+        ],
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "outDir": "types"
+    }
+}

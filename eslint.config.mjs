@@ -25,6 +25,17 @@ export default [
         }
     },
     {
+        files: ['**/*.mjs'],
+        languageOptions: {
+            globals: {
+                ...globals.node
+            }
+        },
+        rules: {
+            'import/no-named-as-default': 'off'
+        }
+    },
+    {
         // Configuration specific to test files
         files: ['**/*.test.js'], // Match test files
 
