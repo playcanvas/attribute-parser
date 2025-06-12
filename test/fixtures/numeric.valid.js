@@ -58,6 +58,14 @@ class Example extends Script {
      * @range []
      */
     h;
+
+    /**
+     * @attribute
+     * @type {number}
+     * @range [0, 1]
+     * Summary text after the range should not cause an error
+     */
+    i;
 }
 
 export { Example };
