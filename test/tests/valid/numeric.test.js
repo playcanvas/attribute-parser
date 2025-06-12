@@ -100,4 +100,14 @@ describe('VALID: Numeric attribute', function () {
         expect(data[0].example.attributes.h.max).to.not.exist;
     });
 
+    it('i: should be a numeric attribute with a range, precision and step', function () {
+        expect(data[1]).to.be.empty;
+        expect(data[0].example.attributes.i).to.exist;
+        expect(data[0].example.attributes.i.name).to.equal('i');
+        expect(data[0].example.attributes.i.type).to.equal('number');
+        expect(data[0].example.attributes.i.array).to.equal(false);
+        expect(data[0].example.attributes.i.default).to.equal(0);
+        expect(data[0].example.attributes.i.min).to.equal(0);
+        expect(data[0].example.attributes.i.max).to.equal(1);
+    });
 });
