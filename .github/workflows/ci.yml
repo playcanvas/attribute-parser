@@ -7,43 +7,68 @@ on:
     branches: [ main ]
 
 jobs:
-  lint:
-    name: Lint Code
+  build:
+    name: Build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
-      - name: Checkout code
+      - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 18.x
+      - name: Set up Node.js 18.x
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 18.x
           cache: 'npm'
+          registry-url: 'https://registry.npmjs.org/'
 
-      - name: Install dependencies
-        run: npm clean-install --progress=false --no-fund
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build PlayCanvas Attribute Parser
+        run: npm run build
+
+      - name: Build PlayCanvas Attribute Parser Types
+        run: npm run build:types
+
+      - name: Run Publint
+        run: npm run publint
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Install Dependencies
+        run: npm ci
 
       - name: Run ESLint
         run: npm run lint
 
-  unit-test-node:
-    name: Unit Test
+  test:
+    name: Test
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: lint # Ensure linting completes successfully first
     steps:
-      - name: Checkout code
+      - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 18.x
+      - name: Set up Node.js 18.x
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 18.x
           cache: 'npm'
+          registry-url: 'https://registry.npmjs.org/'
 
-      - name: Install dependencies
-        run: npm clean-install --progress=false --no-fund
+      - name: Install Dependencies
+        run: npm ci
 
-      - name: Run unit tests
+      - name: Run Tests
         run: npm test
