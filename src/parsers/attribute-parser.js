@@ -51,7 +51,8 @@ export class AttributeParser {
             // Extract metadata from custom tags
             const jsDocTags = node.jsDoc?.[0]?.tags ?? [];
             jsDocTags.forEach((tag) => {
-                let commentText = tag.comment;
+                // Only use the first line of the comment
+                let commentText = (tag.comment?.split('\n')[0] || '').trim();
 
                 // Check if the tag is a supported tag
                 if (this.tagTypeAnnotations.has(tag.tagName.text)) {
