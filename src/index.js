@@ -158,9 +158,12 @@ export class JSDocParser {
                 // Check for a static scriptName property and use that as the name if it exists
                 const scriptNameMember = node.members.find(isScriptNameMember);
 
-                // If the scriptName property exists, use that as the name
+                // If the scriptName property exists, use that verbatim as the name
                 if (scriptNameMember) {
                     name = scriptNameMember.initializer.text;
+                } else {
+                    // Otherwise, convert the class name to lower camel case
+                    name = toLowerCamelCase(name);
                 }
 
                 esmScripts.set(name, node);
@@ -189,7 +192,7 @@ export class JSDocParser {
 
         // Extract attributes from each script
         nodes.forEach((node, name) => {
-            const opts = results[toLowerCamelCase(name)] = { attributes: {}, errors: [] };
+            const opts = results[name] = { attributes: {}, errors: [] };
             this.parser.extractAttributes(node, opts);
         });
 
