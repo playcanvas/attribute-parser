@@ -159,14 +159,15 @@ export class JSDocParser {
                 const scriptNameMember = node.members.find(isScriptNameMember);
 
                 // If the scriptName property exists, use that verbatim as the name
+                let finalName;
                 if (scriptNameMember) {
-                    name = scriptNameMember.initializer.text;
+                    finalName = scriptNameMember.initializer.text;
                 } else {
                     // Otherwise, convert the class name to lower camel case
-                    name = toLowerCamelCase(name);
+                    finalName = toLowerCamelCase(name);
                 }
 
-                esmScripts.set(name, node);
+                esmScripts.set(finalName, node);
             }
         });
 
