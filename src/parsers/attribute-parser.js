@@ -89,9 +89,21 @@ export class AttributeParser {
     getNodeAsAttribute(node, errors = []) {
 
         const name = node.name && ts.isIdentifier(node.name) && node.name.text;
-        const { type, name: typeName, array } = getType(node, this.typeChecker);
+        const { type, name: typeName, array, isMixedUnion } = getType(node, this.typeChecker);
+
         const enums = this.getEnumMembers(node, errors);
         let value = null;
+
+        // If this is not an enum and the type is a mixed union, ie 'a' | false | 1,
+        // we need to raise an error as this is not a supported attribute type
+        if (isMixedUnion && enums.length === 0) {
+            errors.push(new ParsingError(
+                node,
+                `Mixed literal union types (combining different primitive types like string | number) are not supported for attribute: '${name}'. ` +
+                'Please use a union of the same primitive type (e.g., \'1 | 2 | 3\' or \'"a" | "b" | "c"\') or refactor your type.'
+            ));
+            return;
+        }
 
         // we don't need to serialize the value for arrays
         const serializer = !array && this.typeSerializerMap.get(typeName);
