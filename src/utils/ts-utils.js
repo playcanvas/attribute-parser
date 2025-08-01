@@ -326,7 +326,14 @@ export function getType(node, typeChecker) {
         const baseType = typeChecker.getBaseTypeOfLiteralType(actualType);
 
         // If baseType has multiple types, it means we have a mixed union, ie 'a' | false | 1.
-        const isMixedUnion = Array.isArray(baseType.types) && baseType.intrinsicName !== 'boolean';
+        let isMixedUnion = false;
+        if (Array.isArray(baseType.types)) {
+            const primitiveKinds = new Set(
+                baseType.types.map(t => typeChecker.getBaseTypeOfLiteralType(t))
+            );
+            primitiveKinds.delete(null);
+            isMixedUnion = primitiveKinds.size > 1;
+        }
 
         const name = getPrimitiveEnumType(baseType, typeChecker) ?? typeChecker.typeToString(baseType);
 

@@ -100,7 +100,7 @@ export class AttributeParser {
             errors.push(new ParsingError(
                 node,
                 `Mixed literal union types (combining different primitive types like string | number) are not supported for attribute: '${name}'. ` +
-                `Please use a union of the same primitive type (e.g., '1 | 2 | 3' or '"a" | "b" | "c"') or refactor your type.`
+                'Please use a union of the same primitive type (e.g., \'1 | 2 | 3\' or \'"a" | "b" | "c"\') or refactor your type.'
             ));
             return;
         }
