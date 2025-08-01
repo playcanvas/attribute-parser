@@ -97,7 +97,11 @@ export class AttributeParser {
         // If this is not an enum and the type is a mixed union, ie 'a' | false | 1,
         // we need to raise an error as this is not a supported attribute type
         if (isMixedUnion && enums.length === 0) {
-            errors.push(new ParsingError(node, `Mixed literal union types are not supported. ${node.getText()} ${this.typeChecker.typeToString(type)}`));
+            errors.push(new ParsingError(
+                node,
+                `Mixed literal union types (combining different primitive types like string | number) are not supported for attribute: '${name}'. ` +
+                `Please use a union of the same primitive type (e.g., '1 | 2 | 3' or '"a" | "b" | "c"') or refactor your type.`
+            ));
             return;
         }
 
