@@ -75,5 +75,5 @@ function runTests(fileName) {
     });
 }
 
-// runTests('./enum.valid.js');
+runTests('./enum.valid.js');
 runTests('./enum.valid.ts');
