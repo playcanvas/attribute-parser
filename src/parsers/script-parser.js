@@ -41,7 +41,7 @@ const createNewExpressionParser = (name, argProcessor, defaultArr = []) => {
     return (node) => {
         if (node.kind !== ts.SyntaxKind.NewExpression) {
             if (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent)) {
-                throw new ParsingError(node, `Property "${node.name.text}" is not a ${name}.`);
+                throw new ParsingError(node, 'Invalid Property', `Property "${node.name.text}" is not a ${name}.`);
             }
             return defaultArr;
         }
@@ -359,7 +359,7 @@ export class ScriptParser {
 
                 if (typeName === 'any') {
 
-                    const error = new ParsingError(member, `The attribute "${memberName}" is not initialized and does not have a @type tag.`);
+                    const error = new ParsingError(member, 'Invalid Type', `The attribute "${memberName}" is not a valid type. It is either not initialized or does not have a valid @type tag.`);
                     errors.push(error);
                     continue;
 
@@ -383,7 +383,7 @@ export class ScriptParser {
 
                     // Check if the type is a valid interface
                     if (!isInitialized && !typeIsInterface && !typeIsJSDocTypeDef && !isJSDocTypeLiteral) {
-                        const error = new ParsingError(member, `Attribute "${memberName}" is an invalid type.`);
+                        const error = new ParsingError(member, 'Invalid Type', `Attribute "${memberName}" is an invalid type.`);
                         errors.push(error);
                         continue;
                     }

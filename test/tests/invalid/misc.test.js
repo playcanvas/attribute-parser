@@ -18,7 +18,7 @@ describe('INVALID: Misc attribute types', function () {
     it('Example: should exist with attributes and errors (4)', function () {
         expect(data[0].example).to.exist;
         expect(data[0].example.attributes).to.not.be.empty;
-        expect(data[0].example.errors.length).to.equal(3);
+        expect(data[0].example.errors.length).to.equal(4);
     });
 
     it('e: should not be recognised as an attribute (cannot infer GraphNode type)', function () {
@@ -36,6 +36,14 @@ describe('INVALID: Misc attribute types', function () {
         expect(data[0].example.attributes.g.array).to.equal(true);
         expect(data[0].example.attributes.g.default).to.not.exist;
         expect(data[0].example.attributes.g.size).to.not.exist;
+    });
+
+    it('h: should not be recognized as an attribute', function () {
+        expect(data[0].example.attributes.h).to.not.exist;
+
+        // find the error in the errors array
+        const error = data[0].example.errors.find(e => e.message.startsWith('The attribute "h" is not a valid type'));
+        expect(error).to.exist;
     });
 
 });
