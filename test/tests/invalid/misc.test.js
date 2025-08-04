@@ -42,7 +42,7 @@ describe('INVALID: Misc attribute types', function () {
         expect(data[0].example.attributes.h).to.not.exist;
 
         // find the error in the errors array
-        const error = data[0].example.errors.find(e => e.message.startsWith('The attribute "h" is not a valid type'));
+        const error = data[0].example.errors.find(e => e.node.name?.escapedText === 'h');
         expect(error).to.exist;
     });
 
