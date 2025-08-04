@@ -361,9 +361,9 @@ export class ScriptParser {
 
                     let errorMessage;
                     if (!member.initializer) {
-                        errorMessage = `The attribute "${memberName}" is not initialized.`;
-                    } else {
                         errorMessage = `The attribute "${memberName}" does not have a valid @type tag.`;
+                    } else {
+                        errorMessage = `The attribute "${memberName}" either does not have a valid @type tag or is initialized with an invalid type.`;
                     }
                     const error = new ParsingError(member, 'Invalid Type', errorMessage);
                     errors.push(error);
