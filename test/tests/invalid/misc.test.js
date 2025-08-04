@@ -38,7 +38,7 @@ describe('INVALID: Misc attribute types', function () {
         expect(data[0].example.attributes.g.size).to.not.exist;
     });
 
-    it('h: should not be recognized as an attribute', function () {
+    it('h: should not be recognised as an attribute', function () {
         expect(data[0].example.attributes.h).to.not.exist;
 
         // find the error in the errors array
