@@ -69,7 +69,7 @@ export class AttributeParser {
                     } catch (error) {
                         const file = node.getSourceFile();
                         const { line, character } = file.getLineAndCharacterOfPosition(tag.getStart());
-                        const parseError = new ParsingError(tag, `Invalid Tag '@${tag.tagName.text}'`, `Error (${line}, ${character}): Parsing Tag '@${tag.tagName.text} ${commentText}' - ${error.message}`);
+                        const parseError = new ParsingError(node, `Invalid Tag '@${tag.tagName.text}'`, `Error (${line}, ${character}): Parsing Tag '@${tag.tagName.text} ${commentText}' - ${error.message}`);
                         errors.push(parseError);
                     }
                 }
