@@ -2,6 +2,13 @@ import { Script, GraphNode } from 'playcanvas';
 
 class Vec3 {}
 
+/**
+ * @typedef Invalid
+ */
+
+/**
+ * @type {Invalid}
+ */
 class Example extends Script {
     /**
      * @attribute
@@ -19,6 +26,12 @@ class Example extends Script {
      * @size a
      */
     g;
+
+    /**
+     * @attribute
+     * @type {Invalid}
+     */
+    h;
 }
 
 export { Example };

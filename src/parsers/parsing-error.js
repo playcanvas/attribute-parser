@@ -1,6 +1,7 @@
 export class ParsingError {
-    constructor(node, message) {
+    constructor(node, type, message) {
         this.node = node;        // AST node which caused the error
+        this.type = type;        // Type of the error
         this.message = message;  // Description of the error
     }
 

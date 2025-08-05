@@ -69,7 +69,7 @@ export class AttributeParser {
                     } catch (error) {
                         const file = node.getSourceFile();
                         const { line, character } = file.getLineAndCharacterOfPosition(tag.getStart());
-                        const parseError = new ParsingError(tag, `Error (${line}, ${character}): Parsing Tag '@${tag.tagName.text} ${commentText}' - ${error.message}`);
+                        const parseError = new ParsingError(node, `Invalid Tag '@${tag.tagName.text}'`, `Error (${line}, ${character}): Parsing Tag '@${tag.tagName.text} ${commentText}' - ${error.message}`);
                         errors.push(parseError);
                     }
                 }
@@ -99,8 +99,9 @@ export class AttributeParser {
         if (isMixedUnion && enums.length === 0) {
             errors.push(new ParsingError(
                 node,
-                `Mixed literal union types (combining different primitive types like string | number) are not supported for attribute: '${name}'. ` +
-                'Please use a union of the same primitive type (e.g., \'1 | 2 | 3\' or \'"a" | "b" | "c"\') or refactor your type.'
+                'Invalid Type',
+                'Mixed literal union types (combining different primitive types like string | number) are not supported. ' +
+                'Use a union of the same primitive type (e.g., \'1 | 2 | 3\' or \'"a" | "b" | "c"\') or refactor your type.'
             ));
             return;
         }

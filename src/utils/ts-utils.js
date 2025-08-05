@@ -452,7 +452,7 @@ export const isNumericLiteral = (node) => {
 export const parseFloatNode = (node, isArgument = false) => {
     if (!isNumericLiteral(node)) {
         if (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent) || isArgument) {
-            throw new ParsingError(node, `"${node.parent.getText()}" must be defined with a numeric literal.`);
+            throw new ParsingError(node, 'Not a Literal', `"${node.parent.getText()}" must be defined with a numeric literal.`);
         }
         return 0;
     }
@@ -467,7 +467,7 @@ export const parseFloatNode = (node, isArgument = false) => {
 export const parseBooleanNode = (node) => {
     if (node.kind !== ts.SyntaxKind.TrueKeyword && node.kind !== ts.SyntaxKind.FalseKeyword) {
         if (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent)) {
-            throw new ParsingError(node, `"${node.parent.getText()}" must be defined with a boolean literal.`);
+            throw new ParsingError(node, 'Not a Literal', `"${node.parent.getText()}" must be defined with a boolean literal.`);
         }
         return false;
     }
@@ -618,7 +618,7 @@ export function getLiteralValue(node, typeChecker) {
 export const parseStringNode = (node) => {
     if (node.kind !== ts.SyntaxKind.StringLiteral) {
         if  (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent)) {
-            throw new ParsingError(node, `"${node.parent.getText()}" must be defined with a string literal.`);
+            throw new ParsingError(node, 'Not a Literal', `"${node.parent.getText()}" must be defined with a string literal.`);
         }
         return '';
     }
@@ -628,7 +628,7 @@ export const parseStringNode = (node) => {
 export const parseArrayLiteralNode = (node, isArgument = false) => {
     if (node.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
         if  (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent) || isArgument) {
-            throw new ParsingError(node, `"${node.parent.getText()}" must be defined with an array literal.`);
+            throw new ParsingError(node, 'Not a Literal', `"${node.parent.getText()}" must be defined with an array literal.`);
         }
         return [];
     }
