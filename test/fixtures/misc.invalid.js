@@ -10,6 +10,8 @@ class Vec3 {}
  * @type {Invalid}
  */
 class Example extends Script {
+    static scriptName = 'example';
+
     /**
      * @attribute
      */

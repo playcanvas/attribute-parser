@@ -12,7 +12,15 @@ describe('VALID: Export Script', function () {
     it('only results should exist', function () {
         expect(data).to.exist;
         expect(data[0]).to.not.be.empty;
-        expect(data[1]).to.be.empty;
+        expect(data[1]).to.be.of.length(4);
+    });
+
+    it('should warn that 4 scripts do not have a scriptName', function () {
+        expect(data[1]).to.be.of.length(4);
+        expect(data[1][0].type).to.equal('Missing Script Name');
+        expect(data[1][1].type).to.equal('Missing Script Name');
+        expect(data[1][2].type).to.equal('Missing Script Name');
+        expect(data[1][3].type).to.equal('Missing Script Name');
     });
 
     it('Example: should exist with attributes', function () {

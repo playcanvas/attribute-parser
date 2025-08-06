@@ -1,6 +1,8 @@
 import { Script, Color } from 'playcanvas';
 
 class Example extends Script {
+    static scriptName = 'example';
+
     /**
      * @attribute
      * @type {Color}

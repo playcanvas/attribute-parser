@@ -2,6 +2,8 @@
 import { Script, Vec2, Vec3, Vec4 } from 'playcanvas';
 
 class Example extends Script {
+    static scriptName = 'example';
+
     /**
      * @attribute
      * @type {Vec2}

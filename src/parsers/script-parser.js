@@ -2,7 +2,7 @@ import * as ts from 'typescript';
 
 import { AttributeParser } from './attribute-parser.js';
 import { ParsingError } from './parsing-error.js';
-import { hasTag } from '../utils/attribute-utils.js';
+import { getTag, hasTag } from '../utils/attribute-utils.js';
 import { zipArrays } from '../utils/generic-utils.js';
 import { flatMapAnyNodes, getJSDocTags, getLiteralValue, parseArrayLiteral, parseFloatNode } from '../utils/ts-utils.js';
 
@@ -135,21 +135,58 @@ const EDITOR_ASSET_TYPES = [
 const resourceTypesAsUnion = EDITOR_ASSET_TYPES.map(type => `"${type}"`).join('|');
 
 /**
- * The set of supported block tags and validators
+ * The set of supported block tags and their valid types and support messages when they are malformed or invalid.
+ * @type {Map<string, { type: string, supportMessage?: () => string, fix?: string }>}
  */
 const SUPPORTED_BLOCK_TAGS = new Map([
-    ['resource', resourceTypesAsUnion],
-    ['color', '"r"|"rg"|"rgb"|"rgba"'],
-    ['curves', '["x"] | ["x", "y"] | ["x", "y", "z"] | ["x", "z"] | ["y"] | ["y", "z"] | ["z"]'],
-    ['range', 'number[]'],
-    ['placeholder', 'string'],
-    ['precision', 'number'],
-    ['size', 'number'],
-    ['step', 'number'],
-    ['title', 'string'],
-    ['default', 'any'],
-    ['enabledif', 'any'],
-    ['visibleif', 'any']
+    ['resource', {
+        type: resourceTypesAsUnion,
+        supportMessage: () => `@resource is malformed or invalid. The tag should be formatted as "@resource ${resourceTypesAsUnion}".`,
+        fix: 'texture'
+    }],
+    ['color', {
+        type: '"r"|"rg"|"rgb"|"rgba"',
+        supportMessage: () => '@color is malformed or invalid. The tag should be formatted as "@color r", "@color rg", "@color rgb", or "@color rgba".',
+        fix: 'rgb'
+    }],
+    ['curves', {
+        type: '["x"] | ["x", "y"] | ["x", "y", "z"] | ["x", "z"] | ["y"] | ["y", "z"] | ["z"]',
+        supportMessage: () => '@curves is malformed or invalid. The tag should be formatted as "@curves x", "@curves x y", "@curves x y z", "@curves x z", "@curves y", "@curves y z", or "@curves z".',
+        fix: '["x"]'
+    }],
+    ['range', {
+        type: 'number[]',
+        supportMessage: () => '@range is malformed or invalid. The tag should be formatted as "@range [0, 100]".',
+        fix: '[0, 100]'
+    }],
+    ['placeholder', {
+        type: 'string',
+        supportMessage: () => '@placeholder is malformed or invalid. The tag should be formatted as "@placeholder \"My Placeholder\"".',
+        fix: '"My Placeholder"'
+    }],
+    ['precision', {
+        type: 'number',
+        supportMessage: () => '@precision is malformed or invalid. The tag should be formatted as "@precision 0.1".',
+        fix: '0.1'
+    }],
+    ['size', {
+        type: 'number',
+        supportMessage: () => '@size is malformed or invalid. The tag should be formatted as "@size 100".',
+        fix: '100'
+    }],
+    ['step', {
+        type: 'number',
+        supportMessage: () => '@step is malformed or invalid. The tag should be formatted as "@step 1".',
+        fix: '1'
+    }],
+    ['title', {
+        type: 'string',
+        supportMessage: () => '@title is malformed or invalid. The tag should be formatted as "@title \"My Attribute\"".',
+        fix: '"My Attribute"'
+    }],
+    ['default', { type: 'any' }],
+    ['enabledif', { type: 'any' }],
+    ['visibleif', { type: 'any' }]
 ]);
 
 /**
@@ -389,7 +426,36 @@ export class ScriptParser {
 
                     // Check if the type is a valid interface
                     if (!isInitialized && !typeIsInterface && !typeIsJSDocTypeDef && !isJSDocTypeLiteral) {
-                        const error = new ParsingError(member, 'Invalid Type', `Attribute "${memberName}" is an invalid type.`);
+
+                        let error;
+                        const typeTag = getTag('type', member);
+                        const supportedTypes = Array.from(SUPPORTED_INITIALIZABLE_TYPE_NAMES.keys()).join(', ');
+
+                        if (typeTag) {
+                            // If the attribute has a type tag, add an error that references the @type tag
+                            error = new ParsingError(
+                                typeTag.typeExpression,
+                                'Invalid Type',
+                                `"${typeTag.typeExpression.getText()}" is not a valid attribute type. An attribute should be one of the following types: ${supportedTypes}`
+                            );
+
+                        } else if (initializer) {
+                            // If the attribute is initialized with an invalid type, add an error associated with the initializer
+                            error = new ParsingError(
+                                initializer,
+                                'Invalid Type',
+                                `"${initializer.getText()}" is not a valid attribute type. An attribute should be one of the following types: ${supportedTypes}`
+                            );
+
+                        } else {
+                            // If the attribute does not have a type tag or initializer, add an error that references the member
+                            error = new ParsingError(
+                                member,
+                                'Invalid Type',
+                                `Attribute is an invalid type. An attribute should be one of the following types: ${supportedTypes}`
+                            );
+                        }
+
                         errors.push(error);
                         continue;
                     }

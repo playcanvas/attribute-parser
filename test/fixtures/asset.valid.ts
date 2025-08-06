@@ -2,6 +2,8 @@
 import { Script, Asset } from 'playcanvas';
 
 class Example extends Script {
+    static scriptName = 'example';
+
     /** @attribute */
     a : Asset;
 

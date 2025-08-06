@@ -1,6 +1,8 @@
 import { Script } from 'playcanvas';
 
 class Example extends Script {
+    static scriptName = 'example';
+
     /**
      * @attribute
      * @visibleif {b === 2}

@@ -12,7 +12,7 @@ export class AttributeParser {
     /**
      * Creates a new instance of the ScriptParser class.
      *
-     * @param {Map<string, string>} tags - An set of tag definitions and their validators to add to the parser
+     * @param {Map<string, { type: string, supportMessage?: () => string, fix?: string }>} tags - An set of tag definitions and their validators to add to the parser
      * @param {object} env - The TypeScript environment to use
      * @param {Map<string, Function>} typeSerializerMap - A map of custom serializers
      */
@@ -52,24 +52,54 @@ export class AttributeParser {
             const jsDocTags = node.jsDoc?.[0]?.tags ?? [];
             jsDocTags.forEach((tag) => {
                 // Only use the first line of the comment
+                const tagName = tag.tagName.text;
                 let commentText = (tag.comment?.split('\n')[0] || '').trim();
 
                 // Check if the tag is a supported tag
-                if (this.tagTypeAnnotations.has(tag.tagName.text)) {
+                if (this.tagTypeAnnotations.has(tagName)) {
+                    const { type, supportMessage, fix } = this.tagTypeAnnotations.get(tagName);
                     try {
                         const value = parseTag(commentText);
-                        const tagTypeAnnotation = this.tagTypeAnnotations.get(tag.tagName.text);
 
                         // Tags like @resource with string values do not need quotations, so we need to manually add them
                         if (typeof value === 'string') commentText = `"${commentText}"`;
 
-                        validateTag(commentText, tagTypeAnnotation, this.env);
+                        validateTag(commentText, type, this.env);
                         attribute[tag.tagName.text] = value;
 
                     } catch (error) {
-                        const file = node.getSourceFile();
-                        const { line, character } = file.getLineAndCharacterOfPosition(tag.getStart());
-                        const parseError = new ParsingError(node, `Invalid Tag '@${tag.tagName.text}'`, `Error (${line}, ${character}): Parsing Tag '@${tag.tagName.text} ${commentText}' - ${error.message}`);
+
+                        // generate a fix if one is provided
+                        let startPos = tag.getStart();
+                        let endPos = tag.getEnd();
+
+                        const fullText = tag.getText();
+                        const commentText = tag.comment?.split('\n')[0]?.trim() || '';
+
+                        // Find the start of the comment content within the full text
+                        const commentStart = fullText.indexOf(commentText);
+                        if (commentStart !== -1) {
+                            startPos = tag.getStart() + commentStart;
+                            endPos = startPos + commentText.length;
+                        }
+
+                        const sourceFile = tag.getSourceFile();
+                        const startLineChar = sourceFile.getLineAndCharacterOfPosition(startPos);
+                        const endLineChar = sourceFile.getLineAndCharacterOfPosition(endPos);
+
+                        const edit = fix ? {
+                            text: fix,
+                            title: `Fix @${tagName} tag`,
+                            range: {
+                                startLineNumber: startLineChar.line + 1,
+                                startColumn: startLineChar.character + 1,
+                                endLineNumber: endLineChar.line + 1,
+                                endColumn: endLineChar.character + 1
+                            }
+                        } : null;
+
+                        const errorMessage = supportMessage?.() ?? 'The tag is invalid.';
+                        const parseError = new ParsingError(tag, `Invalid Tag '@${tagName}'`, errorMessage, edit);
                         errors.push(parseError);
                     }
                 }
