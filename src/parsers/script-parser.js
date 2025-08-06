@@ -396,11 +396,13 @@ export class ScriptParser {
 
                 if (typeName === 'any') {
 
+                    const supportedTypes = Array.from(SUPPORTED_INITIALIZABLE_TYPE_NAMES.keys()).join(', ');
+
                     let errorMessage;
-                    if (!member.initializer) {
-                        errorMessage = `The attribute "${memberName}" does not have a valid @type tag.`;
+                    if (member.initializer) {
+                        errorMessage = `This attribute is initialized with an invalid type. An attribute should be one of the following: ${supportedTypes}.`;
                     } else {
-                        errorMessage = `The attribute "${memberName}" either does not have a valid @type tag or is initialized with an invalid type.`;
+                        errorMessage = `This attribute has an invalid @type tag. An attribute should be one of the following: ${supportedTypes}.`;
                     }
                     const error = new ParsingError(member, 'Invalid Type', errorMessage);
                     errors.push(error);
@@ -436,7 +438,7 @@ export class ScriptParser {
                             error = new ParsingError(
                                 typeTag.typeExpression,
                                 'Invalid Type',
-                                `"${typeTag.typeExpression.getText()}" is not a valid attribute type. An attribute should be one of the following types: ${supportedTypes}`
+                                `"${typeTag.typeExpression.getText()}" is not a valid attribute type. An attribute should be one of the following: ${supportedTypes}`
                             );
 
                         } else if (initializer) {
@@ -444,7 +446,7 @@ export class ScriptParser {
                             error = new ParsingError(
                                 initializer,
                                 'Invalid Type',
-                                `"${initializer.getText()}" is not a valid attribute type. An attribute should be one of the following types: ${supportedTypes}`
+                                `"${initializer.getText()}" is not a valid attribute type. An attribute should be one of the following: ${supportedTypes}`
                             );
 
                         } else {
@@ -452,7 +454,7 @@ export class ScriptParser {
                             error = new ParsingError(
                                 member,
                                 'Invalid Type',
-                                `Attribute is an invalid type. An attribute should be one of the following types: ${supportedTypes}`
+                                `Attribute is an invalid type. An attribute should be one of the following: ${supportedTypes}`
                             );
                         }
 

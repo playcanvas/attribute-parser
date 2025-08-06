@@ -261,7 +261,6 @@ export class JSDocParser {
             errors.push(...(attributes[scriptName]?.errors ?? []));
         }
 
-        const localResults = {};
         for (const { scriptName, members } of scripts) {
             const localMembers = [];
             for (const member of members) {
@@ -290,9 +289,9 @@ export class JSDocParser {
                 });
             }
 
-            localResults[scriptName] = localMembers;
+            results[scriptName] = localMembers;
         }
 
-        return [localResults, errors];
+        return [results, errors];
     }
 }
