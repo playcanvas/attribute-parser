@@ -65,7 +65,7 @@ export class AttributeParser {
                         if (typeof value === 'string') commentText = `"${commentText}"`;
 
                         validateTag(commentText, type, this.env);
-                        attribute[tag.tagName.text] = value;
+                        attribute[tagName] = value;
 
                     } catch (error) {
 
