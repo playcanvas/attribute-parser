@@ -136,7 +136,7 @@ const resourceTypesAsUnion = EDITOR_ASSET_TYPES.map(type => `"${type}"`).join('|
 
 /**
  * The set of supported block tags and their valid types and support messages when they are malformed or invalid.
- * @type {Map<string, { type: string, supportMessage?: () => string, fix?: string }>}
+ * @type {Map<string, TagDefinition>}
  */
 const SUPPORTED_BLOCK_TAGS = new Map([
     ['resource', {
