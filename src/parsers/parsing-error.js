@@ -1,8 +1,23 @@
+/**
+ * @typedef {Object} Fix
+ * @property {string} text - The text to insert at the fix location
+ * @property {string} title - The title of the fix
+ * @property {{ startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number }} range - The range of the fix
+ */
+
+/**
+ * A class representing a parsing error.
+ * @param {import('typescript').Node} node - The AST node which caused the error
+ * @param {string} type - The type of the error
+ * @param {string} message - The description of the error
+ * @param {Fix} [fix] - The fix for the error
+ */
 export class ParsingError {
-    constructor(node, type, message) {
+    constructor(node, type, message, fix) {
         this.node = node;        // AST node which caused the error
         this.type = type;        // Type of the error
         this.message = message;  // Description of the error
+        this.fix = fix;          // Fix for the error
     }
 
     toString() {

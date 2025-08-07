@@ -20,6 +20,8 @@ enum NumberNumberEnum {
 };
 
 class Example extends Script {
+    static scriptName = 'example';
+
     /**
      * @attribute
      */

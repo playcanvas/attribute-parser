@@ -7,6 +7,7 @@ import { Script, Vec3 } from 'playcanvas';
 class Folder {
     /**
      * @attribute
+     * @type {number}
      */
     a;
 
@@ -14,11 +15,11 @@ class Folder {
 }
 
 export class Example extends Script {
-
-    static scriptName = 'Example';
+    static scriptName = 'example';
 
     /**
      * @attribute
+     * @type {number}
      */
     a;
 

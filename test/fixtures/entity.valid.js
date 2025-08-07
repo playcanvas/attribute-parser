@@ -1,6 +1,8 @@
 import { Script, Entity } from 'playcanvas';
 
 class Example extends Script {
+    static scriptName = 'example';
+
     /**
      * @attribute
      * @type {Entity}

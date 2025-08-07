@@ -3,6 +3,8 @@ import { Script } from 'playcanvas';
 import { Example } from './example.dep.js';
 
 class ExampleExtended extends Example {
+    static scriptName = 'exampleExtended';
+
     /**
      * @attribute
      * @type {number}
@@ -11,6 +13,8 @@ class ExampleExtended extends Example {
 }
 
 class ExampleExtendedExtended extends ExampleExtended {
+    static scriptName = 'exampleExtendedExtended';
+
     /**
      * @attribute
      * @type {string}
@@ -21,6 +25,8 @@ class ExampleExtendedExtended extends ExampleExtended {
 const ScriptAlias = Script;
 
 class ExampleAlias extends ScriptAlias {
+    static scriptName = 'exampleAlias';
+
     /**
      * @attribute
      * @type {boolean}
@@ -29,6 +35,8 @@ class ExampleAlias extends ScriptAlias {
 }
 
 class ExampleNoExtend {
+    static scriptName = 'exampleNoExtend';
+
     /**
      * @attribute
      * @type {number}

@@ -44,6 +44,8 @@ class NestedFolder {
  * @interface
  */
 class Example extends Script {
+    static scriptName = 'example';
+
     /**
      * @attribute
      * @type {Folder}

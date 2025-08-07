@@ -1,11 +1,23 @@
 import { createSystem, createDefaultMapFromNodeModules, createVirtualTypeScriptEnvironment } from '@typescript/vfs';
 import * as ts from 'typescript';
 
+import { ParsingError } from './parsers/parsing-error.js';
 import { ScriptParser } from './parsers/script-parser.js';
-import { isInterface, isStaticMember } from './utils/attribute-utils.js';
-import { createDefaultMapFromCDN, flatMapAnyNodes, getExportedNodes, getType, inheritsFrom, isAliasedClassDeclaration } from './utils/ts-utils.js';
+import { isStaticMember } from './utils/attribute-utils.js';
+import { createDefaultMapFromCDN, getExportedNodes, getType, inheritsFrom, isAliasedClassDeclaration } from './utils/ts-utils.js';
 
 const toLowerCamelCase = str => str[0].toLowerCase() + str.substring(1);
+
+const SUPPORTED_ATTRIBUTE_TYPES = new Set([
+    'Curve',
+    'Vec2',
+    'Vec3',
+    'Vec4',
+    'Color',
+    'number',
+    'string',
+    'boolean'
+]);
 
 const COMPILER_OPTIONS = {
     noLib: true,
@@ -110,9 +122,10 @@ export class JSDocParser {
     /**
      * Returns all the valid ESM Scripts within a file
      * @param {string} fileName - The file name in the program to check
+     * @param {ParsingError[]} errors - An array to store any parsing errors
      * @returns {Map<string, import('typescript').Node>} - A map of valid ESM Script <names, nodes> within the file
      */
-    getAllEsmScripts(fileName) {
+    getAllEsmScripts(fileName, errors = []) {
 
         const typeChecker = this.program.getTypeChecker();
 
@@ -163,8 +176,27 @@ export class JSDocParser {
                 if (scriptNameMember) {
                     finalName = scriptNameMember.initializer.text;
                 } else {
-                    // Otherwise, convert the class name to lower camel case
                     finalName = toLowerCamelCase(name);
+                    const insertOffset = node.members.pos;
+                    const insertPos = node.getSourceFile().getLineAndCharacterOfPosition(insertOffset);
+
+                    errors.push(
+                        new ParsingError(
+                            node,
+                            'Missing Script Name',
+                            'Scripts should have a static scriptName member that identifies the script.',
+                            {
+                                title: 'Add scriptName',
+                                text: `\n    static scriptName = '${finalName}';\n`,
+                                range: {
+                                    startLineNumber: insertPos.line + 1,
+                                    startColumn: insertPos.character + 1,
+                                    endLineNumber: insertPos.line + 1,
+                                    endColumn: insertPos.character + 1
+                                }
+                            }
+                        )
+                    );
                 }
 
                 esmScripts.set(finalName, node);
@@ -189,7 +221,7 @@ export class JSDocParser {
         }
 
         // Extract all exported nodes
-        const nodes = this.getAllEsmScripts(fileName);
+        const nodes = this.getAllEsmScripts(fileName, errors);
 
         // Extract attributes from each script
         nodes.forEach((node, name) => {
@@ -214,41 +246,31 @@ export class JSDocParser {
         }
 
         const typeChecker = this.program.getTypeChecker();
+        const esmScripts = this.getAllEsmScripts(fileName, errors);
+        const [attributes] = this.parseAttributes(fileName);
 
-        // Find the Script class in the PlayCanvas namespace
-        const pcTypes = this.program.getSourceFile('/playcanvas.d.ts');
-        const esmScriptClass = pcTypes.statements.find(node => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script')?.symbol;
-
-        // Parse the source file and pc types
-        const sourceFile = this.program.getSourceFile(fileName);
-
-        if (!sourceFile) {
-            throw new Error(`Source file ${fileName} not found`);
+        const scripts = [];
+        for (const [scriptName, node] of esmScripts) {
+            const members = [];
+            for (const member of node.members) {
+                if (member.kind === ts.SyntaxKind.PropertyDeclaration && !isStaticMember(member)) {
+                    members.push(member);
+                }
+            }
+            scripts.push({ scriptName, members });
+            errors.push(...(attributes[scriptName]?.errors ?? []));
         }
 
-        const nodes = flatMapAnyNodes(sourceFile, (node) => {
-            if (!ts.isClassDeclaration(node)) {
-                return false;
-            }
-
-            return inheritsFrom(node, typeChecker, esmScriptClass) || isInterface(node);
-        });
-
-        for (const node of nodes) {
-            const name = toLowerCamelCase(node.name.text);
-            const members = [];
-
-            for (const member of node.members) {
-                if (member.kind !== ts.SyntaxKind.PropertyDeclaration || isStaticMember(member)) {
-                    continue;
-                }
-
-                // Extract JSDoc tags
-                const tags = member.jsDoc ? member.jsDoc.map(jsdoc => jsdoc.tags?.map(tag => tag.tagName.getText()) ?? []).flat() : [];
-
+        for (const { scriptName, members } of scripts) {
+            const localMembers = [];
+            for (const member of members) {
                 const name = member.name.getText();
+                const attribute = attributes[scriptName].attributes[name];
+                const isAttribute = !!attribute;
+
                 const type = getType(member, typeChecker);
-                if (!type) {
+
+                if (!SUPPORTED_ATTRIBUTE_TYPES.has(type.name)) {
                     continue;
                 }
 
@@ -257,19 +279,17 @@ export class JSDocParser {
                 const jsdocNode = member.jsDoc && member.jsDoc[member.jsDoc.length - 1];
                 const jsdocPos = jsdocNode ? ts.getLineAndCharacterOfPosition(member.getSourceFile(), jsdocNode.getStart()) : null;
 
-                const data = {
+                localMembers.push({
                     name,
+                    isAttribute,
                     type: type.name + (type.array ? '[]' : ''),
-                    isAttribute: tags.includes('attribute'),
                     start: jsdocNode ? { line: jsdocPos.line + 1, column: jsdocPos.character + 1 } :
                         { line: namePos.line + 1, column: namePos.character + 1 },
                     end: { line: namePos.line + 1, column: namePos.character + name.length + 1 }
-                };
-
-                members.push(data);
+                });
             }
 
-            results[name] = members;
+            results[scriptName] = localMembers;
         }
 
         return [results, errors];

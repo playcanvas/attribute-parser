@@ -1,6 +1,8 @@
 import { Script } from 'playcanvas';
 
 class Example extends Script {
+    static scriptName = 'example';
+
     /**
      * This is a description of the attribute. It can be multi-sentence.
      *

@@ -4,25 +4,21 @@ import { getCombinedModifierFlags, ModifierFlags } from 'typescript';
  * @file Utility functions for parsing Script attributes.
  */
 
-
 /**
- * Returns a jsdoc tag from a JSDoc comment.
- * @param {string} tag - The tag to search for
- * @param {import('typescript').Node} doc - The JSDoc comment node
- * @returns {import('typescript').Node} | null} - The tag node
- */
-export const getTagFromJsdoc = (tag, doc) => {
-    return doc?.tags?.find(doc => doc.tagName.text === tag);
-};
-
-/**
- * Checks if a node has a specific JSDoc tag.
+ * Returns a JSDoc tag from a node if it exists
  * @param {string} tag - The tag to search for
  * @param {import("typescript").Node} node - The node to analyze
- * @returns {import('typescript').Node} - True if the tag is found
+ * @returns {import("typescript").JSDocTag | null} - The tag node or null if not found
  */
 export const getTag = (tag, node) => {
-    return node?.jsDoc?.find(doc => getTagFromJsdoc(tag, doc));
+    for (const jsDoc of node?.jsDoc || []) {
+        for (const tagNode of jsDoc.tags || []) {
+            if (tagNode.tagName.text === tag) {
+                return tagNode;
+            }
+        }
+    }
+    return null;
 };
 
 /**
