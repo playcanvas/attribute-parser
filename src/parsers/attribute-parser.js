@@ -6,13 +6,20 @@ import { parseTag, validateTag } from '../utils/tag-utils.js';
 import { getLiteralValue, getType } from '../utils/ts-utils.js';
 
 /**
+ * @typedef {Object} TagDefinition
+ * @property {string} type - The type of the tag
+ * @property {() => string} supportMessage - A function to generate a support message for the tag
+ * @property {string} fix - A function to fix the tag
+ */
+
+/**
  * A class to parse JSDoc comments and extract attribute metadata.
  */
 export class AttributeParser {
     /**
      * Creates a new instance of the ScriptParser class.
      *
-     * @param {Map<string, { type: string, supportMessage?: () => string, fix?: string }>} tags - An set of tag definitions and their validators to add to the parser
+     * @param {Map<string, TagDefinition>} tags - An set of tag definitions and their validators to add to the parser
      * @param {object} env - The TypeScript environment to use
      * @param {Map<string, Function>} typeSerializerMap - A map of custom serializers
      */
