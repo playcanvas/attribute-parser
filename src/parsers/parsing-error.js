@@ -11,7 +11,7 @@
  * @param {string} type - The type of the error
  * @param {string} message - The description of the error
  * @param {Fix} [fix] - The fix for the error
- * @param {string} scriptName - The name of the script this error belongs to (required)
+ * @param {string} [scriptName] - The name of the script this error belongs to (required)
  * @param {string} [attributeName] - The name of the attribute this error belongs to (optional)
  */
 export class ParsingError {
