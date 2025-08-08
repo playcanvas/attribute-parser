@@ -194,7 +194,8 @@ export class JSDocParser {
                                     endLineNumber: insertPos.line + 1,
                                     endColumn: insertPos.character + 1
                                 }
-                            }
+                            },
+                            finalName
                         )
                     );
                 }
@@ -226,7 +227,7 @@ export class JSDocParser {
         // Extract attributes from each script
         nodes.forEach((node, name) => {
             const opts = results[name] = { attributes: {}, errors: [] };
-            this.parser.extractAttributes(node, opts);
+            this.parser.extractAttributes(node, { ...opts, scriptName: name });
         });
 
         return [results, errors];
@@ -285,7 +286,7 @@ export class JSDocParser {
                     type: type.name + (type.array ? '[]' : ''),
                     start: jsdocNode ? { line: jsdocPos.line + 1, column: jsdocPos.character + 1 } :
                         { line: namePos.line + 1, column: namePos.character + 1 },
-                    end: { line: namePos.line + 1, column: namePos.character + name.length + 1 }
+                    end: { line: namePos.line + 1, column: namePos.character + 1 }
                 });
             }
 

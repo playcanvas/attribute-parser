@@ -40,15 +40,17 @@ export class AttributeParser {
      * @param {ts.Node} node - The node to parse
      * @param {ParsingError[]} errors - An array to store any parsing errors
      * @param {boolean} requiresAttributeTag - Whether the comment must have an attribute tag
+     * @param {string} scriptName - The name of the script this node belongs to
+     * @param {string} attributeName - The name of the attribute this node belongs to
      * @returns {*} - The extracted metadata or null if no metadata was found
      */
-    parseAttributeComment(node, errors = [], requiresAttributeTag = true) {
+    parseAttributeComment(node, errors = [], requiresAttributeTag = true, scriptName, attributeName) {
 
         // Check if the comment has an attribute tag
         if (!requiresAttributeTag || hasTag('attribute', node)) {
 
             // Fetch the primary attribute metadata
-            const attribute = this.getNodeAsAttribute(node, errors);
+            const attribute = this.getNodeAsAttribute(node, errors, scriptName);
 
             if (!attribute) return;
 
@@ -106,7 +108,7 @@ export class AttributeParser {
                         } : null;
 
                         const errorMessage = supportMessage?.() ?? 'The tag is invalid.';
-                        const parseError = new ParsingError(tag, `Invalid Tag '@${tagName}'`, errorMessage, edit);
+                        const parseError = new ParsingError(tag, `Invalid Tag '@${tagName}'`, errorMessage, edit, scriptName, attributeName);
                         errors.push(parseError);
                     }
                 }
@@ -121,9 +123,10 @@ export class AttributeParser {
      *
      * @param {ts.Node} node - The node to parse
      * @param {ParsingError[]} errors - An array to store any parsing errors
+     * @param {string} [scriptName] - The name of the script this node belongs to
      * @returns {*} - The extracted members
      */
-    getNodeAsAttribute(node, errors = []) {
+    getNodeAsAttribute(node, errors = [], scriptName) {
 
         const name = node.name && ts.isIdentifier(node.name) && node.name.text;
         const { type, name: typeName, array, isMixedUnion } = getType(node, this.typeChecker);
@@ -138,7 +141,10 @@ export class AttributeParser {
                 node,
                 'Invalid Type',
                 'Mixed literal union types (combining different primitive types like string | number) are not supported. ' +
-                'Use a union of the same primitive type (e.g., \'1 | 2 | 3\' or \'"a" | "b" | "c"\') or refactor your type.'
+                'Use a union of the same primitive type (e.g., \'1 | 2 | 3\' or \'"a" | "b" | "c"\') or refactor your type.',
+                undefined,
+                scriptName,
+                name
             ));
             return;
         }
@@ -149,6 +155,11 @@ export class AttributeParser {
             try {
                 value = serializer(node.initializer ?? node, this.typeChecker);
             } catch (error) {
+                // Enrich any thrown ParsingError with context
+                if (error && typeof error === 'object') {
+                    error.scriptName = scriptName;
+                    error.attributeName = name;
+                }
                 errors.push(error);
                 return;
             }
