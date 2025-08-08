@@ -30,7 +30,14 @@ export class ParsingError {
         const fileName = file.fileName;
         const start = this.node.getSourceFile().getLineAndCharacterOfPosition(this.node.getStart());
         const location = `${fileName}:${start.line + 1}:${start.character}`;
-        const context = this.attributeName ? ` [${this.scriptName}.${this.attributeName}]` : ` [${this.scriptName}]`;
+        let context = '';
+        if (this.scriptName && this.attributeName) {
+            context = ` [${this.scriptName}.${this.attributeName}]`;
+        } else if (this.scriptName) {
+            context = ` [${this.scriptName}]`;
+        } else if (this.attributeName) {
+            context = ` [${this.attributeName}]`;
+        }
         return `ParsingError: ${this.message}${context} at ${location}`;
     }
 }
