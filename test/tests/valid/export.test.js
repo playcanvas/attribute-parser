@@ -21,6 +21,12 @@ describe('VALID: Export Script', function () {
         expect(data[1][1].type).to.equal('Missing Script Name');
         expect(data[1][2].type).to.equal('Missing Script Name');
         expect(data[1][3].type).to.equal('Missing Script Name');
+
+        // Ensure scriptName is present on each error
+        expect(data[1][0].scriptName).to.be.a('string');
+        expect(data[1][1].scriptName).to.be.a('string');
+        expect(data[1][2].scriptName).to.be.a('string');
+        expect(data[1][3].scriptName).to.be.a('string');
     });
 
     it('Example: should exist with attributes', function () {

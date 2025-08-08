@@ -41,6 +41,7 @@ const createNewExpressionParser = (name, argProcessor, defaultArr = []) => {
     return (node) => {
         if (node.kind !== ts.SyntaxKind.NewExpression) {
             if (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent)) {
+                // scriptName/attributeName will be filled by caller if caught
                 throw new ParsingError(node, 'Invalid Property', `Property "${node.name.text}" is not a ${name}.`);
             }
             return defaultArr;
@@ -353,6 +354,7 @@ export class ScriptParser {
      * @property {ParsingError[]} [errors] - The array to store parsing errors
      * @property {boolean} [requiresAttributeTag] - Whether the attribute requires an @attribute tag
      * @property {number} [depth] - The current recursion depth
+     * @property {string} [scriptName] - The current script name for context
      */
 
     /**
@@ -369,6 +371,7 @@ export class ScriptParser {
         const errors = opts.errors ?? [];
         const requiresAttributeTag = opts.requiresAttributeTag ?? true;
         const depth = opts.depth ?? 0;
+        const scriptName = opts.scriptName ?? undefined;
 
         // return early if we've reached the maximum depth
         if (depth > 10) {
@@ -385,7 +388,9 @@ export class ScriptParser {
             const attributeMetadata = this.attributeParser.parseAttributeComment(
                 member,
                 errors,
-                requiresAttributeTag
+                requiresAttributeTag,
+                scriptName,
+                memberName
             );
 
             // If we found metadata, extract the type and add it to the found attributes
@@ -404,7 +409,7 @@ export class ScriptParser {
                     } else {
                         errorMessage = `This attribute has an invalid @type tag. An attribute should be one of the following: ${supportedTypes}.`;
                     }
-                    const error = new ParsingError(member, 'Invalid Type', errorMessage);
+                    const error = new ParsingError(member, 'Invalid Type', errorMessage, undefined, node.name.getText(), memberName);
                     errors.push(error);
                     continue;
 
@@ -438,7 +443,10 @@ export class ScriptParser {
                             error = new ParsingError(
                                 typeTag.typeExpression,
                                 'Invalid Type',
-                                `"${typeTag.typeExpression.getText()}" is not a valid attribute type. An attribute should be one of the following: ${supportedTypes}`
+                                `"${typeTag.typeExpression.getText()}" is not a valid attribute type. An attribute should be one of the following: ${supportedTypes}`,
+                                undefined,
+                                node.name.getText(),
+                                memberName
                             );
 
                         } else if (initializer) {
@@ -446,7 +454,10 @@ export class ScriptParser {
                             error = new ParsingError(
                                 initializer,
                                 'Invalid Type',
-                                `"${initializer.getText()}" is not a valid attribute type. An attribute should be one of the following: ${supportedTypes}`
+                                `"${initializer.getText()}" is not a valid attribute type. An attribute should be one of the following: ${supportedTypes}`,
+                                undefined,
+                                node.name.getText(),
+                                memberName
                             );
 
                         } else {
@@ -454,7 +465,10 @@ export class ScriptParser {
                             error = new ParsingError(
                                 member,
                                 'Invalid Type',
-                                `Attribute is an invalid type. An attribute should be one of the following: ${supportedTypes}`
+                                `Attribute is an invalid type. An attribute should be one of the following: ${supportedTypes}`,
+                                undefined,
+                                node.name.getText(),
+                                memberName
                             );
                         }
 
@@ -471,13 +485,13 @@ export class ScriptParser {
                     // If the type is an interface or an initialized object, we need to parse the attribute comments, if not, just the intitialized object
                     let commentAttributes;
                     if (typeIsInterface || isInitialized) {
-                        commentAttributes = this.extractAttributes(typeNode, { errors, requiresAttributeTag: false, depth: depth + 1 });
+                        commentAttributes = this.extractAttributes(typeNode, { errors, requiresAttributeTag: false, depth: depth + 1, scriptName });
                     }
 
                     // Iterate through the nested attributes and extract their metadata
                     const nestedAttributes = members.reduce((attributes, prop) => {
 
-                        const attribute = this.attributeParser.getNodeAsAttribute(prop, errors);
+                        const attribute = this.attributeParser.getNodeAsAttribute(prop, errors, scriptName);
 
                         // If the attribute is a supported type, add it to the list of found attributes
                         if (attribute && this.allSupportedTypesSet.has(attribute.type)) {

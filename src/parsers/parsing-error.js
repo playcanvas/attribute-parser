@@ -11,13 +11,17 @@
  * @param {string} type - The type of the error
  * @param {string} message - The description of the error
  * @param {Fix} [fix] - The fix for the error
+ * @param {string} scriptName - The name of the script this error belongs to (required)
+ * @param {string} [attributeName] - The name of the attribute this error belongs to (optional)
  */
 export class ParsingError {
-    constructor(node, type, message, fix) {
+    constructor(node, type, message, fix, scriptName, attributeName) {
         this.node = node;        // AST node which caused the error
         this.type = type;        // Type of the error
         this.message = message;  // Description of the error
         this.fix = fix;          // Fix for the error
+        this.scriptName = scriptName; // Script name context
+        this.attributeName = attributeName; // Attribute name context (optional)
     }
 
     toString() {
@@ -25,6 +29,8 @@ export class ParsingError {
         const file = this.node.getSourceFile();
         const fileName = file.fileName;
         const start = this.node.getSourceFile().getLineAndCharacterOfPosition(this.node.getStart());
-        return `ParsingError: ${this.message} at ${fileName}:${start.line + 1}:${start.character}`;
+        const location = `${fileName}:${start.line + 1}:${start.character}`;
+        const context = this.attributeName ? ` [${this.scriptName}.${this.attributeName}]` : ` [${this.scriptName}]`;
+        return `ParsingError: ${this.message}${context} at ${location}`;
     }
 }
