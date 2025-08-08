@@ -409,7 +409,7 @@ export class ScriptParser {
                     } else {
                         errorMessage = `This attribute has an invalid @type tag. An attribute should be one of the following: ${supportedTypes}.`;
                     }
-                    const error = new ParsingError(member, 'Invalid Type', errorMessage, undefined, node.name.getText(), memberName);
+                    const error = new ParsingError(member, 'Invalid Type', errorMessage, node.name.getText(), memberName, undefined);
                     errors.push(error);
                     continue;
 
