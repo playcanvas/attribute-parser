@@ -54,12 +54,12 @@
   "scripts": {
     "build": "rollup -c && npm run build:types",
     "build:types": "tsc -p tsconfig.build.json",
-    "watch": "rollup -c -w",
     "lint": "eslint src rollup.config.mjs eslint.config.mjs",
     "lint:fix": "eslint src rollup.config.mjs eslint.config.mjs --fix",
+    "publint": "publint",
     "test": "mocha test/**/*.test.js --timeout 10000",
     "type:check": "tsc --noEmit",
-    "publint": "publint"
+    "watch": "rollup -c -w"
   },
   "engines": {
     "node": ">=18.0.0"
