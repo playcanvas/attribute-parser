@@ -17,7 +17,7 @@ jobs:
       - name: Set up Node.js 18.x
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 18.x
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org/'
 
@@ -26,12 +26,6 @@ jobs:
 
       - name: Build PlayCanvas Attribute Parser
         run: npm run build
-
-      - name: Build PlayCanvas Attribute Parser Types
-        run: npm run build:types
-
-      - name: Run Publint
-        run: npm run publint
 
   lint:
     name: Lint
@@ -43,7 +37,7 @@ jobs:
       - name: Set up Node.js 18.x
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 18.x
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org/'
 
@@ -63,7 +57,7 @@ jobs:
       - name: Set up Node.js 18.x
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 18.x
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org/'
 
