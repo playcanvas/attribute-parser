@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js 18.x
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 18.x
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org/'
 
@@ -28,8 +28,8 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Build PlayCanvas Attribute Parser Types
-        run: npm run build:types
+      - name: Run Publint
+        run: npm run publint
 
       - name: Publish to npm
         run: npm publish
