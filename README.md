@@ -1,5 +1,14 @@
 # PlayCanvas Attribute Parser
 
+[![NPM Version](https://img.shields.io/npm/v/@playcanvas/attribute-parser)](https://www.npmjs.com/package/@playcanvas/attribute-parser)
+[![NPM Downloads](https://img.shields.io/npm/dw/@playcanvas/attribute-parser)](https://npmtrends.com/@playcanvas/attribute-parser)
+[![License](https://img.shields.io/npm/l/@playcanvas/attribute-parser)](https://github.com/playcanvas/attribute-parser/blob/main/LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-5865F2?style=flat&logo=discord&logoColor=white&color=black)](https://discord.gg/RSaMRzg)
+[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=flat&logo=reddit&logoColor=white&color=black)](https://www.reddit.com/r/PlayCanvas)
+[![X](https://img.shields.io/badge/X-000000?style=flat&logo=x&logoColor=white&color=black)](https://x.com/intent/follow?screen_name=playcanvas)
+
+| [User Manual](https://developer.playcanvas.com) | [API Reference](https://api.playcanvas.com) | [Blog](https://blog.playcanvas.com) | [Forum](https://forum.playcanvas.com) |
+
 This is the official JSDoc attribute parser used in the PlayCanvas Editor.
 
 It collects metadata from user scripts by parsing `@attribute` JSDoc annotations. These attributes enable the PlayCanvas Editor to expose UI controls and contextual information for your script properties.
