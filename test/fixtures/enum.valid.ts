@@ -1,4 +1,4 @@
-import { Script, Vec3, BODYGROUP_DEFAULT } from 'playcanvas';
+import { Script, Vec3, BODYGROUP_DEFAULT, TONEMAP_LINEAR, TONEMAP_NEUTRAL, TONEMAP_ACES2, TONEMAP_ACES, TONEMAP_HEJL, TONEMAP_FILMIC } from 'playcanvas';
 
 enum NumberEnum {
     A = 13,
@@ -19,8 +19,13 @@ enum NumberNumberEnum {
     C = NumberEnum.C
 };
 
-enum ImportedEnum {
-    A = BODYGROUP_DEFAULT
+enum ToneMapping {
+    LINEAR = TONEMAP_LINEAR,
+    FILMIC = TONEMAP_FILMIC,
+    HEJL = TONEMAP_HEJL,
+    ACES = TONEMAP_ACES,
+    ACES2 = TONEMAP_ACES2,
+    NEUTRAL = TONEMAP_NEUTRAL
 };
 
 class Example extends Script {
@@ -55,7 +60,7 @@ class Example extends Script {
     /**
      * @attribute
      */
-    j : ImportedEnum = ImportedEnum.A;
+    j : ToneMapping = ToneMapping.LINEAR;
 }
 
 export { Example };

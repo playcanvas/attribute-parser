@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it, before } from 'mocha';
-import { BODYGROUP_DEFAULT } from 'playcanvas';
+import { TONEMAP_LINEAR, TONEMAP_FILMIC, TONEMAP_HEJL, TONEMAP_ACES, TONEMAP_ACES2, TONEMAP_NEUTRAL } from 'playcanvas';
 
 import { parseAttributes } from '../../utils.js';
 
@@ -70,9 +70,14 @@ function runTests(fileName) {
             expect(data[0].example.attributes.j.name).to.equal('j');
             expect(data[0].example.attributes.j.type).to.equal('number');
             expect(data[0].example.attributes.j.array).to.equal(false);
-            expect(data[0].example.attributes.j.enum).to.be.an('array').with.lengthOf(1);
-            expect(data[0].example.attributes.j.enum[0]).to.deep.equal({ A: BODYGROUP_DEFAULT }); // BODYGROUP_DEFAULT should resolve to its actual value
-            expect(data[0].example.attributes.j.default).to.equal(BODYGROUP_DEFAULT); // BODYGROUP_DEFAULT should resolve to its actual value
+            expect(data[0].example.attributes.j.enum).to.be.an('array').with.lengthOf(6);
+            expect(data[0].example.attributes.j.enum[0]).to.deep.equal({ LINEAR: TONEMAP_LINEAR });
+            expect(data[0].example.attributes.j.enum[1]).to.deep.equal({ FILMIC: TONEMAP_FILMIC });
+            expect(data[0].example.attributes.j.enum[2]).to.deep.equal({ HEJL: TONEMAP_HEJL });
+            expect(data[0].example.attributes.j.enum[3]).to.deep.equal({ ACES: TONEMAP_ACES });
+            expect(data[0].example.attributes.j.enum[4]).to.deep.equal({ ACES2: TONEMAP_ACES2 });
+            expect(data[0].example.attributes.j.enum[5]).to.deep.equal({ NEUTRAL: TONEMAP_NEUTRAL });
+            expect(data[0].example.attributes.j.default).to.equal(TONEMAP_LINEAR);
         });
 
     });

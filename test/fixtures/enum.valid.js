@@ -1,4 +1,4 @@
-import { Script, BODYGROUP_DEFAULT } from 'playcanvas';
+import { Script, TONEMAP_ACES, TONEMAP_ACES2, TONEMAP_FILMIC, TONEMAP_HEJL, TONEMAP_LINEAR, TONEMAP_NEUTRAL } from 'playcanvas';
 
 /**
  * @enum {number}
@@ -12,8 +12,13 @@ const NumberEnum = {
 /**
  * @enum {number}
  */
-const ImportedEnum = {
-    A: BODYGROUP_DEFAULT
+const ToneMapping = {
+    LINEAR: TONEMAP_LINEAR,
+    FILMIC: TONEMAP_FILMIC,
+    HEJL: TONEMAP_HEJL,
+    ACES: TONEMAP_ACES,
+    ACES2: TONEMAP_ACES2,
+    NEUTRAL: TONEMAP_NEUTRAL
 };
 
 /**
@@ -73,9 +78,9 @@ class Example extends Script {
 
     /**
      * @attribute
-     * @type {ImportedEnum}
+     * @type {ToneMapping}
      */
-    j = ImportedEnum.A;
+    j = ToneMapping.LINEAR;
 }
 
 export { Example };

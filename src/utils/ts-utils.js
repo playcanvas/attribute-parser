@@ -504,7 +504,7 @@ function resolveIdentifier(node, typeChecker) {
     }
 
     // Fallback to getLiteralValue which now handles typeChecker approach
-    return getLiteralValue(node, typeChecker);
+    return undefined;
 }
 
 /**
