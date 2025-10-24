@@ -213,7 +213,14 @@ export class AttributeParser {
 
                         // Check if the declaration is a TypeScript enum
                         if (ts.isEnumDeclaration(declaration)) {
-                            members = declaration.members.map(member => ({ [member.name.text]: member.initializer.text }));
+                            members = declaration.members.map((member) => {
+                                const name = member.name.text;
+                                let value;
+                                if (member.initializer) {
+                                    value = getLiteralValue(member.initializer, this.typeChecker);
+                                }
+                                return { [name]: value };
+                            });
                         }
 
                         // Additionally check for JSDoc enum tag

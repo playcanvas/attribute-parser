@@ -195,7 +195,7 @@ function getSuperClasses(node, typeChecker) {
         currentClass = superClassDeclaration;
     }
 
-    return superClasses; // .reverse(); // To return the array in order from the base class to the top-level class
+    return superClasses;
 }
 
 /**
@@ -293,20 +293,38 @@ export function isEnum(node) {
  */
 export function getPrimitiveEnumType(type, typeChecker) {
     // Check if the type is an enum type
-    if (!type.symbol?.declarations?.some(decl => ts.isEnumDeclaration(decl))) return null;
+    const isEnumType = type.symbol?.declarations?.some(decl => ts.isEnumDeclaration(decl));
 
-    // Get the type of enum members
-    const enumMembers = type.symbol.declarations[0].members;
-    const firstMemberValue = typeChecker.getConstantValue(enumMembers[0]);
+    // If not directly an enum, check if it's an enum member (which means it's part of an enum)
+    let isEnumMember = false;
+    if (!isEnumType) {
+        isEnumMember = type.symbol?.declarations?.some(decl => ts.isEnumMember(decl));
+        if (!isEnumMember) return null;
+    }
 
-    const validEnumType = [
-        'number',
-        'string',
-        'boolean'
-    ];
+    // Get the enum members
+    let enumMembers;
+    if (isEnumType) {
+        enumMembers = type.symbol.declarations[0].members;
+    } else if (isEnumMember) {
+        const enumMember = type.symbol.declarations[0];
+        const parentEnum = enumMember.parent;
+        if (ts.isEnumDeclaration(parentEnum)) {
+            enumMembers = parentEnum.members;
+        } else {
+            return null;
+        }
+    }
 
+    // Get the value of the first enum member using our centralized logic
+    const firstMember = enumMembers[0];
+    const firstMemberValue = firstMember.initializer ?
+        getLiteralValue(firstMember.initializer, typeChecker) :
+        getLiteralValue(firstMember, typeChecker);
+
+    const validEnumTypes = ['number', 'string', 'boolean'];
     const typeOf = typeof firstMemberValue;
-    return validEnumType.includes(typeOf) ? typeOf : null;
+    return validEnumTypes.includes(typeOf) ? typeOf : null;
 }
 
 /**
@@ -484,7 +502,9 @@ function resolveIdentifier(node, typeChecker) {
             // Handle other kinds of declarations if needed
         }
     }
-    return undefined;
+
+    // Fallback to getLiteralValue which now handles typeChecker approach
+    return getLiteralValue(node, typeChecker);
 }
 
 /**
@@ -512,6 +532,12 @@ const resolvePropertyAccess = (node, typeChecker) => {
             }
 
         }
+    }
+
+    // Try getLiteralValue first (which now handles typeChecker approach)
+    const result = getLiteralValue(node, typeChecker);
+    if (result !== undefined) {
+        return result;
     }
 
     // If symbol not found directly, attempt to resolve the object first
@@ -574,6 +600,14 @@ function handleObjectLiteral(node, typeChecker) {
  */
 export function getLiteralValue(node, typeChecker) {
     if (!node) return undefined;
+
+    // Try typeChecker approach first for imported constants and other complex cases
+    if (typeChecker) {
+        const type = typeChecker.getTypeAtLocation(node);
+        if (type && type.isLiteral()) {
+            return type.value;
+        }
+    }
 
     if (ts.isLiteralExpression(node) || ts.isBooleanLiteral(node)) {
         if (ts.isStringLiteral(node)) {

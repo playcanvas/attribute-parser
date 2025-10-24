@@ -1,4 +1,4 @@
-import { Script, Vec3 } from 'playcanvas';
+import { Script, Vec3, BODYGROUP_DEFAULT } from 'playcanvas';
 
 enum NumberEnum {
     A = 13,
@@ -17,6 +17,10 @@ enum NumberNumberEnum {
     A = NumberEnum.A,
     B = NumberEnum.B,
     C = NumberEnum.C
+};
+
+enum ImportedEnum {
+    A = BODYGROUP_DEFAULT
 };
 
 class Example extends Script {
@@ -47,6 +51,11 @@ class Example extends Script {
      * @attribute
      */
     i : NumberNumberEnum = 2;
+
+    /**
+     * @attribute
+     */
+    j : ImportedEnum = ImportedEnum.A;
 }
 
 export { Example };

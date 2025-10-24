@@ -1,4 +1,4 @@
-import { Script } from 'playcanvas';
+import { Script, BODYGROUP_DEFAULT } from 'playcanvas';
 
 /**
  * @enum {number}
@@ -7,6 +7,13 @@ const NumberEnum = {
     A: 13,
     B: 14,
     C: 23
+};
+
+/**
+ * @enum {number}
+ */
+const ImportedEnum = {
+    A: BODYGROUP_DEFAULT
 };
 
 /**
@@ -63,6 +70,12 @@ class Example extends Script {
      * @type {NumberNumberEnum}
      */
     i = 2;
+
+    /**
+     * @attribute
+     * @type {ImportedEnum}
+     */
+    j = ImportedEnum.A;
 }
 
 export { Example };

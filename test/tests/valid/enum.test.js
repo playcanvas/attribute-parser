@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { describe, it, before } from 'mocha';
+import { BODYGROUP_DEFAULT } from 'playcanvas';
 
 import { parseAttributes } from '../../utils.js';
 
@@ -64,12 +65,14 @@ function runTests(fileName) {
             expect(data[0].example.attributes.h.default).to.equal('');
         });
 
-        it('j: should be a enum attribute array with a size', function () {
-            expect(data[0].example.attributes.i).to.exist;
-            expect(data[0].example.attributes.i.name).to.equal('i');
-            expect(data[0].example.attributes.i.type).to.equal('number');
-            expect(data[0].example.attributes.i.array).to.equal(false);
-            expect(data[0].example.attributes.i.default).equal(2);
+        it('j: should be a enum attribute with imported constant', function () {
+            expect(data[0].example.attributes.j).to.exist;
+            expect(data[0].example.attributes.j.name).to.equal('j');
+            expect(data[0].example.attributes.j.type).to.equal('number');
+            expect(data[0].example.attributes.j.array).to.equal(false);
+            expect(data[0].example.attributes.j.enum).to.be.an('array').with.lengthOf(1);
+            expect(data[0].example.attributes.j.enum[0]).to.deep.equal({ A: BODYGROUP_DEFAULT }); // BODYGROUP_DEFAULT should resolve to its actual value
+            expect(data[0].example.attributes.j.default).to.equal(BODYGROUP_DEFAULT); // BODYGROUP_DEFAULT should resolve to its actual value
         });
 
     });
