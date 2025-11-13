@@ -23,6 +23,18 @@ async function getFileData(filePath) {
 }
 
 /**
+ * Loads the playcanvas types file from node_modules.
+ * @returns {Promise<[string, string]>} A promise that resolves to an array containing the file path and its contents.
+ */
+async function getPlaycanvasTypes() {
+    const typesUrl = import.meta.resolve('playcanvas/build/playcanvas.d.ts');
+    const typesPath = fileURLToPath(typesUrl);
+    const contents = await fs.readFile(typesPath, 'utf8');
+    // Use /playcanvas.d.ts as the virtual file system path to match what the code expects
+    return ['/playcanvas.d.ts', contents];
+}
+
+/**
  * Fetches the contents of multiple files.
  * @param {string[]} filePaths - An array of file paths.
  * @returns {Promise<[string, string][]>} A promise that resolves to an array containing the file names and their contents.
@@ -40,15 +52,17 @@ export function fetchScripts(filePaths) {
 export async function parseAttributes(...paths) {
     const parser = new JSDocParser();
     await parser.init();
-    const scriptContents = await fetchScripts([...paths, './playcanvas.d.ts']);
-    parser.updateProgram(scriptContents);
+    const scriptContents = await fetchScripts(paths);
+    const playcanvasTypes = await getPlaycanvasTypes();
+    parser.updateProgram([...scriptContents, playcanvasTypes]);
     return parser.parseAttributes(paths[0]);
 }
 
 export async function getAttributes(...paths) {
     const parser = new JSDocParser();
     await parser.init();
-    const scriptContents = await fetchScripts([...paths, './playcanvas.d.ts']);
-    parser.updateProgram(scriptContents);
+    const scriptContents = await fetchScripts(paths);
+    const playcanvasTypes = await getPlaycanvasTypes();
+    parser.updateProgram([...scriptContents, playcanvasTypes]);
     return parser.getAttributes(paths[0]);
 }

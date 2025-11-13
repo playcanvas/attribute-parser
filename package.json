@@ -42,8 +42,9 @@
     "chai": "5.2.1",
     "globals": "16.3.0",
     "mocha": "11.7.1",
-    "rollup": "4.46.2",
-    "publint": "0.3.12"
+    "playcanvas": "^2.12.3",
+    "publint": "0.3.12",
+    "rollup": "4.46.2"
   },
   "dependencies": {
     "@playcanvas/eslint-config": "^2.0.0",
