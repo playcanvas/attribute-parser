@@ -16,7 +16,9 @@
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/index.js"
+      "node": "./dist/index.node.mjs",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./libs": "./dist/libs.d.ts"
   },
@@ -29,6 +31,7 @@
   },
   "files": [
     "dist/index.js",
+    "dist/index.node.mjs",
     "dist/libs.d.ts",
     "types",
     "README.md",
