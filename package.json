@@ -50,7 +50,7 @@
     "rollup": "4.46.2"
   },
   "dependencies": {
-    "@playcanvas/eslint-config": "^2.0.0",
+    "@playcanvas/eslint-config": "3.0.0-beta.5",
     "@typescript/vfs": "^1.6.0",
     "eslint": "^9.0.0",
     "typescript": "^5.5.3"
