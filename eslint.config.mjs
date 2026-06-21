@@ -1,8 +1,8 @@
-import playcanvasConfig from '@playcanvas/eslint-config';
+import javascriptConfig from '@playcanvas/eslint-config/javascript';
 import globals from 'globals';
 
 export default [
-    ...playcanvasConfig,
+    ...javascriptConfig,
     {
         ignores: ['**/program.invalid.js'] // Exclude specific files
     },
