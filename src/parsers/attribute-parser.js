@@ -54,15 +54,16 @@ export class AttributeParser {
 
             if (!attribute) return;
 
-            // Extract the description from the summary section
-            attribute.description = node.jsDoc?.[0]?.comment || '';
+            // Extract the description from the summary section. The comment is a NodeArray
+            // rather than a string when it contains inline tags like {@link}, so flatten it
+            attribute.description = ts.getTextOfJSDocComment(node.jsDoc?.[0]?.comment) ?? '';
 
             // Extract metadata from custom tags
             const jsDocTags = node.jsDoc?.[0]?.tags ?? [];
             jsDocTags.forEach((tag) => {
                 // Only use the first line of the comment
                 const tagName = tag.tagName.text;
-                let commentText = (tag.comment?.split('\n')[0] || '').trim();
+                let commentText = (ts.getTextOfJSDocComment(tag.comment) ?? '').split('\n')[0].trim();
 
                 // Check if the tag is a supported tag
                 if (this.tagTypeAnnotations.has(tagName)) {
@@ -83,7 +84,7 @@ export class AttributeParser {
                         let endPos = tag.getEnd();
 
                         const fullText = tag.getText();
-                        const commentText = tag.comment?.split('\n')[0]?.trim() || '';
+                        const commentText = (ts.getTextOfJSDocComment(tag.comment) ?? '').split('\n')[0].trim();
 
                         // Find the start of the comment content within the full text
                         const commentStart = fullText.indexOf(commentText);

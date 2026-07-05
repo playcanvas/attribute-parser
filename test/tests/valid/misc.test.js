@@ -43,6 +43,22 @@ describe('VALID: Misc attribute types', function () {
         expect(data[0].example.attributes.c).to.not.exist;
     });
 
+    it('e: should flatten inline {@link} tags in the description to a plain string', function () {
+        expect(data[0].example.attributes.e).to.exist;
+        expect(data[0].example.attributes.e.name).to.equal('e');
+        expect(data[0].example.attributes.e.type).to.equal('number');
+        expect(data[0].example.attributes.e.description).to.be.a('string');
+        expect(data[0].example.attributes.e.description).to.equal('Movement speed. Ignored when {@link Example#a} is true.');
+        expect(data[0].example.attributes.e.title).to.be.a('string');
+        expect(data[0].example.attributes.e.title).to.equal('Speed {@link Example}');
+        expect(data[0].example.errors).to.be.empty;
+    });
+
+    it('results: should be serializable when descriptions contain inline {@link} tags', function () {
+        expect(() => JSON.stringify(data[0])).to.not.throw();
+        expect(() => structuredClone(data[0])).to.not.throw();
+    });
+
     it('d: should be a numeric attribute with a getter and setter defined in reverse order', function () {
         expect(data[0].example.attributes.d).to.exist;
         expect(data[0].example.attributes.d.name).to.equal('d');

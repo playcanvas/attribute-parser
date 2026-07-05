@@ -48,6 +48,15 @@ class Example extends Script {
     set d(v) {
         this._d = v;
     }
+
+    /**
+     * Movement speed. Ignored when {@link Example#a} is true.
+     *
+     * @attribute
+     * @type {number}
+     * @title Speed {@link Example}
+     */
+    e;
 }
 
 export { Example };
