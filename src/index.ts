@@ -1,20 +1,44 @@
 import { createSystem, createDefaultMapFromNodeModules, createVirtualTypeScriptEnvironment } from '@typescript/vfs';
+import type { VirtualTypeScriptEnvironment } from '@typescript/vfs';
 import * as ts from 'typescript';
 
-import { ParsingError } from './parsers/parsing-error.js';
-import { ScriptParser } from './parsers/script-parser.js';
-import { isStaticMember } from './utils/attribute-utils.js';
+import type { AttributeData } from './parsers/attribute-parser.ts';
+import { ParsingError } from './parsers/parsing-error.ts';
+import { ScriptParser } from './parsers/script-parser.ts';
+import type { ValidationError } from './parsers/script-parser.ts';
+import { isStaticMember } from './utils/attribute-utils.ts';
 import {
     createDefaultMapFromCDN,
     getExportedNodes,
     getType,
     inheritsFrom,
     isAliasedClassDeclaration
-} from './utils/ts-utils.js';
+} from './utils/ts-utils.ts';
+import type { InternalNode } from './utils/ts-utils.ts';
 
-const toLowerCamelCase = (str) => str[0].toLowerCase() + str.substring(1);
+const toLowerCamelCase = (str: string) => str[0].toLowerCase() + str.substring(1);
 
 const SUPPORTED_ATTRIBUTE_TYPES = new Set(['Curve', 'Vec2', 'Vec3', 'Vec4', 'Color', 'number', 'string', 'boolean']);
+
+type ScriptResults = {
+    /** The extracted attributes, keyed by attribute name */
+    attributes: Record<string, AttributeData>;
+    /** The parsing errors for this script */
+    errors: ParsingError[];
+};
+
+type MemberInfo = {
+    /** The name of the member */
+    name: string;
+    /** Whether the member is a script attribute */
+    isAttribute: boolean;
+    /** The type of the member, with an array suffix when applicable */
+    type: string;
+    /** The start of the member, including any JSDoc block */
+    start: { line: number; column: number };
+    /** The end of the member */
+    end: { line: number; column: number };
+};
 
 const COMPILER_OPTIONS = {
     noLib: true,
@@ -31,25 +55,24 @@ const COMPILER_OPTIONS = {
 };
 
 export class JSDocParser {
-    /**
-     * @type {import('@typescript/vfs').VirtualTypeScriptEnvironment}
-     * @private
-     */
-    _env;
+    private _env: VirtualTypeScriptEnvironment;
 
     /**
      * An internal array of program errors
-     * @private
      */
-    _errors = [];
+    private _errors: ValidationError[] = [];
+
+    declare parser: ScriptParser;
+
+    declare program: ts.Program;
 
     /**
      * Initializes the JSDocParser with the standard library files
      *
-     * @param {string} libPath - A path to a directory of library types, or a path to the '.d.ts' file itself
-     * @returns {Promise<JSDocParser>} - The initialized JSDocParser
+     * @param libPath - A path to a directory of library types, or a path to the '.d.ts' file itself
+     * @returns The initialized JSDocParser
      */
-    async init(libPath) {
+    async init(libPath?: string) {
         if (this._env) {
             return this;
         }
@@ -77,13 +100,12 @@ export class JSDocParser {
     /**
      * Creates program from fileName and scriptsContents
      *
-     * @param {[string, string][]} newFiles - An array of {[path]: [content]} which represent the files in the program
-     * @param {string[]} removedFiles - An array of file paths that should be removed from the program
-     * @returns {{ parser: ScriptParser, program: ts.Program,
-     * errors: import('./parsers/script-parser.js').ValidationError[]}} - The extracted attributes
+     * @param newFiles - An array of [path, content] tuples which represent the files in the program
+     * @param removedFiles - An array of file paths that should be removed from the program
+     * @returns The program errors
      */
-    updateProgram(newFiles = [], removedFiles = []) {
-        const errors = [];
+    updateProgram(newFiles: [string, string][] = [], removedFiles: string[] = []) {
+        const errors: ValidationError[] = [];
 
         // Add custom files to the map
         newFiles.forEach(([filePath, fileContent]) => {
@@ -112,11 +134,11 @@ export class JSDocParser {
 
     /**
      * Returns all the valid ESM Scripts within a file
-     * @param {string} fileName - The file name in the program to check
-     * @param {ParsingError[]} errors - An array to store any parsing errors
-     * @returns {Map<string, import('typescript').Node>} - A map of valid ESM Script <names, nodes> within the file
+     * @param fileName - The file name in the program to check
+     * @param errors - An array to store any parsing errors
+     * @returns A map of valid ESM Script <names, nodes> within the file
      */
-    getAllEsmScripts(fileName, errors = []) {
+    getAllEsmScripts(fileName: string, errors: (ParsingError | ValidationError)[] = []) {
         const typeChecker = this.program.getTypeChecker();
 
         // Find the Script class in the PlayCanvas namespace
@@ -126,7 +148,7 @@ export class JSDocParser {
             throw new Error('PlayCanvas Types must be supplied');
         }
 
-        const esmScripts = new Map();
+        const esmScripts = new Map<string, ts.Node>();
 
         // Parse the source file and pc types
         const sourceFile = this.program.getSourceFile(fileName);
@@ -144,11 +166,13 @@ export class JSDocParser {
         // Extract all exported nodes
         const nodes = getExportedNodes(this.program, sourceFile);
 
-        const esmScriptClass = pcTypes.statements.find(
-            (node) => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script'
+        const esmScriptClass = (
+            pcTypes.statements.find(
+                (node) => ts.isClassDeclaration(node) && node.name.text === 'Script'
+            ) as InternalNode
         )?.symbol;
 
-        const isScriptNameMember = (member) =>
+        const isScriptNameMember = (member: ts.ClassElement) =>
             ts.isPropertyDeclaration(member) && // Is a property declaration
             ts.isIdentifier(member.name) &&
             member.name.text === 'scriptName' &&
@@ -157,17 +181,20 @@ export class JSDocParser {
 
         // Check if the file exports a class that inherits from `Script`
         nodes.forEach((node, name) => {
-            if (isAliasedClassDeclaration(node, typeChecker) && inheritsFrom(node, typeChecker, esmScriptClass)) {
+            if (
+                isAliasedClassDeclaration(node, typeChecker) &&
+                inheritsFrom(node as ts.ClassDeclaration, typeChecker, esmScriptClass)
+            ) {
                 // Check for a static scriptName property and use that as the name if it exists
-                const scriptNameMember = node.members.find(isScriptNameMember);
+                const scriptNameMember = (node as ts.ClassDeclaration).members.find(isScriptNameMember);
 
                 // If the scriptName property exists, use that verbatim as the name
                 let finalName;
                 if (scriptNameMember) {
-                    finalName = scriptNameMember.initializer.text;
+                    finalName = ((scriptNameMember as ts.PropertyDeclaration).initializer as ts.StringLiteral).text;
                 } else {
                     finalName = toLowerCamelCase(name);
-                    const insertOffset = node.members.pos;
+                    const insertOffset = (node as ts.ClassDeclaration).members.pos;
                     const insertPos = node.getSourceFile().getLineAndCharacterOfPosition(insertOffset);
 
                     errors.push(
@@ -200,12 +227,12 @@ export class JSDocParser {
     /**
      * Analyzes the specified TypeScript file and extracts metadata from JSDoc comments.
      *
-     * @param {string} fileName - The name of the file in the program to run
-     * @returns {[results: object, errors: import('./parsers/script-parser.js').ValidationError[]]} - The extracted attributes
+     * @param fileName - The name of the file in the program to run
+     * @returns The extracted attributes and errors
      */
-    parseAttributes(fileName) {
-        const results = {};
-        const errors = [...this._errors];
+    parseAttributes(fileName: string): [Record<string, ScriptResults>, (ParsingError | ValidationError)[]] {
+        const results: Record<string, ScriptResults> = {};
+        const errors: (ParsingError | ValidationError)[] = [...this._errors];
 
         if (errors.length > 0) {
             return [results, errors];
@@ -216,7 +243,7 @@ export class JSDocParser {
 
         // Extract attributes from each script
         nodes.forEach((node, name) => {
-            const opts = (results[name] = { attributes: {}, errors: [] });
+            const opts = (results[name] = { attributes: {}, errors: [] as ParsingError[] });
             this.parser.extractAttributes(node, { ...opts, scriptName: name });
         });
 
@@ -225,12 +252,12 @@ export class JSDocParser {
 
     /**
      * Analyzes the specified TypeScript file and extracts metadata from JSDoc comments.
-     * @param {string} fileName - The name of the file to run
-     * @returns {[results: object, errors: import('./parsers/script-parser.js').ValidationError[]]} - The extracted attributes
+     * @param fileName - The name of the file to run
+     * @returns The extracted attributes and errors
      */
-    getAttributes(fileName) {
-        const results = {};
-        const errors = [...this._errors];
+    getAttributes(fileName: string): [Record<string, MemberInfo[]>, (ParsingError | ValidationError)[]] {
+        const results: Record<string, MemberInfo[]> = {};
+        const errors: (ParsingError | ValidationError)[] = [...this._errors];
 
         if (errors.length > 0) {
             return [results, errors];
@@ -243,7 +270,7 @@ export class JSDocParser {
         const scripts = [];
         for (const [scriptName, node] of esmScripts) {
             const members = [];
-            for (const member of node.members) {
+            for (const member of (node as ts.ClassDeclaration).members) {
                 if (member.kind === ts.SyntaxKind.PropertyDeclaration && !isStaticMember(member)) {
                     members.push(member);
                 }
@@ -253,7 +280,7 @@ export class JSDocParser {
         }
 
         for (const { scriptName, members } of scripts) {
-            const localMembers = [];
+            const localMembers: MemberInfo[] = [];
             for (const member of members) {
                 const name = member.name.getText();
                 const attribute = attributes[scriptName].attributes[name];
@@ -267,7 +294,8 @@ export class JSDocParser {
 
                 const namePos = ts.getLineAndCharacterOfPosition(member.getSourceFile(), member.name.getStart());
 
-                const jsdocNode = member.jsDoc && member.jsDoc[member.jsDoc.length - 1];
+                const jsDocs = (member as InternalNode).jsDoc;
+                const jsdocNode = jsDocs && jsDocs[jsDocs.length - 1];
                 const jsdocPos = jsdocNode
                     ? ts.getLineAndCharacterOfPosition(member.getSourceFile(), jsdocNode.getStart())
                     : null;

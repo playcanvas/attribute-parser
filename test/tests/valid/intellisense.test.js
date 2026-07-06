@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, before } from 'mocha';
 
-import { getAttributes } from '../../utils.js';
+import { getAttributes } from '../../utils.ts';
 
 describe('VALID: Intellisense Parsing', function () {
     let data;

@@ -2,13 +2,13 @@
  * This merges two arrays together, filling in the missing values
  * in the first array with values from the second array.
  *
- * @param {array} a - The first array
- * @param {array} b - The second array
- * @returns {array} - The merged array
+ * @param a - The first array
+ * @param b - The second array
+ * @returns The merged array
  */
-export function zipArrays(a, b) {
+export function zipArrays<T>(a: T[], b: T[]) {
     const length = Math.max(a.length, b.length);
-    const result = new Array(length);
+    const result = new Array<T>(length);
 
     for (let i = 0; i < length; i++) {
         result[i] = i < a.length ? a[i] : b[i];

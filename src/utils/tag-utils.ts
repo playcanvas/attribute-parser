@@ -1,11 +1,12 @@
+import type { VirtualTypeScriptEnvironment } from '@typescript/vfs';
 import { DiagnosticCategory } from 'typescript';
 
-import { parseNumber, parseStringToNumericalArray } from './ts-utils.js';
+import { parseNumber, parseStringToNumericalArray } from './ts-utils.ts';
 
 /**
  * Parses a tag value into a boolean, number, array or string
- * @param {string} input - The tag value to parse
- * @returns {boolean|number|string|Array<any>} - The parsed value
+ * @param input - The tag value to parse
+ * @returns The parsed value
  */
 export function parseTag(input = '') {
     // Remove any leading or trailing whitespace, replace single quotes with double quotes
@@ -23,12 +24,16 @@ export function parseTag(input = '') {
     try {
         const arr = parseStringToNumericalArray(input);
         if (Array.isArray(arr)) return arr;
-    } catch {}
+    } catch {
+        // not a numerical array, keep checking
+    }
 
     try {
         const arr = JSON.parse(input);
         if (Array.isArray(arr)) return arr;
-    } catch {}
+    } catch {
+        // not valid JSON, fall through to string
+    }
 
     // If none of the above, return the string
     return input;
@@ -37,13 +42,13 @@ export function parseTag(input = '') {
 /**
  * Validates that a tag value matches the expected type
  *
- * @param {String} value - The value to be validated.
- * @param {String} typeAnnotation - The TypeScript type annotation as a string.
- * @param {import('@typescript/vfs').VirtualTypeScriptEnvironment} env - The environment containing the language service and file creation utilities.
+ * @param value - The value to be validated.
+ * @param typeAnnotation - The TypeScript type annotation as a string.
+ * @param env - The environment containing the language service and file creation utilities.
  * @throws Will throw an error if the value does not conform to the typeAnnotation.
- * @returns {true} if validation passes without type errors.
+ * @returns true if validation passes without type errors.
  */
-export function validateTag(value, typeAnnotation, env) {
+export function validateTag(value: string, typeAnnotation: string, env: VirtualTypeScriptEnvironment) {
     const virtualFileName = '/___virtual__.ts';
     const sourceText = `let a: ${typeAnnotation} = ${value};`;
 

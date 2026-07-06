@@ -8,11 +8,15 @@ import ts from 'typescript';
 
 const production = process.env.NODE_ENV === 'production';
 
-// Concatenates the TypeScript compiler options into a single file
-const types = knownLibFilesForCompilerOptions({ target: ts.ScriptTarget.ES2023 }, ts).reduce((acc, file) => {
-    const src = fs.readFileSync(`node_modules/typescript/lib/${file}`, 'utf8');
-    return `${acc}// ${file}\n${src}\n\n`;
-}, '');
+// Concatenates the TypeScript compiler options into a single file. The known lib list can
+// include files removed in newer TypeScript versions (e.g. lib.es2022.sharedmemory.d.ts),
+// so skip any that no longer exist.
+const types = knownLibFilesForCompilerOptions({ target: ts.ScriptTarget.ES2023 }, ts)
+    .filter((file) => fs.existsSync(`node_modules/typescript/lib/${file}`))
+    .reduce((acc, file) => {
+        const src = fs.readFileSync(`node_modules/typescript/lib/${file}`, 'utf8');
+        return `${acc}// ${file}\n${src}\n\n`;
+    }, '');
 fs.mkdirSync('dist', { recursive: true });
 fs.writeFileSync('dist/libs.d.ts', types);
 
@@ -29,7 +33,7 @@ const swcPlugin = () =>
 // Browser build: bundles typescript and @typescript/vfs and stubs out node built-ins,
 // for in-browser consumers (e.g. the editor), which supply lib types via a CDN.
 const browser = {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     output: {
         dir: 'dist',
         format: 'esm'
@@ -42,7 +46,8 @@ const browser = {
         }),
         resolve({
             browser: true, // This instructs the plugin to resolve for the browser
-            preferBuiltins: false // Prefer the local versions of built-ins instead of Node.js versions
+            preferBuiltins: false, // Prefer the local versions of built-ins instead of Node.js versions
+            extensions: ['.js', '.ts']
         }),
         swcPlugin()
     ]
@@ -52,7 +57,7 @@ const browser = {
 // (real os/fs/path and a native require). The browser build stubs these out, which breaks
 // createDefaultMapFromNodeModules and TypeScript's getNodeSystem() under node.
 const node = {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     external: [/^node:/, 'typescript', '@typescript/vfs'],
     output: {
         dir: 'dist',
@@ -62,7 +67,8 @@ const node = {
     plugins: [
         resolve({
             exportConditions: ['node'],
-            preferBuiltins: true
+            preferBuiltins: true,
+            extensions: ['.js', '.ts']
         }),
         swcPlugin()
     ]
