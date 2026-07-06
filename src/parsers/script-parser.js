@@ -4,7 +4,13 @@ import { AttributeParser } from './attribute-parser.js';
 import { ParsingError } from './parsing-error.js';
 import { getTag, hasTag } from '../utils/attribute-utils.js';
 import { zipArrays } from '../utils/generic-utils.js';
-import { flatMapAnyNodes, getJSDocTags, getLiteralValue, parseArrayLiteral, parseFloatNode } from '../utils/ts-utils.js';
+import {
+    flatMapAnyNodes,
+    getJSDocTags,
+    getLiteralValue,
+    parseArrayLiteral,
+    parseFloatNode
+} from '../utils/ts-utils.js';
 
 /**
  * @typedef {object} Attribute
@@ -58,14 +64,14 @@ const createNewExpressionParser = (name, argProcessor, defaultArr = []) => {
  * @param {ts.Node[]} args - The arguments to parse
  * @returns {number[]} - The parsed arguments
  */
-const parseNumberArguments = args => args.map(arg => parseFloatNode(arg, true));
+const parseNumberArguments = (args) => args.map((arg) => parseFloatNode(arg, true));
 
 // Creating specific parser instances
-const createNumberArgumentParser = (name, defaultArr = []) => (
-    createNewExpressionParser(name, parseNumberArguments, defaultArr));
+const createNumberArgumentParser = (name, defaultArr = []) =>
+    createNewExpressionParser(name, parseNumberArguments, defaultArr);
 
-const createArrayArgumentParser = (name, defaultArr = []) => (
-    createNewExpressionParser(name, parseArrayLiteral, defaultArr));
+const createArrayArgumentParser = (name, defaultArr = []) =>
+    createNewExpressionParser(name, parseArrayLiteral, defaultArr);
 
 /**
  * Map of pc types that can be initialized with values and their corresponding argument parsers.
@@ -85,15 +91,7 @@ const SUPPORTED_INITIALIZABLE_TYPE_NAMES = new Map([
 /**
  * The full set of supported PlayCanvas types.
  */
-const SUPPORTED_PLAYCANVAS_TYPES = new Set([
-    'Curve',
-    'Asset',
-    'Entity',
-    'Vec2',
-    'Vec3',
-    'Vec4',
-    'Color'
-]);
+const SUPPORTED_PLAYCANVAS_TYPES = new Set(['Curve', 'Asset', 'Entity', 'Vec2', 'Vec3', 'Vec4', 'Color']);
 
 /**
  * Checks if a node is a supported PlayCanvas type.
@@ -133,58 +131,91 @@ const EDITOR_ASSET_TYPES = [
     'wasm'
 ];
 
-const resourceTypesAsUnion = EDITOR_ASSET_TYPES.map(type => `"${type}"`).join('|');
+const resourceTypesAsUnion = EDITOR_ASSET_TYPES.map((type) => `"${type}"`).join('|');
 
 /**
  * The set of supported block tags and their valid types and support messages when they are malformed or invalid.
  * @type {Map<string, TagDefinition>}
  */
 const SUPPORTED_BLOCK_TAGS = new Map([
-    ['resource', {
-        type: resourceTypesAsUnion,
-        supportMessage: () => `@resource is malformed or invalid. The tag should be formatted as "@resource ${resourceTypesAsUnion}".`,
-        fix: 'texture'
-    }],
-    ['color', {
-        type: '"r"|"rg"|"rgb"|"rgba"',
-        supportMessage: () => '@color is malformed or invalid. The tag should be formatted as "@color r", "@color rg", "@color rgb", or "@color rgba".',
-        fix: 'rgb'
-    }],
-    ['curves', {
-        type: '["x"] | ["x", "y"] | ["x", "y", "z"] | ["x", "z"] | ["y"] | ["y", "z"] | ["z"]',
-        supportMessage: () => '@curves is malformed or invalid. The tag should be formatted as "@curves x", "@curves x y", "@curves x y z", "@curves x z", "@curves y", "@curves y z", or "@curves z".',
-        fix: '["x"]'
-    }],
-    ['range', {
-        type: 'number[]',
-        supportMessage: () => '@range is malformed or invalid. The tag should be formatted as "@range [0, 100]".',
-        fix: '[0, 100]'
-    }],
-    ['placeholder', {
-        type: 'string',
-        supportMessage: () => '@placeholder is malformed or invalid. The tag should be formatted as "@placeholder \"My Placeholder\"".',
-        fix: '"My Placeholder"'
-    }],
-    ['precision', {
-        type: 'number',
-        supportMessage: () => '@precision is malformed or invalid. The tag should be formatted as "@precision 0.1".',
-        fix: '0.1'
-    }],
-    ['size', {
-        type: 'number',
-        supportMessage: () => '@size is malformed or invalid. The tag should be formatted as "@size 100".',
-        fix: '100'
-    }],
-    ['step', {
-        type: 'number',
-        supportMessage: () => '@step is malformed or invalid. The tag should be formatted as "@step 1".',
-        fix: '1'
-    }],
-    ['title', {
-        type: 'string',
-        supportMessage: () => '@title is malformed or invalid. The tag should be formatted as "@title \"My Attribute\"".',
-        fix: '"My Attribute"'
-    }],
+    [
+        'resource',
+        {
+            type: resourceTypesAsUnion,
+            supportMessage: () =>
+                `@resource is malformed or invalid. The tag should be formatted as "@resource ${resourceTypesAsUnion}".`,
+            fix: 'texture'
+        }
+    ],
+    [
+        'color',
+        {
+            type: '"r"|"rg"|"rgb"|"rgba"',
+            supportMessage: () =>
+                '@color is malformed or invalid. The tag should be formatted as "@color r", "@color rg", "@color rgb", or "@color rgba".',
+            fix: 'rgb'
+        }
+    ],
+    [
+        'curves',
+        {
+            type: '["x"] | ["x", "y"] | ["x", "y", "z"] | ["x", "z"] | ["y"] | ["y", "z"] | ["z"]',
+            supportMessage: () =>
+                '@curves is malformed or invalid. The tag should be formatted as "@curves x", "@curves x y", "@curves x y z", "@curves x z", "@curves y", "@curves y z", or "@curves z".',
+            fix: '["x"]'
+        }
+    ],
+    [
+        'range',
+        {
+            type: 'number[]',
+            supportMessage: () => '@range is malformed or invalid. The tag should be formatted as "@range [0, 100]".',
+            fix: '[0, 100]'
+        }
+    ],
+    [
+        'placeholder',
+        {
+            type: 'string',
+            supportMessage: () =>
+                '@placeholder is malformed or invalid. The tag should be formatted as "@placeholder \"My Placeholder\"".',
+            fix: '"My Placeholder"'
+        }
+    ],
+    [
+        'precision',
+        {
+            type: 'number',
+            supportMessage: () =>
+                '@precision is malformed or invalid. The tag should be formatted as "@precision 0.1".',
+            fix: '0.1'
+        }
+    ],
+    [
+        'size',
+        {
+            type: 'number',
+            supportMessage: () => '@size is malformed or invalid. The tag should be formatted as "@size 100".',
+            fix: '100'
+        }
+    ],
+    [
+        'step',
+        {
+            type: 'number',
+            supportMessage: () => '@step is malformed or invalid. The tag should be formatted as "@step 1".',
+            fix: '1'
+        }
+    ],
+    [
+        'title',
+        {
+            type: 'string',
+            supportMessage: () =>
+                '@title is malformed or invalid. The tag should be formatted as "@title \"My Attribute\"".',
+            fix: '"My Attribute"'
+        }
+    ],
     ['default', { type: 'any' }],
     ['enabledif', { type: 'any' }],
     ['visibleif', { type: 'any' }]
@@ -196,7 +227,6 @@ const SUPPORTED_BLOCK_TAGS = new Map([
  * @returns {*} - The mapped attribute
  */
 const mapAttributesToOutput = (attribute) => {
-
     attribute.type = attribute.typeName.toLowerCase();
 
     // Flatten the range into min and max
@@ -275,7 +305,6 @@ export class ScriptParser {
      * @param {number} [maxDepth] - The maximum recursion depth
      */
     constructor(env, maxDepth = 2) {
-
         if (!env) {
             throw new Error('A TypeScript Environment must be provided to the ScriptParser.');
         }
@@ -293,7 +322,9 @@ export class ScriptParser {
         }
 
         // Return an array of all nodes that are supported PlayCanvas types eg Vec3, Color, etc.
-        const allSupportedTypes = flatMapAnyNodes(playcanvasTypesFile, isSupportedPlayCanvasNode).map(node => this.typeChecker.getTypeAtLocation(node));
+        const allSupportedTypes = flatMapAnyNodes(playcanvasTypesFile, isSupportedPlayCanvasNode).map((node) =>
+            this.typeChecker.getTypeAtLocation(node)
+        );
 
         // Add primitive types
         allSupportedTypes.push(this.typeChecker.getStringType());
@@ -312,7 +343,6 @@ export class ScriptParser {
         });
 
         this.attributeParser = new AttributeParser(SUPPORTED_BLOCK_TAGS, env, this.typeSerializerMap);
-
     }
 
     /**
@@ -321,7 +351,6 @@ export class ScriptParser {
      * @returns {boolean} - True if the program has no errors, false otherwise
      */
     validateProgram(errors = []) {
-
         // Report any compiler errors
         const compilerDiagnostics = this.program.getSyntacticDiagnostics();
 
@@ -365,7 +394,6 @@ export class ScriptParser {
      * @returns {Attribute[]} - The extracted attributes;
      */
     extractAttributes(node, opts = {}) {
-
         // Default params
         const attributes = opts.attributes || {};
         const errors = opts.errors ?? [];
@@ -383,7 +411,6 @@ export class ScriptParser {
 
         // Parse the comments for attribute metadata
         for (const { member, memberName } of members) {
-
             // Parse the comment for attribute metadata
             const attributeMetadata = this.attributeParser.parseAttributeComment(
                 member,
@@ -395,12 +422,10 @@ export class ScriptParser {
 
             // If we found metadata, extract the type and add it to the found attributes
             if (attributeMetadata) {
-
                 const { type, typeName } = attributeMetadata;
                 const initializer = member?.initializer;
 
                 if (typeName === 'any') {
-
                     const supportedTypes = Array.from(SUPPORTED_INITIALIZABLE_TYPE_NAMES.keys()).join(', ');
 
                     let errorMessage;
@@ -409,10 +434,16 @@ export class ScriptParser {
                     } else {
                         errorMessage = `This attribute has an invalid @type tag. An attribute should be one of the following: ${supportedTypes}.`;
                     }
-                    const error = new ParsingError(member, 'Invalid Type', errorMessage, node.name.getText(), memberName, undefined);
+                    const error = new ParsingError(
+                        member,
+                        'Invalid Type',
+                        errorMessage,
+                        node.name.getText(),
+                        memberName,
+                        undefined
+                    );
                     errors.push(error);
                     continue;
-
                 } else if (!this.allSupportedTypesSet.has(type) && attributeMetadata.enum.length === 0) {
                     // If this is a complex type, but not an enum, we may need to recurse through it's nested nested properties
 
@@ -433,7 +464,6 @@ export class ScriptParser {
 
                     // Check if the type is a valid interface
                     if (!isInitialized && !typeIsInterface && !typeIsJSDocTypeDef && !isJSDocTypeLiteral) {
-
                         let error;
                         const typeTag = getTag('type', member);
                         const supportedTypes = Array.from(SUPPORTED_INITIALIZABLE_TYPE_NAMES.keys()).join(', ');
@@ -448,7 +478,6 @@ export class ScriptParser {
                                 node.name.getText(),
                                 memberName
                             );
-
                         } else if (initializer) {
                             // If the attribute is initialized with an invalid type, add an error associated with the initializer
                             error = new ParsingError(
@@ -459,7 +488,6 @@ export class ScriptParser {
                                 node.name.getText(),
                                 memberName
                             );
-
                         } else {
                             // If the attribute does not have a type tag or initializer, add an error that references the member
                             error = new ParsingError(
@@ -477,20 +505,25 @@ export class ScriptParser {
                     }
 
                     // Extract the attributes from the nested type
-                    const members = typeNode.members ?? // interface members
+                    const members =
+                        typeNode.members ?? // interface members
                         typeNode.properties ?? // an object literals properties
-                        Array.from(type.symbol.members).map(arr => arr[1].declarations[0]) ??  // a typedefs property declarations
+                        Array.from(type.symbol.members).map((arr) => arr[1].declarations[0]) ?? // a typedefs property declarations
                         [];
 
                     // If the type is an interface or an initialized object, we need to parse the attribute comments, if not, just the intitialized object
                     let commentAttributes;
                     if (typeIsInterface || isInitialized) {
-                        commentAttributes = this.extractAttributes(typeNode, { errors, requiresAttributeTag: false, depth: depth + 1, scriptName });
+                        commentAttributes = this.extractAttributes(typeNode, {
+                            errors,
+                            requiresAttributeTag: false,
+                            depth: depth + 1,
+                            scriptName
+                        });
                     }
 
                     // Iterate through the nested attributes and extract their metadata
                     const nestedAttributes = members.reduce((attributes, prop) => {
-
                         const attribute = this.attributeParser.getNodeAsAttribute(prop, errors, scriptName);
 
                         // If the attribute is a supported type, add it to the list of found attributes
@@ -501,7 +534,6 @@ export class ScriptParser {
                         return attributes;
                     }, {});
 
-
                     // Merge the property and comment attributes
                     const mergedAttributes = { ...nestedAttributes, ...commentAttributes };
 
@@ -511,7 +543,6 @@ export class ScriptParser {
 
                 // Add the attribute to the list of found attributes
                 attributes[memberName] = mapAttributesToOutput(attributeMetadata);
-
             }
         }
 

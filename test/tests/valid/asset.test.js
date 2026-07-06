@@ -4,7 +4,6 @@ import { describe, it, before } from 'mocha';
 import { parseAttributes } from '../../utils.js';
 
 function runTests(fileName) {
-
     const isTS = fileName.endsWith('.ts');
     const script = isTS ? 'TS' : 'JS';
 
@@ -51,7 +50,6 @@ function runTests(fileName) {
             expect(data[0].example.attributes.c.default).to.equal(null);
             expect(data[0].example.attributes.c.assetType).to.equal('container');
         });
-
     });
 }
 

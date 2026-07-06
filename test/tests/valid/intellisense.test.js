@@ -4,7 +4,6 @@ import { describe, it, before } from 'mocha';
 import { getAttributes } from '../../utils.js';
 
 describe('VALID: Intellisense Parsing', function () {
-
     let data;
     before(async function () {
         data = await getAttributes('./intellisense.valid.js');

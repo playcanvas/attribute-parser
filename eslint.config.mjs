@@ -1,10 +1,11 @@
 import javascriptConfig from '@playcanvas/eslint-config/javascript';
+import prettierConfig from 'eslint-config-prettier/flat';
 import globals from 'globals';
 
 export default [
     ...javascriptConfig,
     {
-        ignores: ['**/program.invalid.js'] // Exclude specific files
+        ignores: ['dist/**', 'types/**', 'test/fixtures/**']
     },
     {
         languageOptions: {
@@ -42,5 +43,6 @@ export default [
         rules: {
             'prefer-arrow-callback': 'off' // Allow function expressions in test files
         }
-    }
+    },
+    prettierConfig
 ];

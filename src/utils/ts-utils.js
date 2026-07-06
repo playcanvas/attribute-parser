@@ -174,7 +174,7 @@ function getSuperClasses(node, typeChecker) {
             break;
         }
 
-        const extendsClause = heritageClauses.find(clause => clause.token === ts.SyntaxKind.ExtendsKeyword);
+        const extendsClause = heritageClauses.find((clause) => clause.token === ts.SyntaxKind.ExtendsKeyword);
         if (!extendsClause || extendsClause.types.length === 0) {
             break;
         }
@@ -212,8 +212,9 @@ export function getJSDocTags(node, typeChecker) {
     // check if class interface of initialized object
     if (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) {
         // get an array of the class an all parent classed
-        const heritageChain = getSuperClasses(node, typeChecker)
-        .filter(classNode => !classNode.getSourceFile().isDeclarationFile);
+        const heritageChain = getSuperClasses(node, typeChecker).filter(
+            (classNode) => !classNode.getSourceFile().isDeclarationFile
+        );
 
         // iterate over the heritance chain
         heritageChain.forEach((classNode) => {
@@ -228,7 +229,7 @@ export function getJSDocTags(node, typeChecker) {
                     // If we are a setter with no jsdoc block, check any associated getter
                     if (isSetter && !hasJsDoc) {
                         const symbol = typeChecker.getSymbolAtLocation(member.name);
-                        member = symbol.declarations.find(accessor => accessor.jsDoc?.length > 0);
+                        member = symbol.declarations.find((accessor) => accessor.jsDoc?.length > 0);
                         hasJsDoc = !!member;
                     }
 
@@ -245,10 +246,10 @@ export function getJSDocTags(node, typeChecker) {
         // Handle object literals
         node.properties.forEach((property) => {
             if (ts.isPropertyAssignment(property)) {
-                const memberName = property.name &&
-                    (ts.isIdentifier(property.name) || ts.isStringLiteral(property.name)) ?
-                    property.name.text :
-                    'unnamed';
+                const memberName =
+                    property.name && (ts.isIdentifier(property.name) || ts.isStringLiteral(property.name))
+                        ? property.name.text
+                        : 'unnamed';
 
                 if (property.jsDoc?.length > 0) {
                     tags.push({
@@ -277,7 +278,7 @@ export function isEnum(node) {
     // Check for JSDoc @enum tag in a variable declaration
     if (ts.isVariableDeclaration(node)) {
         const jsDocs = ts.getJSDocTags(node);
-        const hasEnumTag = jsDocs.some(doc => doc.tagName.text === 'enum');
+        const hasEnumTag = jsDocs.some((doc) => doc.tagName.text === 'enum');
         return hasEnumTag;
     }
 
@@ -293,12 +294,12 @@ export function isEnum(node) {
  */
 export function getPrimitiveEnumType(type, typeChecker) {
     // Check if the type is an enum type
-    const isEnumType = type.symbol?.declarations?.some(decl => ts.isEnumDeclaration(decl));
+    const isEnumType = type.symbol?.declarations?.some((decl) => ts.isEnumDeclaration(decl));
 
     // If not directly an enum, check if it's an enum member (which means it's part of an enum)
     let isEnumMember = false;
     if (!isEnumType) {
-        isEnumMember = type.symbol?.declarations?.some(decl => ts.isEnumMember(decl));
+        isEnumMember = type.symbol?.declarations?.some((decl) => ts.isEnumMember(decl));
         if (!isEnumMember) return null;
     }
 
@@ -318,9 +319,9 @@ export function getPrimitiveEnumType(type, typeChecker) {
 
     // Get the value of the first enum member using our centralized logic
     const firstMember = enumMembers[0];
-    const firstMemberValue = firstMember.initializer ?
-        getLiteralValue(firstMember.initializer, typeChecker) :
-        getLiteralValue(firstMember, typeChecker);
+    const firstMemberValue = firstMember.initializer
+        ? getLiteralValue(firstMember.initializer, typeChecker)
+        : getLiteralValue(firstMember, typeChecker);
 
     const validEnumTypes = ['number', 'string', 'boolean'];
     const typeOf = typeof firstMemberValue;
@@ -346,9 +347,7 @@ export function getType(node, typeChecker) {
         // If baseType has multiple types, it means we have a mixed union, ie 'a' | false | 1.
         let isMixedUnion = false;
         if (Array.isArray(baseType.types)) {
-            const primitiveKinds = new Set(
-                baseType.types.map(t => typeChecker.getBaseTypeOfLiteralType(t))
-            );
+            const primitiveKinds = new Set(baseType.types.map((t) => typeChecker.getBaseTypeOfLiteralType(t)));
             primitiveKinds.delete(null);
             isMixedUnion = primitiveKinds.size > 1;
         }
@@ -470,7 +469,11 @@ export const isNumericLiteral = (node) => {
 export const parseFloatNode = (node, isArgument = false) => {
     if (!isNumericLiteral(node)) {
         if (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent) || isArgument) {
-            throw new ParsingError(node, 'Not a Literal', `"${node.parent.getText()}" must be defined with a numeric literal.`);
+            throw new ParsingError(
+                node,
+                'Not a Literal',
+                `"${node.parent.getText()}" must be defined with a numeric literal.`
+            );
         }
         return 0;
     }
@@ -485,7 +488,11 @@ export const parseFloatNode = (node, isArgument = false) => {
 export const parseBooleanNode = (node) => {
     if (node.kind !== ts.SyntaxKind.TrueKeyword && node.kind !== ts.SyntaxKind.FalseKeyword) {
         if (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent)) {
-            throw new ParsingError(node, 'Not a Literal', `"${node.parent.getText()}" must be defined with a boolean literal.`);
+            throw new ParsingError(
+                node,
+                'Not a Literal',
+                `"${node.parent.getText()}" must be defined with a boolean literal.`
+            );
         }
         return false;
     }
@@ -528,9 +535,10 @@ const resolvePropertyAccess = (node, typeChecker) => {
             }
 
             if (ts.isEnumMember(declaration)) {
-                return declaration.initializer ? getLiteralValue(declaration.initializer, typeChecker) : declaration.name.getText();
+                return declaration.initializer
+                    ? getLiteralValue(declaration.initializer, typeChecker)
+                    : declaration.name.getText();
             }
-
         }
     }
 
@@ -576,11 +584,11 @@ const evaluatePrefixUnaryExpression = (node, typeChecker) => {
 function handleObjectLiteral(node, typeChecker) {
     const obj = {};
     node.properties.forEach((prop) => {
-        if  (ts.isPropertyAssignment(prop)) {
+        if (ts.isPropertyAssignment(prop)) {
             const key = prop.name.getText();
             const value = getLiteralValue(prop.initializer, typeChecker);
             obj[key] = value;
-        } else if  (ts.isShorthandPropertyAssignment(prop)) {
+        } else if (ts.isShorthandPropertyAssignment(prop)) {
             const key = prop.name.getText();
             const value = resolveIdentifier(prop.name, typeChecker);
             obj[key] = value;
@@ -628,7 +636,7 @@ export function getLiteralValue(node, typeChecker) {
         case ts.SyntaxKind.NullKeyword:
             return null;
         case ts.SyntaxKind.ArrayLiteralExpression:
-            return (node).elements.map(element => getLiteralValue(element, typeChecker));
+            return node.elements.map((element) => getLiteralValue(element, typeChecker));
         case ts.SyntaxKind.ObjectLiteralExpression:
             return handleObjectLiteral(node, typeChecker);
         case ts.SyntaxKind.Identifier:
@@ -636,7 +644,7 @@ export function getLiteralValue(node, typeChecker) {
         case ts.SyntaxKind.PropertyAccessExpression:
             return resolvePropertyAccess(node, typeChecker);
         case ts.SyntaxKind.ParenthesizedExpression:
-            return getLiteralValue((node).expression, typeChecker);
+            return getLiteralValue(node.expression, typeChecker);
         case ts.SyntaxKind.PrefixUnaryExpression:
             return evaluatePrefixUnaryExpression(node, typeChecker);
         default:
@@ -651,8 +659,12 @@ export function getLiteralValue(node, typeChecker) {
  */
 export const parseStringNode = (node) => {
     if (node.kind !== ts.SyntaxKind.StringLiteral) {
-        if  (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent)) {
-            throw new ParsingError(node, 'Not a Literal', `"${node.parent.getText()}" must be defined with a string literal.`);
+        if (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent)) {
+            throw new ParsingError(
+                node,
+                'Not a Literal',
+                `"${node.parent.getText()}" must be defined with a string literal.`
+            );
         }
         return '';
     }
@@ -661,8 +673,12 @@ export const parseStringNode = (node) => {
 
 export const parseArrayLiteralNode = (node, isArgument = false) => {
     if (node.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
-        if  (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent) || isArgument) {
-            throw new ParsingError(node, 'Not a Literal', `"${node.parent.getText()}" must be defined with an array literal.`);
+        if (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent) || isArgument) {
+            throw new ParsingError(
+                node,
+                'Not a Literal',
+                `"${node.parent.getText()}" must be defined with an array literal.`
+            );
         }
         return [];
     }

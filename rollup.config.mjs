@@ -16,14 +16,15 @@ const types = knownLibFilesForCompilerOptions({ target: ts.ScriptTarget.ES2023 }
 fs.mkdirSync('dist', { recursive: true });
 fs.writeFileSync('dist/libs.d.ts', types);
 
-const swcPlugin = () => swc({
-    swc: {
-        minify: production,
-        env: {
-            loose: true
+const swcPlugin = () =>
+    swc({
+        swc: {
+            minify: production,
+            env: {
+                loose: true
+            }
         }
-    }
-});
+    });
 
 // Browser build: bundles typescript and @typescript/vfs and stubs out node built-ins,
 // for in-browser consumers (e.g. the editor), which supply lib types via a CDN.

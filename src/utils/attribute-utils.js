@@ -31,7 +31,6 @@ export const hasTag = (tag, node) => {
     return !!getTag(tag, node);
 };
 
-
 /**
  * Checks if the JSDoc node node has an '@interface' tag
  * @param {import('typescript').Node} node - The node to analyze
@@ -46,4 +45,4 @@ export const isInterface = (node) => {
  * @param {import('typescript').Node} member - The node to analyze
  * @returns {boolean} - True if the node is a scriptName property
  */
-export const isStaticMember = member => (getCombinedModifierFlags(member) & ModifierFlags.Static) !== 0;
+export const isStaticMember = (member) => (getCombinedModifierFlags(member) & ModifierFlags.Static) !== 0;

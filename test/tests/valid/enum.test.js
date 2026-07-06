@@ -5,7 +5,6 @@ import { TONEMAP_LINEAR, TONEMAP_FILMIC, TONEMAP_HEJL, TONEMAP_ACES, TONEMAP_ACE
 import { parseAttributes } from '../../utils.js';
 
 function runTests(fileName) {
-
     const isTS = fileName.endsWith('.ts');
     const script = isTS ? 'TS' : 'JS';
 
@@ -79,7 +78,6 @@ function runTests(fileName) {
             expect(data[0].example.attributes.j.enum[5]).to.deep.equal({ NEUTRAL: TONEMAP_NEUTRAL });
             expect(data[0].example.attributes.j.default).to.equal(TONEMAP_LINEAR);
         });
-
     });
 }
 

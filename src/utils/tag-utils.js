@@ -8,7 +8,6 @@ import { parseNumber, parseStringToNumericalArray } from './ts-utils.js';
  * @returns {boolean|number|string|Array<any>} - The parsed value
  */
 export function parseTag(input = '') {
-
     // Remove any leading or trailing whitespace, replace single quotes with double quotes
     input = input.replace(/['`]/g, '"').trim();
 
@@ -24,12 +23,12 @@ export function parseTag(input = '') {
     try {
         const arr = parseStringToNumericalArray(input);
         if (Array.isArray(arr)) return arr;
-    } catch { }
+    } catch {}
 
     try {
         const arr = JSON.parse(input);
         if (Array.isArray(arr)) return arr;
-    } catch { }
+    } catch {}
 
     // If none of the above, return the string
     return input;
@@ -58,9 +57,7 @@ export function validateTag(value, typeAnnotation, env) {
     const errors = languageService.getSemanticDiagnostics(virtualFileName);
 
     // Filter for type assignment errors (Error Code 2322: Type 'X' is not assignable to type 'Y')
-    const typeErrors = errors.filter(
-        error => error.code === 2322 && error.category === DiagnosticCategory.Error
-    );
+    const typeErrors = errors.filter((error) => error.code === 2322 && error.category === DiagnosticCategory.Error);
 
     // If any type error is found, throw an error with the diagnostic message
     if (typeErrors.length > 0) {

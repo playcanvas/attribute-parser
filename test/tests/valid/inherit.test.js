@@ -106,5 +106,4 @@ describe('VALID: Script inheritance attributes', function () {
     it('ExampleNoExtend: should not exist (does not extend Script)', function () {
         expect(data[0].exampleNoExtend).to.not.exist;
     });
-
 });

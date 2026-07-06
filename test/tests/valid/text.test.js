@@ -54,5 +54,4 @@ describe('VALID: Text attribute', function () {
         expect(data[0].example.attributes.d.size).to.equal(2);
         expect(data[0].example.attributes.d.default).equal(null);
     });
-
 });

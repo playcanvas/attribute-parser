@@ -19,52 +19,51 @@ Given a script like this:
 
 ```javascript
 class Rotator extends ScriptType {
-  /**
-   * @attribute
-   * Speed determines how fast to rotate things
-   */
-  speed = new Vec3();
+    /**
+     * @attribute
+     * Speed determines how fast to rotate things
+     */
+    speed = new Vec3();
 
-  /**
-   * @attribute
-   * An array of Entities to rotate
-   *
-   * @type {Entity[]}
-   */
-  thingsToRotate;
+    /**
+     * @attribute
+     * An array of Entities to rotate
+     *
+     * @type {Entity[]}
+     */
+    thingsToRotate;
 }
 ```
 
 The parser outputs:
 
-
 ```json
 {
-  "rotator": {
-    "attributes": {
-      "speed": {
-        "type": "vec3",
-        "name": "speed",
-        "array": false,
-        "description": "Speed determines how fast to rotate things",
-        "default": [0, 0, 0]
-      },
-      "thingsToRotate": {
-        "type": "entity",
-        "name": "thingsToRotate",
-        "array": true,
-        "description": "An array of Entities to rotate",
-        "default": null
-      }
-    },
-    "errors": []
-  }
+    "rotator": {
+        "attributes": {
+            "speed": {
+                "type": "vec3",
+                "name": "speed",
+                "array": false,
+                "description": "Speed determines how fast to rotate things",
+                "default": [0, 0, 0]
+            },
+            "thingsToRotate": {
+                "type": "entity",
+                "name": "thingsToRotate",
+                "array": true,
+                "description": "An array of Entities to rotate",
+                "default": null
+            }
+        },
+        "errors": []
+    }
 }
 ```
 
 JSDocs tags are parsed and values and outputs the metadata in a serializable format.
 
-### Usage 
+### Usage
 
 ```javascript
 // Initialise the parser
@@ -79,7 +78,7 @@ const scripts = await fetchScripts([...paths, './playcanvas.d.ts']);
 parser.updateProgram(scripts);
 
 // Parse attributes from the entry point
-const [attributes, errors] = parser.parseAttributes("./index.js");
+const [attributes, errors] = parser.parseAttributes('./index.js');
 ```
 
 ### Attribute structure
@@ -89,5 +88,3 @@ See the [test fixtures](https://github.com/playcanvas/attribute-parser/tree/main
 ### Tests
 
 This project includes good test coverage for all supported tag formats and edge cases.
-
-
