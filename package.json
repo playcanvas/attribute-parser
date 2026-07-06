@@ -1,6 +1,6 @@
 {
     "name": "@playcanvas/attribute-parser",
-    "version": "1.10.3",
+    "version": "1.11.0",
     "description": "The PlayCanvas Attribute Parser",
     "keywords": [
         "playcanvas",
