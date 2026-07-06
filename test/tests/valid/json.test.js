@@ -4,7 +4,6 @@ import { describe, it, before } from 'mocha';
 import { parseAttributes } from '../../utils.js';
 
 describe('JS: VALID: Asset attribute', function () {
-
     let data;
     before(async function () {
         data = await parseAttributes('./json.valid.js');
@@ -37,7 +36,9 @@ describe('JS: VALID: Asset attribute', function () {
         expect(data[0].example.attributes.f.schema[0].type).to.equal('boolean');
         expect(data[0].example.attributes.f.schema[0].array).to.equal(false);
         expect(data[0].example.attributes.f.schema[0].default).to.equal(false);
-        expect(data[0].example.attributes.f.schema[0].description).to.equal('This is some description of the attribute.');
+        expect(data[0].example.attributes.f.schema[0].description).to.equal(
+            'This is some description of the attribute.'
+        );
     });
 
     it('f[b]: should be a numeric attribute', function () {
@@ -168,9 +169,7 @@ describe('JS: VALID: Asset attribute', function () {
     });
 });
 
-
 describe('TS: VALID: Asset attribute', function () {
-
     let data;
     before(async function () {
         data = await parseAttributes('./json.valid.ts');
@@ -203,7 +202,9 @@ describe('TS: VALID: Asset attribute', function () {
         expect(data[0].example.attributes.f.schema[0].type).to.equal('boolean');
         expect(data[0].example.attributes.f.schema[0].array).to.equal(false);
         expect(data[0].example.attributes.f.schema[0].default).to.equal(false);
-        expect(data[0].example.attributes.f.schema[0].description).to.equal('This is some description of the attribute.');
+        expect(data[0].example.attributes.f.schema[0].description).to.equal(
+            'This is some description of the attribute.'
+        );
     });
 
     it('f[b]: should be a numeric attribute', function () {

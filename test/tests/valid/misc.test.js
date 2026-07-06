@@ -28,7 +28,9 @@ describe('VALID: Misc attribute types', function () {
         expect(data[0].example.attributes.a.array).to.equal(false);
         expect(data[0].example.attributes.a.default).to.equal(0);
         expect(data[0].example.attributes.a.title).to.equal('A number');
-        expect(data[0].example.attributes.a.description).to.equal('This is a description of the attribute. It can be multi-sentence.\n\nAnd multi-line too');
+        expect(data[0].example.attributes.a.description).to.equal(
+            'This is a description of the attribute. It can be multi-sentence.\n\nAnd multi-line too'
+        );
     });
 
     it('b: should be a numeric attribute with a getter and setter', function () {
@@ -48,7 +50,9 @@ describe('VALID: Misc attribute types', function () {
         expect(data[0].example.attributes.e.name).to.equal('e');
         expect(data[0].example.attributes.e.type).to.equal('number');
         expect(data[0].example.attributes.e.description).to.be.a('string');
-        expect(data[0].example.attributes.e.description).to.equal('Movement speed. Ignored when {@link Example#a} is true.');
+        expect(data[0].example.attributes.e.description).to.equal(
+            'Movement speed. Ignored when {@link Example#a} is true.'
+        );
         expect(data[0].example.attributes.e.title).to.be.a('string');
         expect(data[0].example.attributes.e.title).to.equal('Speed {@link Example}');
         expect(data[0].example.errors).to.be.empty;
@@ -66,5 +70,4 @@ describe('VALID: Misc attribute types', function () {
         expect(data[0].example.attributes.d.array).to.equal(false);
         expect(data[0].example.attributes.d.default).to.equal(0);
     });
-
 });

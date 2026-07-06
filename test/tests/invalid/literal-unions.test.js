@@ -18,19 +18,19 @@ describe('INVALID: Mixed literal union types', function () {
 
     it('mixedLiteralUnion: should raise an error for mixed literal union', function () {
         const errors = data[0].example.errors;
-        const mixedUnionError = errors.find(error => error.node.name.escapedText === 'mixedLiteralUnion');
+        const mixedUnionError = errors.find((error) => error.node.name.escapedText === 'mixedLiteralUnion');
         expect(mixedUnionError).to.exist;
     });
 
     it('mixedStringNumberBoolean: should raise an error for mixed string/number/boolean union', function () {
         const errors = data[0].example.errors;
-        const mixedUnionError = errors.find(error => error.node.name.escapedText === 'mixedStringNumberBoolean');
+        const mixedUnionError = errors.find((error) => error.node.name.escapedText === 'mixedStringNumberBoolean');
         expect(mixedUnionError).to.exist;
     });
 
     it('mixedPrimitiveTypes: should raise an error for mixed primitive types union', function () {
         const errors = data[0].example.errors;
-        const mixedUnionError = errors.find(error => error.node.name.escapedText === 'mixedPrimitiveTypes');
+        const mixedUnionError = errors.find((error) => error.node.name.escapedText === 'mixedPrimitiveTypes');
         expect(mixedUnionError).to.exist;
     });
 });

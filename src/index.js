@@ -4,20 +4,17 @@ import * as ts from 'typescript';
 import { ParsingError } from './parsers/parsing-error.js';
 import { ScriptParser } from './parsers/script-parser.js';
 import { isStaticMember } from './utils/attribute-utils.js';
-import { createDefaultMapFromCDN, getExportedNodes, getType, inheritsFrom, isAliasedClassDeclaration } from './utils/ts-utils.js';
+import {
+    createDefaultMapFromCDN,
+    getExportedNodes,
+    getType,
+    inheritsFrom,
+    isAliasedClassDeclaration
+} from './utils/ts-utils.js';
 
-const toLowerCamelCase = str => str[0].toLowerCase() + str.substring(1);
+const toLowerCamelCase = (str) => str[0].toLowerCase() + str.substring(1);
 
-const SUPPORTED_ATTRIBUTE_TYPES = new Set([
-    'Curve',
-    'Vec2',
-    'Vec3',
-    'Vec4',
-    'Color',
-    'number',
-    'string',
-    'boolean'
-]);
+const SUPPORTED_ATTRIBUTE_TYPES = new Set(['Curve', 'Vec2', 'Vec3', 'Vec4', 'Color', 'number', 'string', 'boolean']);
 
 const COMPILER_OPTIONS = {
     noLib: true,
@@ -29,7 +26,7 @@ const COMPILER_OPTIONS = {
     allowJs: true,
     baseUrl: './',
     paths: {
-        'playcanvas': ['/playcanvas.js']
+        playcanvas: ['/playcanvas.js']
     }
 };
 
@@ -59,18 +56,13 @@ export class JSDocParser {
 
         let fsMap;
         if (!libPath) {
-
             // This is a node only option. If no lib path is passed, attempt to resolve ES types from node_modules.
             fsMap = await createDefaultMapFromNodeModules(COMPILER_OPTIONS, ts);
-
         } else if (libPath.endsWith('.d.ts')) {
-
             // If the libPath is a '.d.ts' file then load it and add it
-            const types = await fetch(libPath).then(r => r.text());
+            const types = await fetch(libPath).then((r) => r.text());
             fsMap = new Map([['/lib.d.ts', types]]);
-
         } else {
-
             // A libPath was supplied, but not to a '.d.ts', so assume this is a path to types
             fsMap = await createDefaultMapFromCDN(COMPILER_OPTIONS, libPath, ts);
         }
@@ -107,7 +99,6 @@ export class JSDocParser {
             this._env.deleteFile(filePath);
         });
 
-
         this.parser = new ScriptParser(this._env);
         this.program = this._env.languageService.getProgram();
 
@@ -126,7 +117,6 @@ export class JSDocParser {
      * @returns {Map<string, import('typescript').Node>} - A map of valid ESM Script <names, nodes> within the file
      */
     getAllEsmScripts(fileName, errors = []) {
-
         const typeChecker = this.program.getTypeChecker();
 
         // Find the Script class in the PlayCanvas namespace
@@ -154,20 +144,20 @@ export class JSDocParser {
         // Extract all exported nodes
         const nodes = getExportedNodes(this.program, sourceFile);
 
-        const esmScriptClass = pcTypes.statements.find(node => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script')?.symbol;
+        const esmScriptClass = pcTypes.statements.find(
+            (node) => node.kind === ts.SyntaxKind.ClassDeclaration && node.name.text === 'Script'
+        )?.symbol;
 
-        const isScriptNameMember = member => (
+        const isScriptNameMember = (member) =>
             ts.isPropertyDeclaration(member) && // Is a property declaration
             ts.isIdentifier(member.name) &&
             member.name.text === 'scriptName' &&
             isStaticMember(member) &&
-            ts.isStringLiteral(member.initializer)
-        );
+            ts.isStringLiteral(member.initializer);
 
         // Check if the file exports a class that inherits from `Script`
         nodes.forEach((node, name) => {
             if (isAliasedClassDeclaration(node, typeChecker) && inheritsFrom(node, typeChecker, esmScriptClass)) {
-
                 // Check for a static scriptName property and use that as the name if it exists
                 const scriptNameMember = node.members.find(isScriptNameMember);
 
@@ -226,7 +216,7 @@ export class JSDocParser {
 
         // Extract attributes from each script
         nodes.forEach((node, name) => {
-            const opts = results[name] = { attributes: {}, errors: [] };
+            const opts = (results[name] = { attributes: {}, errors: [] });
             this.parser.extractAttributes(node, { ...opts, scriptName: name });
         });
 
@@ -278,14 +268,17 @@ export class JSDocParser {
                 const namePos = ts.getLineAndCharacterOfPosition(member.getSourceFile(), member.name.getStart());
 
                 const jsdocNode = member.jsDoc && member.jsDoc[member.jsDoc.length - 1];
-                const jsdocPos = jsdocNode ? ts.getLineAndCharacterOfPosition(member.getSourceFile(), jsdocNode.getStart()) : null;
+                const jsdocPos = jsdocNode
+                    ? ts.getLineAndCharacterOfPosition(member.getSourceFile(), jsdocNode.getStart())
+                    : null;
 
                 localMembers.push({
                     name,
                     isAttribute,
                     type: type.name + (type.array ? '[]' : ''),
-                    start: jsdocNode ? { line: jsdocPos.line + 1, column: jsdocPos.character + 1 } :
-                        { line: namePos.line + 1, column: namePos.character + 1 },
+                    start: jsdocNode
+                        ? { line: jsdocPos.line + 1, column: jsdocPos.character + 1 }
+                        : { line: namePos.line + 1, column: namePos.character + 1 },
                     end: { line: namePos.line + 1, column: namePos.character + 1 }
                 });
             }

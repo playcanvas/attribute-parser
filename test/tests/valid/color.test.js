@@ -45,5 +45,4 @@ describe('VALID: Color attribute', function () {
         expect(data[0].example.attributes.c.size).to.equal(2);
         expect(data[0].example.attributes.c.default).equal(null);
     });
-
 });

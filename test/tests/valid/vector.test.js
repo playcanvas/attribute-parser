@@ -49,5 +49,4 @@ describe('VALID: Vector attribute', function () {
     it('d: should not be recognized as an attribute (extends vector and not is vector)', function () {
         expect(data[0].example.attributes.d).to.not.exist;
     });
-
 });

@@ -1,71 +1,75 @@
 {
-  "name": "@playcanvas/attribute-parser",
-  "version": "1.10.3",
-  "author": "PlayCanvas <support@playcanvas.com>",
-  "homepage": "https://github.com/playcanvas/attribute-parser#readme",
-  "description": "The PlayCanvas Attribute Parser",
-  "keywords": [
-    "playcanvas",
-    "attribute",
-    "parser"
-  ],
-  "license": "MIT",
-  "type": "module",
-  "main": "dist/index.js",
-  "types": "types/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./types/index.d.ts",
-      "node": "./dist/index.node.mjs",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+    "name": "@playcanvas/attribute-parser",
+    "version": "1.10.3",
+    "author": "PlayCanvas <support@playcanvas.com>",
+    "homepage": "https://github.com/playcanvas/attribute-parser#readme",
+    "description": "The PlayCanvas Attribute Parser",
+    "keywords": [
+        "playcanvas",
+        "attribute",
+        "parser"
+    ],
+    "license": "MIT",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "types/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./types/index.d.ts",
+            "node": "./dist/index.node.mjs",
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
+        },
+        "./libs": "./dist/libs.d.ts"
     },
-    "./libs": "./dist/libs.d.ts"
-  },
-  "bugs": {
-    "url": "https://github.com/playcanvas/attribute-parser/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/playcanvas/attribute-parser.git"
-  },
-  "files": [
-    "dist/index.js",
-    "dist/index.node.mjs",
-    "dist/libs.d.ts",
-    "types",
-    "README.md",
-    "LICENSE.md"
-  ],
-  "devDependencies": {
-    "@rollup/plugin-commonjs": "28.0.6",
-    "@rollup/plugin-node-resolve": "16.0.1",
-    "@rollup/plugin-swc": "0.4.0",
-    "@swc/core": "1.13.3",
-    "chai": "5.2.1",
-    "globals": "16.3.0",
-    "mocha": "11.7.1",
-    "playcanvas": "^2.12.3",
-    "publint": "0.3.12",
-    "rollup": "4.46.2"
-  },
-  "dependencies": {
-    "@playcanvas/eslint-config": "^2.0.0",
-    "@typescript/vfs": "^1.6.0",
-    "eslint": "^9.0.0",
-    "typescript": "^5.5.3"
-  },
-  "scripts": {
-    "build": "rollup -c && npm run build:types",
-    "build:types": "tsc -p tsconfig.build.json",
-    "lint": "eslint src rollup.config.mjs eslint.config.mjs",
-    "lint:fix": "eslint src rollup.config.mjs eslint.config.mjs --fix",
-    "publint": "publint",
-    "test": "mocha test/**/*.test.js --timeout 10000",
-    "type:check": "tsc --noEmit",
-    "watch": "rollup -c -w"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+    "bugs": {
+        "url": "https://github.com/playcanvas/attribute-parser/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/playcanvas/attribute-parser.git"
+    },
+    "files": [
+        "dist/index.js",
+        "dist/index.node.mjs",
+        "dist/libs.d.ts",
+        "types",
+        "README.md",
+        "LICENSE.md"
+    ],
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "28.0.6",
+        "@rollup/plugin-node-resolve": "16.0.1",
+        "@rollup/plugin-swc": "0.4.0",
+        "@swc/core": "1.13.3",
+        "chai": "5.2.1",
+        "eslint-config-prettier": "10.1.8",
+        "globals": "16.3.0",
+        "mocha": "11.7.1",
+        "playcanvas": "^2.12.3",
+        "prettier": "3.6.2",
+        "publint": "0.3.12",
+        "rollup": "4.46.2"
+    },
+    "dependencies": {
+        "@playcanvas/eslint-config": "3.0.0-beta.6",
+        "@typescript/vfs": "^1.6.0",
+        "eslint": "^9.0.0",
+        "typescript": "^5.5.3"
+    },
+    "scripts": {
+        "build": "rollup -c && npm run build:types",
+        "build:types": "tsc -p tsconfig.build.json",
+        "fmt": "prettier --check .",
+        "fmt:fix": "prettier --write .",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "publint": "publint",
+        "test": "mocha",
+        "typecheck": "tsc --noEmit",
+        "watch": "rollup -c -w"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
 }

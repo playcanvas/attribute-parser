@@ -16,10 +16,10 @@
  */
 export class ParsingError {
     constructor(node, type, message, fix, scriptName, attributeName) {
-        this.node = node;        // AST node which caused the error
-        this.type = type;        // Type of the error
-        this.message = message;  // Description of the error
-        this.fix = fix;          // Fix for the error
+        this.node = node; // AST node which caused the error
+        this.type = type; // Type of the error
+        this.message = message; // Description of the error
+        this.fix = fix; // Fix for the error
         this.scriptName = scriptName; // Script name context
         this.attributeName = attributeName; // Attribute name context (optional)
     }
