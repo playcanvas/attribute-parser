@@ -1,48 +1,15 @@
-import javascriptConfig from '@playcanvas/eslint-config/javascript';
-import prettierConfig from 'eslint-config-prettier/flat';
-import globals from 'globals';
+import typescriptConfig from '@playcanvas/eslint-config/typescript';
 
 export default [
-    ...javascriptConfig,
+    ...typescriptConfig,
     {
-        ignores: ['dist/**', 'types/**', 'test/fixtures/**']
+        ignores: ['types/**', 'test/fixtures/**']
     },
     {
-        languageOptions: {
-            ecmaVersion: 2022,
-            sourceType: 'module',
-            globals: {
-                ...globals.browser,
-                ...globals.mocha,
-                ...globals.node
-            }
-        }
-    },
-    {
+        // chai assertions like expect(x).to.be.true are expression statements
+        files: ['test/**/*.test.js'],
         rules: {
-            'no-unused-expressions': 'off',
-            'jsdoc/check-tag-names': 'off',
-            'import/no-unresolved': 'off'
+            '@typescript-eslint/no-unused-expressions': 'off'
         }
-    },
-    {
-        files: ['**/*.mjs'],
-        languageOptions: {
-            globals: {
-                ...globals.node
-            }
-        },
-        rules: {
-            'import/no-named-as-default': 'off'
-        }
-    },
-    {
-        // Configuration specific to test files
-        files: ['**/*.test.js'], // Match test files
-
-        rules: {
-            'prefer-arrow-callback': 'off' // Allow function expressions in test files
-        }
-    },
-    prettierConfig
+    }
 ];

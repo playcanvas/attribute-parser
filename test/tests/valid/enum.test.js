@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, before } from 'mocha';
 import { TONEMAP_LINEAR, TONEMAP_FILMIC, TONEMAP_HEJL, TONEMAP_ACES, TONEMAP_ACES2, TONEMAP_NEUTRAL } from 'playcanvas';
 
-import { parseAttributes } from '../../utils.js';
+import { parseAttributes } from '../../utils.ts';
 
 function runTests(fileName) {
     const isTS = fileName.endsWith('.ts');

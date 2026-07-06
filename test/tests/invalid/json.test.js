@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, before } from 'mocha';
 
-import { parseAttributes } from '../../utils.js';
+import { parseAttributes } from '../../utils.ts';
 
 describe('INVALID: JSON attribute', function () {
     let data;

@@ -1,21 +1,37 @@
-/**
- * @typedef {Object} Fix
- * @property {string} text - The text to insert at the fix location
- * @property {string} title - The title of the fix
- * @property {{ startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number }} range - The range of the fix
- */
+import type { Node } from 'typescript';
+
+export type Fix = {
+    /** The text to insert at the fix location */
+    text: string;
+    /** The title of the fix */
+    title: string;
+    /** The range of the fix */
+    range: { startLineNumber: number; startColumn: number; endLineNumber: number; endColumn: number };
+};
 
 /**
  * A class representing a parsing error.
- * @param {import('typescript').Node} node - The AST node which caused the error
- * @param {string} type - The type of the error
- * @param {string} message - The description of the error
- * @param {Fix} [fix] - The fix for the error
- * @param {string} [scriptName] - The name of the script this error belongs to (required)
- * @param {string} [attributeName] - The name of the attribute this error belongs to (optional)
  */
 export class ParsingError {
-    constructor(node, type, message, fix, scriptName, attributeName) {
+    /** The AST node which caused the error */
+    node: Node;
+
+    /** The type of the error */
+    type: string;
+
+    /** The description of the error */
+    message: string;
+
+    /** The fix for the error */
+    fix?: Fix;
+
+    /** The name of the script this error belongs to */
+    scriptName?: string;
+
+    /** The name of the attribute this error belongs to */
+    attributeName?: string;
+
+    constructor(node: Node, type: string, message: string, fix?: Fix, scriptName?: string, attributeName?: string) {
         this.node = node; // AST node which caused the error
         this.type = type; // Type of the error
         this.message = message; // Description of the error

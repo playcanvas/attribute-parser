@@ -1,58 +1,84 @@
+import type { VirtualTypeScriptEnvironment } from '@typescript/vfs';
 import * as ts from 'typescript';
 
-import { AttributeParser } from './attribute-parser.js';
-import { ParsingError } from './parsing-error.js';
-import { getTag, hasTag } from '../utils/attribute-utils.js';
-import { zipArrays } from '../utils/generic-utils.js';
+import { getTag, hasTag } from '../utils/attribute-utils.ts';
+import { zipArrays } from '../utils/generic-utils.ts';
 import {
     flatMapAnyNodes,
     getJSDocTags,
     getLiteralValue,
     parseArrayLiteral,
     parseFloatNode
-} from '../utils/ts-utils.js';
+} from '../utils/ts-utils.ts';
+import type { InternalNode } from '../utils/ts-utils.ts';
 
-/**
- * @typedef {object} Attribute
- * @property {string} type - The type of the attribute
- * @property {boolean} array - Whether the attribute is an array type of not
- * @property {string} [description] - The description of the attribute
- * @property {string} [placeholder] - Placeholder for Editor's for field UI.
- * @property {*} [defaultValue] - The default value of the attribute
- * @property {Object<string, number|boolean|string>[]} [enum] - An array of possible values for the attribute
- * @property {{ min: number, max: number}} [range] - Numerical constraints for the attribute
- * @property {number} [precision] - Numerical constraints for the attribute
- * @property {number} [step] - Numerical constraints for the attribute
- * @property {string} [resource] - Name of asset type to be used in 'asset' type attribute
- */
+import { AttributeParser } from './attribute-parser.ts';
+import type { AttributeData, TagDefinition, TypeSerializer } from './attribute-parser.ts';
+import { ParsingError } from './parsing-error.ts';
+import type { Fix } from './parsing-error.ts';
 
-/**
- * @typedef {object} ValidationError
- * @property {string} message - The error message
- * @property {string} [file] - The file the error occurred in
- * @property {number} [line] - The line the error occurred on
- * @property {number} [column] - The column the error occurred on
- * @property {number} [length] - The length of the error
- */
+export type Attribute = {
+    /** The type of the attribute */
+    type: string;
+    /** Whether the attribute is an array type of not */
+    array: boolean;
+    /** The description of the attribute */
+    description?: string;
+    /** Placeholder for Editor's for field UI. */
+    placeholder?: string;
+    /** The default value of the attribute */
+    defaultValue?: unknown;
+    /** An array of possible values for the attribute */
+    enum?: Record<string, number | boolean | string>[];
+    /** Numerical constraints for the attribute */
+    range?: { min: number; max: number };
+    /** Numerical constraints for the attribute */
+    precision?: number;
+    /** Numerical constraints for the attribute */
+    step?: number;
+    /** Name of asset type to be used in 'asset' type attribute */
+    resource?: string;
+};
+
+export type ValidationError = {
+    /** The error message */
+    message: string;
+    /** The file the error occurred in */
+    file?: string;
+    /** The line the error occurred on */
+    line?: number;
+    /** The column the error occurred on */
+    column?: number;
+    /** The length of the error */
+    length?: number;
+};
 
 /**
  * Creates a parser for new expressions.
  *
- * @param {string} name - The name of the type
- * @param {Function} argProcessor - Function to process arguments
- * @param {number[]} [defaultArr] - The default array to use if the node is not a valid array
- * @returns {Function} - The parser function that extracts the values from the node
+ * @param name - The name of the type
+ * @param argProcessor - Function to process arguments
+ * @param defaultArr - The default array to use if the node is not a valid array
+ * @returns The parser function that extracts the values from the node
  */
-const createNewExpressionParser = (name, argProcessor, defaultArr = []) => {
-    return (node) => {
+const createNewExpressionParser = (
+    name: string,
+    argProcessor: (args: readonly ts.Node[]) => number[],
+    defaultArr: number[] = []
+) => {
+    return (node: ts.Node) => {
         if (node.kind !== ts.SyntaxKind.NewExpression) {
             if (ts.isPropertyAssignment(node.parent) || ts.isPropertyDeclaration(node.parent)) {
                 // scriptName/attributeName will be filled by caller if caught
-                throw new ParsingError(node, 'Invalid Property', `Property "${node.name.text}" is not a ${name}.`);
+                throw new ParsingError(
+                    node,
+                    'Invalid Property',
+                    `Property "${((node as InternalNode).name as ts.Identifier).text}" is not a ${name}.`
+                );
             }
             return defaultArr;
         }
-        const args = argProcessor(node.arguments);
+        const args = argProcessor((node as ts.NewExpression).arguments);
 
         // combine the two arrays together, filling any missing values with the defaultArr
         return zipArrays(args, defaultArr);
@@ -61,23 +87,23 @@ const createNewExpressionParser = (name, argProcessor, defaultArr = []) => {
 
 /**
  * Parses single arguments directly.
- * @param {ts.Node[]} args - The arguments to parse
- * @returns {number[]} - The parsed arguments
+ * @param args - The arguments to parse
+ * @returns The parsed arguments
  */
-const parseNumberArguments = (args) => args.map((arg) => parseFloatNode(arg, true));
+const parseNumberArguments = (args: readonly ts.Node[]) => args.map((arg) => parseFloatNode(arg, true));
 
 // Creating specific parser instances
-const createNumberArgumentParser = (name, defaultArr = []) =>
+const createNumberArgumentParser = (name: string, defaultArr: number[] = []) =>
     createNewExpressionParser(name, parseNumberArguments, defaultArr);
 
-const createArrayArgumentParser = (name, defaultArr = []) =>
+const createArrayArgumentParser = (name: string, defaultArr: number[] = []) =>
     createNewExpressionParser(name, parseArrayLiteral, defaultArr);
 
 /**
  * Map of pc types that can be initialized with values and their corresponding argument parsers.
  * eg `new Vec3(1, 2, 3)`
  */
-const SUPPORTED_INITIALIZABLE_TYPE_NAMES = new Map([
+const SUPPORTED_INITIALIZABLE_TYPE_NAMES = new Map<string, TypeSerializer>([
     ['Curve', createArrayArgumentParser('Curve')],
     ['Vec2', createNumberArgumentParser('Vec2', [0, 0])],
     ['Vec3', createNumberArgumentParser('Vec3', [0, 0, 0])],
@@ -95,10 +121,10 @@ const SUPPORTED_PLAYCANVAS_TYPES = new Set(['Curve', 'Asset', 'Entity', 'Vec2', 
 
 /**
  * Checks if a node is a supported PlayCanvas type.
- * @param {ts.Node} node - The node to check
- * @returns {boolean} - True if the node is a supported PlayCanvas type
+ * @param node - The node to check
+ * @returns True if the node is a supported PlayCanvas type
  */
-const isSupportedPlayCanvasNode = (node) => {
+const isSupportedPlayCanvasNode = (node: ts.Node) => {
     return ts.isClassDeclaration(node) && SUPPORTED_PLAYCANVAS_TYPES.has(node.name.text);
 };
 
@@ -135,9 +161,8 @@ const resourceTypesAsUnion = EDITOR_ASSET_TYPES.map((type) => `"${type}"`).join(
 
 /**
  * The set of supported block tags and their valid types and support messages when they are malformed or invalid.
- * @type {Map<string, TagDefinition>}
  */
-const SUPPORTED_BLOCK_TAGS = new Map([
+const SUPPORTED_BLOCK_TAGS = new Map<string, TagDefinition>([
     [
         'resource',
         {
@@ -178,7 +203,7 @@ const SUPPORTED_BLOCK_TAGS = new Map([
         {
             type: 'string',
             supportMessage: () =>
-                '@placeholder is malformed or invalid. The tag should be formatted as "@placeholder \"My Placeholder\"".',
+                '@placeholder is malformed or invalid. The tag should be formatted as "@placeholder "My Placeholder"".',
             fix: '"My Placeholder"'
         }
     ],
@@ -212,7 +237,7 @@ const SUPPORTED_BLOCK_TAGS = new Map([
         {
             type: 'string',
             supportMessage: () =>
-                '@title is malformed or invalid. The tag should be formatted as "@title \"My Attribute\"".',
+                '@title is malformed or invalid. The tag should be formatted as "@title "My Attribute"".',
             fix: '"My Attribute"'
         }
     ],
@@ -223,10 +248,10 @@ const SUPPORTED_BLOCK_TAGS = new Map([
 
 /**
  * A mapping function that transforms the Script Parsers internal representation of an attribute to a required output.
- * @param {*} attribute - The attribute to map
- * @returns {*} - The mapped attribute
+ * @param attribute - The attribute to map
+ * @returns The mapped attribute
  */
-const mapAttributesToOutput = (attribute) => {
+const mapAttributesToOutput = (attribute: AttributeData) => {
     attribute.type = attribute.typeName.toLowerCase();
 
     // Flatten the range into min and max
@@ -295,16 +320,43 @@ const mapAttributesToOutput = (attribute) => {
     return attribute;
 };
 
+export type ParserOptions = {
+    /** The attributes object to add to */
+    attributes?: Record<string, AttributeData>;
+    /** The array to store parsing errors */
+    errors?: ParsingError[];
+    /** Whether the attribute requires an @attribute tag */
+    requiresAttributeTag?: boolean;
+    /** The current recursion depth */
+    depth?: number;
+    /** The current script name for context */
+    scriptName?: string;
+};
+
 /**
  * A class to parse ESM Scripts and extract attribute metadata from JSDoc comments.
  * This class uses the TypeScript compiler API to parse the script and extract the metadata.
  */
 export class ScriptParser {
+    env: VirtualTypeScriptEnvironment;
+
+    program: ts.Program;
+
+    typeChecker: ts.TypeChecker;
+
+    maxDepth: number;
+
+    typeSerializerMap: Map<string, TypeSerializer>;
+
+    allSupportedTypesSet: Set<ts.Type>;
+
+    attributeParser: AttributeParser;
+
     /**
-     * @param {import('@typescript/vfs').VirtualTypeScriptEnvironment} env - The TypeScript virtual environment
-     * @param {number} [maxDepth] - The maximum recursion depth
+     * @param env - The TypeScript virtual environment
+     * @param maxDepth - The maximum recursion depth
      */
-    constructor(env, maxDepth = 2) {
+    constructor(env: VirtualTypeScriptEnvironment, maxDepth = 2) {
         if (!env) {
             throw new Error('A TypeScript Environment must be provided to the ScriptParser.');
         }
@@ -347,10 +399,10 @@ export class ScriptParser {
 
     /**
      * Checks a program for compile errors and returns a list of formatted error messages.
-     * @param {ValidationError[]} errors - The array to store error messages
-     * @returns {boolean} - True if the program has no errors, false otherwise
+     * @param errors - The array to store error messages
+     * @returns True if the program has no errors, false otherwise
      */
-    validateProgram(errors = []) {
+    validateProgram(errors: ValidationError[] = []) {
         // Report any compiler errors
         const compilerDiagnostics = this.program.getSyntacticDiagnostics();
 
@@ -378,22 +430,13 @@ export class ScriptParser {
     }
 
     /**
-     * @typedef {Object} ParserOptions
-     * @property {object} [attributes] - The attributes object to add to
-     * @property {ParsingError[]} [errors] - The array to store parsing errors
-     * @property {boolean} [requiresAttributeTag] - Whether the attribute requires an @attribute tag
-     * @property {number} [depth] - The current recursion depth
-     * @property {string} [scriptName] - The current script name for context
-     */
-
-    /**
      * Extracts Script Attributes from JSDoc style tag from a AST node
      *
-     * @param {import('typescript').Node} node - The TypeScript node to analyze
-     * @param {ParserOptions} [opts] - The input options
-     * @returns {Attribute[]} - The extracted attributes;
+     * @param node - The TypeScript node to analyze
+     * @param opts - The input options
+     * @returns The extracted attributes
      */
-    extractAttributes(node, opts = {}) {
+    extractAttributes(node: ts.Node, opts: ParserOptions = {}) {
         // Default params
         const attributes = opts.attributes || {};
         const errors = opts.errors ?? [];
@@ -422,14 +465,16 @@ export class ScriptParser {
 
             // If we found metadata, extract the type and add it to the found attributes
             if (attributeMetadata) {
-                const { type, typeName } = attributeMetadata;
-                const initializer = member?.initializer;
+                // type is still the resolved ts.Type here; it only becomes a string on output
+                const type = attributeMetadata.type as ts.Type;
+                const { typeName } = attributeMetadata;
+                const initializer = (member as InternalNode).initializer;
 
                 if (typeName === 'any') {
                     const supportedTypes = Array.from(SUPPORTED_INITIALIZABLE_TYPE_NAMES.keys()).join(', ');
 
                     let errorMessage;
-                    if (member.initializer) {
+                    if (initializer) {
                         errorMessage = `This attribute is initialized with an invalid type. An attribute should be one of the following: ${supportedTypes}.`;
                     } else {
                         errorMessage = `This attribute has an invalid @type tag. An attribute should be one of the following: ${supportedTypes}.`;
@@ -438,7 +483,8 @@ export class ScriptParser {
                         member,
                         'Invalid Type',
                         errorMessage,
-                        node.name.getText(),
+                        // pre-existing quirk: the script name is passed in the fix slot
+                        (node as InternalNode).name.getText() as unknown as Fix,
                         memberName,
                         undefined
                     );
@@ -449,7 +495,7 @@ export class ScriptParser {
 
                     // extract attributes for the Types properties
                     const symbol = type.aliasSymbol || type.symbol;
-                    const typeNode = symbol?.valueDeclaration || symbol.declarations?.[0];
+                    const typeNode = (symbol?.valueDeclaration || symbol.declarations?.[0]) as InternalNode;
 
                     if (!typeNode) {
                         // The attribute does not have a valid type
@@ -465,7 +511,7 @@ export class ScriptParser {
                     // Check if the type is a valid interface
                     if (!isInitialized && !typeIsInterface && !typeIsJSDocTypeDef && !isJSDocTypeLiteral) {
                         let error;
-                        const typeTag = getTag('type', member);
+                        const typeTag = getTag('type', member) as ts.JSDocTypeTag | null;
                         const supportedTypes = Array.from(SUPPORTED_INITIALIZABLE_TYPE_NAMES.keys()).join(', ');
 
                         if (typeTag) {
@@ -475,7 +521,7 @@ export class ScriptParser {
                                 'Invalid Type',
                                 `"${typeTag.typeExpression.getText()}" is not a valid attribute type. An attribute should be one of the following: ${supportedTypes}`,
                                 undefined,
-                                node.name.getText(),
+                                (node as InternalNode).name.getText(),
                                 memberName
                             );
                         } else if (initializer) {
@@ -485,7 +531,7 @@ export class ScriptParser {
                                 'Invalid Type',
                                 `"${initializer.getText()}" is not a valid attribute type. An attribute should be one of the following: ${supportedTypes}`,
                                 undefined,
-                                node.name.getText(),
+                                (node as InternalNode).name.getText(),
                                 memberName
                             );
                         } else {
@@ -495,7 +541,7 @@ export class ScriptParser {
                                 'Invalid Type',
                                 `Attribute is an invalid type. An attribute should be one of the following: ${supportedTypes}`,
                                 undefined,
-                                node.name.getText(),
+                                (node as InternalNode).name.getText(),
                                 memberName
                             );
                         }
@@ -505,10 +551,12 @@ export class ScriptParser {
                     }
 
                     // Extract the attributes from the nested type
-                    const members =
+                    const members: readonly ts.Node[] =
                         typeNode.members ?? // interface members
                         typeNode.properties ?? // an object literals properties
-                        Array.from(type.symbol.members).map((arr) => arr[1].declarations[0]) ?? // a typedefs property declarations
+                        Array.from(type.symbol.members as unknown as Iterable<[string, ts.Symbol]>).map(
+                            (entry) => entry[1].declarations[0]
+                        ) ?? // a typedefs property declarations
                         [];
 
                     // If the type is an interface or an initialized object, we need to parse the attribute comments, if not, just the intitialized object
@@ -523,11 +571,11 @@ export class ScriptParser {
                     }
 
                     // Iterate through the nested attributes and extract their metadata
-                    const nestedAttributes = members.reduce((attributes, prop) => {
+                    const nestedAttributes = members.reduce((attributes: Record<string, AttributeData>, prop) => {
                         const attribute = this.attributeParser.getNodeAsAttribute(prop, errors, scriptName);
 
                         // If the attribute is a supported type, add it to the list of found attributes
-                        if (attribute && this.allSupportedTypesSet.has(attribute.type)) {
+                        if (attribute && this.allSupportedTypesSet.has(attribute.type as ts.Type)) {
                             attributes[attribute.name] = mapAttributesToOutput(attribute);
                         }
 

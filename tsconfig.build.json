@@ -1,8 +1,10 @@
 {
-    "files": ["src/index.js"],
+    "extends": "./tsconfig.json",
+    "files": ["src/index.ts"],
+    "include": [],
     "compilerOptions": {
-        "allowJs": true,
-        "lib": ["es2019", "dom", "dom.iterable"],
+        "noEmit": false,
+        "sourceMap": false,
         "declaration": true,
         "emitDeclarationOnly": true,
         "outDir": "types"

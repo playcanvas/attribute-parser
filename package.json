@@ -1,18 +1,23 @@
 {
     "name": "@playcanvas/attribute-parser",
     "version": "1.10.3",
-    "author": "PlayCanvas <support@playcanvas.com>",
-    "homepage": "https://github.com/playcanvas/attribute-parser#readme",
     "description": "The PlayCanvas Attribute Parser",
     "keywords": [
         "playcanvas",
         "attribute",
         "parser"
     ],
+    "homepage": "https://github.com/playcanvas/attribute-parser#readme",
+    "bugs": {
+        "url": "https://github.com/playcanvas/attribute-parser/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/playcanvas/attribute-parser.git"
+    },
     "license": "MIT",
+    "author": "PlayCanvas <support@playcanvas.com>",
     "type": "module",
-    "main": "dist/index.js",
-    "types": "types/index.d.ts",
     "exports": {
         ".": {
             "types": "./types/index.d.ts",
@@ -22,41 +27,13 @@
         },
         "./libs": "./dist/libs.d.ts"
     },
-    "bugs": {
-        "url": "https://github.com/playcanvas/attribute-parser/issues"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/playcanvas/attribute-parser.git"
-    },
+    "main": "dist/index.js",
+    "types": "types/index.d.ts",
     "files": [
-        "dist/index.js",
         "dist/index.node.mjs",
         "dist/libs.d.ts",
-        "types",
-        "README.md",
-        "LICENSE.md"
+        "types"
     ],
-    "devDependencies": {
-        "@rollup/plugin-commonjs": "28.0.9",
-        "@rollup/plugin-node-resolve": "16.0.3",
-        "@rollup/plugin-swc": "0.4.1",
-        "@swc/core": "1.15.43",
-        "chai": "5.3.3",
-        "eslint-config-prettier": "10.1.8",
-        "globals": "16.5.0",
-        "mocha": "11.7.6",
-        "playcanvas": "2.12.3",
-        "prettier": "3.9.4",
-        "publint": "0.3.21",
-        "rollup": "4.62.2"
-    },
-    "dependencies": {
-        "@playcanvas/eslint-config": "3.0.0-beta.8",
-        "@typescript/vfs": "^1.6.0",
-        "eslint": "^9.0.0",
-        "typescript": "^5.5.3"
-    },
     "scripts": {
         "build": "rollup -c && npm run build:types",
         "build:types": "tsc -p tsconfig.build.json",
@@ -69,7 +46,26 @@
         "typecheck": "tsc --noEmit",
         "watch": "rollup -c -w"
     },
+    "dependencies": {
+        "@playcanvas/eslint-config": "3.0.0-beta.8",
+        "@typescript/vfs": "^1.6.0",
+        "eslint": "^9.0.0",
+        "typescript": "^5.5.3"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "28.0.9",
+        "@rollup/plugin-node-resolve": "16.0.3",
+        "@rollup/plugin-swc": "0.4.1",
+        "@swc/core": "1.15.43",
+        "@types/node": "26.1.0",
+        "chai": "5.3.3",
+        "mocha": "11.7.6",
+        "playcanvas": "2.12.3",
+        "prettier": "3.9.4",
+        "publint": "0.3.21",
+        "rollup": "4.62.2"
+    },
     "engines": {
-        "node": ">=18.0.0"
+        "node": ">=22.0.0"
     }
 }

@@ -2,17 +2,17 @@ import fs from 'fs/promises';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-import { JSDocParser } from '../src/index.js';
+import { JSDocParser } from '../src/index.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 /**
  * Reads the contents of a file and returns an array containing the file name and its contents.
- * @param {string} filePath - The path to the file.
- * @returns {Promise<[string, string]>} A promise that resolves to an array containing the file name and its contents.
+ * @param filePath - The path to the file.
+ * @returns A promise that resolves to an array containing the file name and its contents.
  */
-async function getFileData(filePath) {
+async function getFileData(filePath: string): Promise<[string, string]> {
     try {
         const contents = await fs.readFile(path.join(__dirname, 'fixtures', filePath), 'utf8');
         return [path.join('/', filePath), contents];
@@ -24,9 +24,9 @@ async function getFileData(filePath) {
 
 /**
  * Loads the playcanvas types file from node_modules.
- * @returns {Promise<[string, string]>} A promise that resolves to an array containing the file path and its contents.
+ * @returns A promise that resolves to an array containing the file path and its contents.
  */
-async function getPlaycanvasTypes() {
+async function getPlaycanvasTypes(): Promise<[string, string]> {
     const typesUrl = import.meta.resolve('playcanvas/build/playcanvas.d.ts');
     const typesPath = fileURLToPath(typesUrl);
     const contents = await fs.readFile(typesPath, 'utf8');
@@ -36,20 +36,19 @@ async function getPlaycanvasTypes() {
 
 /**
  * Fetches the contents of multiple files.
- * @param {string[]} filePaths - An array of file paths.
- * @returns {Promise<[string, string][]>} A promise that resolves to an array containing the file names and their contents.
+ * @param filePaths - An array of file paths.
+ * @returns A promise that resolves to an array containing the file names and their contents.
  */
-export function fetchScripts(filePaths) {
+export function fetchScripts(filePaths: string[]) {
     return Promise.all(filePaths.map(getFileData));
 }
 
 /**
- * @param {string[]} paths - The path to the example file.
- * @returns {Promise<[results: any,
- * errors: import('../src/parsers/script-parser.js').ValidationError[]]>} A promise that resolves to
- * an array of attribute data.
+ * Parses the attributes of the given example files.
+ * @param paths - The paths to the example files.
+ * @returns A promise that resolves to the extracted attributes and errors.
  */
-export async function parseAttributes(...paths) {
+export async function parseAttributes(...paths: string[]) {
     const parser = new JSDocParser();
     await parser.init();
     const scriptContents = await fetchScripts(paths);
@@ -58,7 +57,12 @@ export async function parseAttributes(...paths) {
     return parser.parseAttributes(paths[0]);
 }
 
-export async function getAttributes(...paths) {
+/**
+ * Gets the attribute members of the given example files.
+ * @param paths - The paths to the example files.
+ * @returns A promise that resolves to the extracted members and errors.
+ */
+export async function getAttributes(...paths: string[]) {
     const parser = new JSDocParser();
     await parser.init();
     const scriptContents = await fetchScripts(paths);
