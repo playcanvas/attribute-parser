@@ -398,6 +398,15 @@ export class ScriptParser {
     }
 
     /**
+     * Whether a type is a supported attribute type. Generic PlayCanvas classes (e.g. `Asset<K>`)
+     * resolve to an instantiation, so compare its generic target as well.
+     */
+    isSupportedType(type: ts.Type) {
+        return this.allSupportedTypesSet.has(type) ||
+            this.allSupportedTypesSet.has((type as ts.TypeReference).target);
+    }
+
+    /**
      * Checks a program for compile errors and returns a list of formatted error messages.
      * @param errors - The array to store error messages
      * @returns True if the program has no errors, false otherwise
@@ -490,7 +499,7 @@ export class ScriptParser {
                     );
                     errors.push(error);
                     continue;
-                } else if (!this.allSupportedTypesSet.has(type) && attributeMetadata.enum.length === 0) {
+                } else if (!this.isSupportedType(type) && attributeMetadata.enum.length === 0) {
                     // If this is a complex type, but not an enum, we may need to recurse through it's nested nested properties
 
                     // extract attributes for the Types properties
@@ -575,7 +584,7 @@ export class ScriptParser {
                         const attribute = this.attributeParser.getNodeAsAttribute(prop, errors, scriptName);
 
                         // If the attribute is a supported type, add it to the list of found attributes
-                        if (attribute && this.allSupportedTypesSet.has(attribute.type as ts.Type)) {
+                        if (attribute && this.isSupportedType(attribute.type as ts.Type)) {
                             attributes[attribute.name] = mapAttributesToOutput(attribute);
                         }
 
