@@ -377,7 +377,10 @@ export function getType(node: ts.Node, typeChecker: ts.TypeChecker) {
             isMixedUnion = primitiveKinds.size > 1;
         }
 
-        const name = getPrimitiveEnumType(baseType, typeChecker) ?? typeChecker.typeToString(baseType);
+        // Instantiations of generic classes (e.g. `Asset<string>`) are reported by their class name
+        const ref = baseType as ts.TypeReference;
+        const genericName = ref.target && ref.target !== ref ? baseType.symbol?.name : undefined;
+        const name = getPrimitiveEnumType(baseType, typeChecker) ?? genericName ?? typeChecker.typeToString(baseType);
 
         return { type: baseType, name, array, isMixedUnion };
     }
