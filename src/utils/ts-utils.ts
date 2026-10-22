@@ -377,9 +377,14 @@ export function getType(node: ts.Node, typeChecker: ts.TypeChecker) {
             isMixedUnion = primitiveKinds.size > 1;
         }
 
-        const name = getPrimitiveEnumType(baseType, typeChecker) ?? typeChecker.typeToString(baseType);
+        // generic class instances (eg Asset<string>) resolve to their declared class type
+        const target = (baseType as ts.TypeReference).target;
+        const generic = target && target !== baseType && target.objectFlags & ts.ObjectFlags.Class ? target : null;
 
-        return { type: baseType, name, array, isMixedUnion };
+        const name =
+            getPrimitiveEnumType(baseType, typeChecker) ?? generic?.symbol.name ?? typeChecker.typeToString(baseType);
+
+        return { type: generic ?? baseType, name, array, isMixedUnion };
     }
 
     return null;
