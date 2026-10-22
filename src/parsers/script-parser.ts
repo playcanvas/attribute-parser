@@ -495,18 +495,16 @@ export class ScriptParser {
 
                     // extract attributes for the Types properties
                     const symbol = type.aliasSymbol || type.symbol;
-                    const typeNode = (symbol?.valueDeclaration || symbol.declarations?.[0]) as InternalNode;
-
-                    if (!typeNode) {
-                        // The attribute does not have a valid type
-                        continue;
-                    }
+                    const typeNode = (symbol?.valueDeclaration || symbol?.declarations?.[0]) as InternalNode;
 
                     // Type constraints: Must be either an interface, typedef or initialized object literal, or a jsdoc type literal
-                    const typeIsJSDocTypeDef = ts.isJSDocTypedefTag(typeNode);
-                    const typeIsInterface = hasTag('interface', typeNode) || ts.isInterfaceDeclaration(typeNode);
-                    const isInitialized = !!initializer && ts.isObjectLiteralExpression(initializer);
-                    const isJSDocTypeLiteral = type.symbol.name === '__type';
+                    // types without a declaration (tuples, unresolved or empty types) are reported as invalid below
+                    const typeIsJSDocTypeDef = !!typeNode && ts.isJSDocTypedefTag(typeNode);
+                    const typeIsInterface =
+                        !!typeNode && (hasTag('interface', typeNode) || ts.isInterfaceDeclaration(typeNode));
+                    const isInitialized =
+                        !!initializer && ts.isObjectLiteralExpression(initializer) && initializer.properties.length > 0;
+                    const isJSDocTypeLiteral = !!typeNode && type.symbol?.name === '__type';
 
                     // Check if the type is a valid interface
                     if (!isInitialized && !typeIsInterface && !typeIsJSDocTypeDef && !isJSDocTypeLiteral) {
