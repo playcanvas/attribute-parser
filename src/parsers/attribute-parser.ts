@@ -191,7 +191,12 @@ export class AttributeParser {
     getNodeAsAttribute(node: ts.Node, errors: ParsingError[] = [], scriptName?: string) {
         const nameNode = (node as InternalNode).name;
         const name = (nameNode && ts.isIdentifier(nameNode) && nameNode.text) as string;
-        const { type, name: typeName, array, isMixedUnion } = getType(node, this.typeChecker);
+
+        // null for names that aren't identifiers (#private, ['computed'], 'quoted', 42), which can't be attributes
+        const nodeType = getType(node, this.typeChecker);
+        if (!nodeType) return;
+
+        const { type, name: typeName, array, isMixedUnion } = nodeType;
 
         const enums = this.getEnumMembers(node, errors);
         let value: LiteralValue = null;
