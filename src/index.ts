@@ -286,9 +286,10 @@ export class JSDocParser {
                 const attribute = attributes[scriptName].attributes[name];
                 const isAttribute = !!attribute;
 
+                // null for names that aren't identifiers (#private, ['computed'], 'quoted', 42)
                 const type = getType(member, typeChecker);
 
-                if (!SUPPORTED_ATTRIBUTE_TYPES.has(type.name)) {
+                if (!type || !SUPPORTED_ATTRIBUTE_TYPES.has(type.name)) {
                     continue;
                 }
 
