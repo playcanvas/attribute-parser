@@ -47,7 +47,7 @@
         "watch": "rollup -c -w"
     },
     "dependencies": {
-        "@playcanvas/eslint-config": "3.0.0-beta.8",
+        "@playcanvas/eslint-config": "3.0.0-beta.9",
         "@typescript/vfs": "^1.6.0",
         "eslint": "^9.0.0",
         "typescript": "^5.5.3"
