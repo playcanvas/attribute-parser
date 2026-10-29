@@ -179,12 +179,24 @@ export class JSDocParser {
             isStaticMember(member) &&
             ts.isStringLiteral(member.initializer);
 
+        // A base class which scripts extend, but which is not a script itself, declares a null name
+        const isNullScriptNameMember = (member: ts.ClassElement) =>
+            ts.isPropertyDeclaration(member) &&
+            ts.isIdentifier(member.name) &&
+            member.name.text === 'scriptName' &&
+            isStaticMember(member) &&
+            member.initializer?.kind === ts.SyntaxKind.NullKeyword;
+
         // Check if the file exports a class that inherits from `Script`
         nodes.forEach((node, name) => {
             if (
                 isAliasedClassDeclaration(node, typeChecker) &&
                 inheritsFrom(node as ts.ClassDeclaration, typeChecker, esmScriptClass)
             ) {
+                if ((node as ts.ClassDeclaration).members.some(isNullScriptNameMember)) {
+                    return;
+                }
+
                 // Check for a static scriptName property and use that as the name if it exists
                 const scriptNameMember = (node as ts.ClassDeclaration).members.find(isScriptNameMember);
 
